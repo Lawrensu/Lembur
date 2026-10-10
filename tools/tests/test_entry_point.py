@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import csv
 import json
+import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -368,6 +369,30 @@ class EntryPointTests(unittest.TestCase):
         self.call("add-transactions", rows={"not": "an array"}, code=1)
         self.call("add-transactions", rows=[{"invented_field": "value"}], code=1)
         self.call("resolve", "--txn-id", "T9999", "--bank-reference", "", "--reason", "Unknown", code=1)
+
+    def test_piped_json_preserves_unicode_with_restricted_console_encoding(self):
+        label = "\u4e2d\U0001f600\u2192"
+        row = sale()
+        for key in ("description", "counterparty", "reference", "source_file", "notes"):
+            row[key] = label
+        argv = [sys.executable, "-B", str(ROOT / "tools" / "lembur.py"),
+                "add-transactions", "--workspace", str(self.workspace), "--input", "-"]
+        for encoding in ("cp1252", "ascii"):
+            with self.subTest(encoding=encoding):
+                env = dict(os.environ, PYTHONIOENCODING=encoding + ":strict", PYTHONUTF8="0")
+                result = subprocess.run(argv, cwd=ROOT, input=json.dumps([row]).encode("ascii"),
+                                        stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
+                expected_code = 0 if encoding == "cp1252" else 1
+                self.assertEqual(result.returncode, expected_code, result.stderr)
+                self.assertEqual(result.stderr, b"")
+                output = json.loads(result.stdout.decode("ascii"))
+                if expected_code == 0:
+                    for key in ("description", "counterparty", "reference", "source_file", "notes"):
+                        self.assertEqual(output["transactions"][0][key], label)
+                        self.assertEqual(self.ledger()["transactions"][0][key], label)
+                else:
+                    self.assertEqual(output["source_files"], [label])
+        self.assertEqual(len(self.ledger()["transactions"]), 1)
 
     def test_input_file_and_csv_are_pinned(self):
         path = Path(self.temp.name) / "rows.json"

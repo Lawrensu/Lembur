@@ -369,7 +369,7 @@ def main(argv=None):
         if isinstance(exc, CommandError):
             result.update(exc.details)
         code = 1
-    print(json.dumps(result, ensure_ascii=False))
+    print(json.dumps(result, ensure_ascii=True))
     return code
 
 
