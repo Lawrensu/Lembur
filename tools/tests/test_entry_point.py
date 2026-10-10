@@ -370,6 +370,146 @@ class EntryPointTests(unittest.TestCase):
         self.call("add-transactions", rows=[{"invented_field": "value"}], code=1)
         self.call("resolve", "--txn-id", "T9999", "--bank-reference", "", "--reason", "Unknown", code=1)
 
+    def payslip_input(self, value=None):
+        path = Path(self.temp.name) / "payslip_text.json"
+        if value is None:
+            value = {"debate_summary": "Payroll < Growth & review",
+                     "ruling": "Keep the student's time <safe>",
+                     "raise_plan": [{"text": "Raise <price>", "draft_file": "approvals/2026-W41/price.txt"},
+                                    {"text": "Focus & simplify", "draft_file": "approvals/2026-W41/mix.txt"}]}
+        path.write_text(json.dumps(value), encoding="utf-8")
+        return path
+
+    def test_payslip_fills_saved_figures_and_all_four_design_blocks(self):
+        row = sale(name="Needs <review>", product="P99")
+        row["description"] = "Needs <review>"
+        self.call("add-transactions", rows=[row])
+        self.call("reconcile")
+        self.call("numbers", "--week", WEEK)
+        review_path = self.workspace / "audit" / WEEK / "review_items.md"
+        review_path.write_text("* Check <receipt> & message\n* Check second source\n", encoding="utf-8")
+        numbers_path = self.workspace / "audit" / WEEK / "numbers.json"
+        saved = json.loads(numbers_path.read_text(encoding="utf-8"))
+        saved["take_home_rm"] = "123.45"
+        saved["products"][0]["name"] = "Keychain <special> & safe"
+        saved["products"][0]["loses_money"] = True
+        numbers_path.write_text(json.dumps(saved), encoding="utf-8")
+        before = self.snapshot()
+        input_path = self.payslip_input()
+        result = self.call("payslip", "--week", WEEK, "--input", str(input_path),
+                           "--template", str(ROOT / "tools" / "tests" / "payslip_template.html"))
+        path = self.workspace / "payslips" / (WEEK + ".html")
+        self.assertEqual(result, {"payslip": str(path)})
+        rendered = path.read_text(encoding="utf-8")
+        self.assertIn("Take home RM123.45", rendered)
+        self.assertIn('<span id="rate"></span>', rendered)
+        self.assertIn('class="loss-true"', rendered)
+        self.assertIn('class="loss-false"', rendered)
+        self.assertEqual(rendered.count("<article "), 2)
+        self.assertIn("Keychain &lt;special&gt; &amp; safe", rendered)
+        self.assertIn("Payroll &lt; Growth &amp; review", rendered)
+        self.assertIn("&lt;safe&gt;", rendered)
+        self.assertIn("T0001 2026-10-05 unmatched", rendered)
+        self.assertIn("Needs &lt;review&gt;", rendered)
+        self.assertIn("* Check &lt;receipt&gt; &amp; message", rendered)
+        self.assertIn("* Check second source", rendered)
+        self.assertIn("Raise &lt;price&gt;", rendered)
+        self.assertIn('href="approvals/2026-W41/price.txt"', rendered)
+        self.assertIn("Focus &amp; simplify", rendered)
+        self.assertNotIn("{{", rendered)
+        self.assertNotIn("<!-- each", rendered)
+        self.assertNotIn("None", rendered)
+        after = self.snapshot()
+        after.pop(str(Path("payslips") / (WEEK + ".html")))
+        self.assertEqual(before, after)
+        for command in ("payslip", "hours", "numbers", "close-week"):
+            args = ["--week", WEEK]
+            if command == "payslip":
+                args += ["--input", str(input_path), "--template",
+                         str(ROOT / "tools" / "tests" / "payslip_template.html")]
+            self.call(command, *args, code=1)
+        self.assertEqual(path.read_text(encoding="utf-8"), rendered)
+
+    def test_payslip_empty_blocks_are_removed_and_global_dotted_values_fill(self):
+        self.call("numbers", "--week", WEEK)
+        path = Path(self.temp.name) / "minimal.html"
+        path.write_text("{{category_totals_rm.sales}}|{{hours.total}}|{{hourly_rate_rm}}"
+                        "<!-- each products --><b>{{product_id}} {{profit_per_hour_rm}} {{loses_money}}</b><!-- end products -->"
+                        "<!-- each review_rows -->{{txn_id}}<!-- end review_rows -->"
+                        "<!-- each review_items -->{{text}}<!-- end review_items -->"
+                        "<!-- each raise_plan -->{{text}} {{draft_file}}<!-- end raise_plan -->", encoding="utf-8")
+        input_path = self.payslip_input({"debate_summary": "", "ruling": "", "raise_plan": []})
+        self.call("payslip", "--week", WEEK, "--input", str(input_path), "--template", str(path))
+        output = (self.workspace / "payslips" / (WEEK + ".html")).read_text(encoding="utf-8")
+        self.assertEqual(output, "0.00|0.0|<b>P01  false</b><b>P02  false</b>")
+
+    def test_payslip_unknown_names_are_reported_before_writing_even_in_empty_blocks(self):
+        self.call("numbers", "--week", WEEK)
+        input_path = self.payslip_input()
+        template = Path(self.temp.name) / "unknown.html"
+        template.write_text("{{missing}}<!-- each review_rows -->{{not_a_field}}<!-- end review_rows -->"
+                            "<!-- each invented -->{{anything}}<!-- end invented -->", encoding="utf-8")
+        before = self.snapshot()
+        result = self.call("payslip", "--week", WEEK, "--input", str(input_path),
+                           "--template", str(template), code=1)
+        self.assertEqual(result["names"], ["invented", "missing", "not_a_field"])
+        self.assertEqual(before, self.snapshot())
+        self.assertFalse((self.workspace / "payslips").exists())
+
+    def test_payslip_refuses_non_design_block_fields(self):
+        self.call("numbers", "--week", WEEK)
+        input_path = self.payslip_input()
+        template = Path(self.temp.name) / "wrong_fields.html"
+        template.write_text("<!-- each products -->{{direct_minutes}}<!-- end products -->"
+                            "<!-- each raise_plan -->{{recommendation}} {{draft_path}}<!-- end raise_plan -->",
+                            encoding="utf-8")
+        before = self.snapshot()
+        result = self.call("payslip", "--week", WEEK, "--input", str(input_path),
+                           "--template", str(template), code=1)
+        self.assertEqual(result["names"], ["direct_minutes", "draft_path", "recommendation"])
+        self.assertEqual(before, self.snapshot())
+
+    def test_payslip_requires_numbers_file(self):
+        before = self.snapshot()
+        result = self.call("payslip", "--week", WEEK, "--input", str(self.payslip_input()),
+                           "--template", str(ROOT / "tools" / "tests" / "payslip_template.html"), code=1)
+        self.assertIn("saved numbers file is missing", result["error"])
+        self.assertEqual(result["path"], str(self.workspace / "audit" / WEEK / "numbers.json"))
+        self.assertEqual(before, self.snapshot())
+
+    def test_payslip_refuses_pdf_issued_week_before_any_writes(self):
+        self.issue(".pdf")
+        before = self.snapshot()
+        result = self.call("payslip", "--week", WEEK, "--input", str(self.payslip_input()), code=1)
+        self.assertIn("issued", result["error"])
+        self.assertEqual(before, self.snapshot())
+
+    def test_payslip_default_template_path_and_missing_template_are_read_only(self):
+        self.call("numbers", "--week", WEEK)
+        input_path = self.payslip_input()
+        result = subprocess.run([sys.executable, "-B", str(ROOT / "tools" / "lembur.py"),
+            "payslip", "--workspace", str(self.workspace), "--week", WEEK,
+            "--input", str(input_path)], cwd=self.temp.name, text=True, capture_output=True)
+        self.assertEqual(result.returncode, 1)
+        self.assertEqual(result.stderr, "")
+        self.assertIn("payslip_template.html", json.loads(result.stdout)["error"])
+        self.assertFalse((self.workspace / "payslips").exists())
+
+    def test_payslip_bad_input_or_unclosed_block_never_writes(self):
+        self.call("numbers", "--week", WEEK)
+        template = ROOT / "tools" / "tests" / "payslip_template.html"
+        before = self.snapshot()
+        for value in ({}, {"debate_summary": 1, "ruling": "", "raise_plan": []},
+                      {"debate_summary": "", "ruling": "", "raise_plan": [{"text": "Missing draft"}]}):
+            self.call("payslip", "--week", WEEK, "--input", str(self.payslip_input(value)),
+                      "--template", str(template), code=1)
+            self.assertEqual(before, self.snapshot())
+        broken = Path(self.temp.name) / "broken.html"
+        broken.write_text("<!-- each products -->{{name}}", encoding="utf-8")
+        self.call("payslip", "--week", WEEK, "--input", str(self.payslip_input()),
+                  "--template", str(broken), code=1)
+        self.assertEqual(before, self.snapshot())
+
     def test_correct_plan_refuses_invalid_or_negative_values_before_writing(self):
         before = self.snapshot()
         for value in ("unreadable", "", "-1", "-0.5", "NaN", "sNaN", "Infinity", "-Infinity"):
