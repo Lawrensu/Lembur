@@ -26,7 +26,7 @@
 
 * From PLAN section 13, 10 October 23:45.
 * **Working, merged into `dev`**: the tools and the command line with their tests, the payslip command and Damian's template, the dataset, the answer key, the comparator and the redesigned docs.
-* **Not built**: everything in `app/` and `prompts/`. Do not tick or present any of it as done until its proof in PLAN section 12 is recorded.
+* **Built and merged into `dev`**: the tool layer `app/tools.py` and the Telegram bot `app/bot.py`, each with its tests. **Not built**: the model module, the runner and `prompts/`. Do not present any unbuilt part as done until its proof in PLAN section 12 is recorded.
 * **Order of work**: the backend first, merged into `dev`. Meanwhile the prompts are drafted and the bot is built against a stand in. Then the runner and the bot in parallel, then the join, then recording.
 * **Seams**: design sections 6.3 and 6.4 fix what each package calls. Stay in your own files. If a seam does not fit, tell Law.
 * **Result shape**: the owner of a proof writes the result under it in PLAN section 12 as `**Result, <date> <time>, <name>**: pass, fail or fallback taken. What was done. What happened.`
@@ -55,11 +55,11 @@
 
 ## Package 3, Telegram connection: Damian
 
-* [ ] Create a bot with `@BotFather` and put its token in `.env`. Never put a bot token in the repository.
-* [ ] Build `app/bot.py` against a stand in `run_night` that returns the night summary of design section 6.3. It saves files into `inbox/`, answers `payslip`, `review`, `approve N` and `skip N`, and passes anything else to `run_night` (design section 6.5).
-* [ ] Write the fixed sentences the bot says and the morning message, “Your board meeting is ready”. Figures in them are copied from `numbers.json`, so only the wording is yours.
-* [ ] Proof 3, the bot receives a message and a photo and replies with a file: send a text and a photo, then the word `payslip`. The photo must be in the inbox of that chat's workspace and the payslip file must arrive in the chat. Fallback: run the night from the command line and show the files.
-* [ ] Join the bot to the real `run_night` once the runner is in `dev`.
+* [x] Create a bot with `@BotFather` and put its token in `.env`. Never put a bot token in the repository. Done: bot `lembur_damian_bot`, and the token was checked live against Telegram. `.env` is git ignored.
+* [x] Build `app/bot.py` against a stand in `run_night` that returns the night summary of design section 6.3. It saves files into `inbox/`, answers `payslip`, `review`, `approve N` and `skip N`, and passes anything else to `run_night` (design section 6.5). Merged into `dev` as `4d13715`. 70 offline tests: 60 passed, 10 skipped for unavailable symlink support.
+* [x] Write the fixed sentences the bot says and the morning message, “Your board meeting is ready”. Figures in them are copied from `numbers.json`, so only the wording is yours.
+* [ ] Proof 3, the bot receives a message and a photo and replies with a file: send a text and a photo, then the word `payslip`. The photo must be in the inbox of that chat's workspace and the payslip file must arrive in the chat. Fallback: run the night from the command line and show the files. **Partial result recorded under the proof in PLAN section 12**: the photo half passed live; the payslip half waits on the runner.
+* [ ] Join the bot to the real `run_night` once the runner is in `dev`. This is what unblocks the rest of proof 3.
 
 ## Sharon: data and checks
 

@@ -8,7 +8,7 @@
 - The story: Lembur is a back office team in the student's chat app. She installs nothing. WorkBuddy is the platform we built it with, not part of the running product (PLAN section 11).
 - Professional-colleague role titles and warm, student-first direction follow the confirmed design choices.
 - Aisyah is the fictional persona in the merged demo dataset. Her story and the independently verified draft answer key still await Sharon's business sign-off.
-- The runner, the model module, the bot and the prompts are written as designs and are not built yet (PLAN section 13). Show none of them as running until its proof in PLAN section 12 is recorded.
+- Built and merged into `dev`: the deterministic tools, the command line, the payslip command and template, the dataset, the answer key, the comparator, the tool layer (`app/tools.py`) and the Telegram bot (`app/bot.py`), each with its tests. Not built yet: the model module (`app/model.py`), the runner (`app/runner.py`) and the prompts (`prompts/`). Show nothing as running until its proof in PLAN section 12 is recorded.
 - Until a real run exists, use the figures in data/answer_key/answer_key.md and label each one as a sample. Never invent a figure. Measured runtime and actual recommendation and ruling text remain placeholders.
 - Replace placeholders only with traceable, approved evidence. Do not call fixture checks a successful application run.
 
@@ -69,7 +69,7 @@
 - **Two model roles**: `reason` drives the agents and `read` turns an image into text. Both come from the model gateway the organisers provided. No third party package and no agent framework (design section 6.3; PLAN section 18).
 - **No install**: the product is a service and the student only needs a chat app (design section 1).
 - **Not a general assistant**: a finished tool with numbers from tested tools, no set up and nothing sent without her approval (PLAN section 3).
-- Status: the runner, the model module, the bot and the prompts are designs, not built yet (PLAN section 13). Draw them as the plan until their proofs are recorded.
+- Status: the tool layer and the Telegram bot are built and merged; the model module, the runner and the prompts are designs, not built yet (PLAN section 13). Draw the unbuilt parts as the plan until their proofs are recorded.
 - Proposed visual: three layers, the chat app on top, the runner in the middle and the tools below, with the four agents inside the runner.
 - Source: DESIGN sections 1, 4, 5.5 and 6; PLAN sections 3 and 13.
 
@@ -81,7 +81,7 @@
 - Growth coach: prioritises revenue and sales; proposes changes and prepares drafts after the ruling.
 - Auditor: reruns the numbers, checks sources and review coverage, and rules with cited reasons.
 - Agents interpret and recommend; deterministic tools calculate. Reconciliation is a tool, not an extra agent.
-- Each agent has its own prompt file in `prompts/` (design section 6.4); the prompts are not built yet.
+- Each agent has its own prompt file in `prompts/` (design section 6.4). The prompts are not built yet; their content is derived from the four instruction files in `skills/`, which were rehearsed against the answer key.
 - Proposed visual: four named roles with their responsibilities; show actual execution evidence only where available.
 - Source: DESIGN sections 4, 5 and 6.4; `submission/identities.md`.
 
