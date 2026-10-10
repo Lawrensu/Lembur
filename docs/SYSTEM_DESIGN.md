@@ -73,7 +73,8 @@ workspace/
   receipts/<year_month>/    filed source documents and saved nightly messages
   boardroom/<week>/         payroll.md, growth.md, ruling.md
   audit/<week>/             numbers.json, audit_report.md, intake_log.md, review_items.md
-  payslips/<week>.pdf       weekly payslip
+  payslips/<week>.html      weekly payslip filled from a template
+  payslips/<week>.pdf       optional later PDF
   approvals/<week>/         drafted posts and messages, one file per draft
 ```
 
@@ -162,9 +163,17 @@ workspace/
 * **Mechanism**: a Python script in `tools/`, run by a skill. Confirmed by check 6 on 10 October, so the spreadsheet formula fallback is not used.
 * **Boundary**: agents pass in what they have read (rows, event durations, corrections). They never calculate.
 * **Counted row**: a transaction row counts towards totals and hours unless its status is `duplicate` or its `amount_rm` is empty.
+* **Entry point**: `python -B tools/lembur.py <command> --workspace workspace`. Commands return JSON on standard output, exit 0 on success and 1 on failure, without tracebacks. Batch input is a JSON array read with `--input <file>` or `--input -` for standard input.
+* **Issued week**: either `payslips/<week>.html` or `payslips/<week>.pdf` marks the week as issued. It blocks `hours`, `numbers` and `close-week` for that week, not intake. The payslip is HTML filled from a template; PDF comes later. No payslip command is built at this stage.
 
 ### 4.1 Reconciliation tool
 
+* **Transaction intake, `add-transactions`**: accepts incomplete schema rows in Bookkeeper intake order and assigns IDs after the highest stored transaction ID. IDs are never reused; the entry point has no row deletion command.
+  * Refuses a batch carrying `txn_id` or `bank_reference`, even empty, or a `reconciliation_status` other than empty or `needs_review`.
+  * Refuses the whole batch if any nonempty `source_file` is already in the ledger and lists those paths. Several rows from one message in the same new batch are allowed. Reason: retrying cash intake would otherwise count the sales twice.
+* **Statement intake, `add-bank-lines`**: an identical stored line is skipped and reported. The same `bank_reference` with different content refuses the whole batch. References must be nonempty and unique after intake.
+* **Commands**: `reconcile` prints ambiguous row IDs with candidate bank lines; `resolve --txn-id --bank-reference --reason` records a choice, or an empty reference for an undecided row. A reason is required.
+* **Classification, `classify --txn-id --category --reason`**: works on any row the classification gate names, including empty, unknown or type inconsistent categories. The new category must be known and agree with the row's type. The reason is required and appended to `notes`.
 * **Status values**
   * `matched`: one bank line agrees with the row
   * `ambiguous_resolved`: several bank lines fitted; the Bookkeeper chose one and wrote why
@@ -186,18 +195,20 @@ workspace/
      * No candidate → `unmatched`.
      * Anything else → handed to the Bookkeeper as ambiguous.
   6. **Ambiguous rows**: the Bookkeeper picks a bank line using `counterparty` and `description` → `ambiguous_resolved`, reason in `notes`. If it cannot decide → `needs_review`.
-  7. **Leftover bank lines**, on payslip day only: each unused bank line becomes a new transaction row.
+  7. **Leftover bank lines**, on payslip day only: `close-week --week` converts only unused bank lines dated inside that week into new transaction rows. It does not issue the payslip.
      * Copied from the bank line: `date`, `type`, `amount_rm`, `description`, `bank_reference`.
      * `payment_method` is `bank_transfer`, `source_file` is empty, status is `unmatched`, `notes` says no document was found.
      * Income becomes `sales` with `product_id` empty. An expense is created with an empty `category`; the Bookkeeper must classify it from the description before running the numbers tool. An unclear expense becomes `other_expenses` with a note explaining the uncertainty. No silent expense category default.
 * **Review list**: every row with status `unmatched`, `duplicate` or `needs_review`, plus every line of `audit/<week>/review_items.md`. Payroll appends one line per nontransaction item, containing its date, what is unclear and the message reference. No new sheet.
 * **Running again**: each run tests rows that are not cash and have an empty status, or are `unmatched` with an empty `bank_reference`. Settled rows are never changed.
 * **Known limits**
-  * A document that arrives after step 7 turned its bank line into a row is not paired automatically. It shows as `unmatched` for the student to resolve.
+  * A document that arrives after step 7 turned its bank line into a row is not paired automatically. Intake remains open even after the week is issued; the late document gets a new row, stays `unmatched` and is on review. It does not overwrite the bank created row.
   * A copy of a mismatched receipt arriving on a later run is not caught as a duplicate: the original row's amount was replaced by the bank amount, so the duplicate key no longer agrees. The later copy is `unmatched` and counted. A copy in the same run is caught.
 
 ### 4.2 Hours tool
 
+* **Command**: `hours --week <week> [--input <events JSON>] [--payslip-day]` rebuilds the open week using events as read. Input is optional on nights without an event. It appends every returned warning to `audit/<week>/review_items.md`, never repeating an existing line.
+* **Plan correction command**: `correct-plan --field --new-value --changed-at --reason` applies the correction through the plan tool.
 * **Formula**: week hours = production + fulfilment + events + admin, summed from the `hours` lines dated in the week.
 * **Lines**
   * **Production**: one line per date and product, from counted sales rows.
@@ -244,7 +255,8 @@ workspace/
 All figures use counted rows and hours lines dated in the week.
 
 * **Classification gate**: `business_numbers.compute` raises `ValueError` while any counted row has an empty category, an unknown category, or a category that disagrees with its type. `sales` requires `income`; the five expense categories require `expense`. The Bookkeeper must finish classification first. Rows that are not counted, including duplicates and rows with an empty amount, never block this gate.
-* **Entry point warnings**: append every warning returned by the hours tool and the numbers tool to `audit/<week>/review_items.md`, including warnings about missing products or channels. Do not change the figures to hide a warning.
+* **Entry point warnings**: both `hours` and `numbers` append every returned warning to `audit/<week>/review_items.md`, including warnings about missing products or channels. Each warning occupies one line; an existing identical line is never repeated. Do not change the figures to hide a warning.
+* **Commands**: `numbers --week` saves exactly the compute return value; `numbers-check --week` reruns without writing any file and reports equality or differing top level keys, exiting 1 on a mismatch. Classification refusal prints the affected row IDs and reasons. `review --week` prints the week's transaction review rows and every saved review item.
 * **Saved numbers**: Payroll writes exactly the numbers tool return value to `audit/<week>/numbers.json`. Payroll, the Growth coach and the Auditor copy figures only from this file. The Auditor reruns the tool without writing and records the comparison with the saved file in `audit_report.md`.
 * **Category totals**: the sum of `amount_rm` for each category.
 * **Take home**: sales total minus the totals of the five expense categories.
@@ -304,7 +316,7 @@ All figures use counted rows and hours lines dated in the week.
   * Appends every hours tool and numbers tool warning, plus stated hours that are not events, to `audit/<week>/review_items.md`.
   * On payslip day, writes its recommendation, then builds the payslip once after the ruling. There is no draft payslip.
   * Includes both transaction review rows and every line of `review_items.md` in the payslip review list.
-* **Writes**: `hours` lines, plan corrections, `audit/<week>/numbers.json`, `audit/<week>/review_items.md`, `boardroom/<week>/payroll.md`, `payslips/<week>.pdf`.
+* **Writes**: `hours` lines, plan corrections, `audit/<week>/numbers.json`, `audit/<week>/review_items.md`, `boardroom/<week>/payroll.md`, `payslips/<week>.html`, and a PDF in a later step.
 * **Objective**: maximise the student's hourly rate.
 
 ### 5.4 Growth coach
@@ -352,7 +364,7 @@ All figures use counted rows and hours lines dated in the week.
 * **Payslip day adds**
   6. **Recommendations**, Payroll and Growth coach in parallel: `payroll.md`, `growth.md`.
   7. **Audit and ruling**, Auditor: rerun the numbers tool without writing, compare with the saved numbers file, and write `audit_report.md` and `ruling.md`.
-  8. **Payslip**, Payroll: build `payslips/<week>.pdf` once, after the ruling, using the saved numbers file. The Auditor then confirms both review sources reached the payslip.
+  8. **Payslip**, Payroll: fill the template to build `payslips/<week>.html` once, after the ruling, using the saved numbers file. PDF is a later step. The Auditor then confirms both review sources reached the payslip.
   9. **Drafts**, Growth coach: posts and supplier messages in `approvals`.
   10. **Morning message**, WorkBuddy messaging: "Your board meeting is ready" plus the approval list.
 * **Approval**: the student approves each draft individually. Only then is it sent or posted.
