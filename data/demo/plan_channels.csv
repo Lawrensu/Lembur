@@ -1,0 +1,4 @@
+channel,fee_percent,fee_per_order_rm,shipping_cost_per_order_rm,fulfilment_minutes_per_order
+instagram,0,0.00,4.00,5
+telegram,0,0.00,0.00,3
+bazaar,0,0.00,0.00,0

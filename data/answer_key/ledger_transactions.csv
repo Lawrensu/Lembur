@@ -1,0 +1,21 @@
+txn_id,date,type,category,description,product_id,quantity,amount_rm,channel,payment_method,counterparty,reference,source_file,reconciliation_status,bank_reference,notes
+T0001,2026-10-05,income,sales,1 Beaded keychain,P01,1,5.00,instagram,bank_transfer,Dana,,receipts/2026-10/order_2026-10-05_dana.png,ambiguous_resolved,DEMO-IN-001,Multiple RM5.00 candidates; counterparty Dana matches bank description. Paired to DEMO-IN-001.
+T0002,2026-10-05,income,sales,1 Beaded keychain,P01,1,5.00,instagram,bank_transfer,Mira,,receipts/2026-10/order_2026-10-05_mira.png,ambiguous_resolved,DEMO-IN-002,Multiple RM5.00 candidates; counterparty Mira matches bank description. Paired to DEMO-IN-002.
+T0003,2026-10-05,expense,materials,Small bead restock,,,18.00,,bank_transfer,Demo Bead Nook,DEMO-OUT-001,receipts/2026-10/receipt_beads.png,matched,DEMO-OUT-001,
+T0004,2026-10-05,expense,materials,Small bead restock,,,18.00,,bank_transfer,Demo Bead Nook,DEMO-OUT-001,receipts/2026-10/receipt_beads_copy.png,duplicate,,Duplicate of T0003; exclude from totals and hours.
+T0005,2026-10-06,income,sales,1 Beaded keychain,P01,1,5.00,instagram,bank_transfer,Farah,DEMO-IN-003,receipts/2026-10/order_2026-10-06_farah.png,matched,DEMO-IN-003,
+T0006,2026-10-06,income,sales,1 Beaded bracelet,P02,1,18.00,instagram,bank_transfer,Hana,DEMO-IN-005,receipts/2026-10/order_2026-10-06_hana.png,matched,DEMO-IN-005,
+T0007,2026-10-06,income,sales,1 Beaded keychain,P01,1,5.00,instagram,bank_transfer,Nisa,DEMO-IN-004,receipts/2026-10/order_2026-10-06_nisa.png,matched,DEMO-IN-004,
+T0008,2026-10-07,income,sales,1 Beaded keychain,P01,1,5.00,instagram,bank_transfer,Iman,DEMO-IN-006,receipts/2026-10/order_2026-10-07_iman.png,matched,DEMO-IN-006,
+T0009,2026-10-07,expense,packaging,Small pouch restock,,,6.00,,bank_transfer,Demo Pouch Corner,DEMO-OUT-002,receipts/2026-10/receipt_pouches.png,matched,DEMO-OUT-002,
+T0010,2026-10-08,income,sales,1 Beaded keychain,P01,1,5.00,instagram,bank_transfer,Lina,DEMO-IN-007,receipts/2026-10/order_2026-10-08_lina.png,matched,DEMO-IN-007,
+T0011,2026-10-08,income,sales,1 Beaded bracelet,P02,1,18.00,telegram,bank_transfer,Rina,DEMO-IN-008,receipts/2026-10/order_2026-10-08_rina.png,matched,DEMO-IN-008,
+T0012,2026-10-08,expense,materials,Thread refill; total unreadable,,,,,cash,Demo Thread Stop,,receipts/2026-10/receipt_thread_blurred.png,needs_review,,Amount unreadable at intake; request a clearer receipt. Do not infer an amount.
+T0013,2026-10-09,income,sales,1 Beaded keychain,P01,1,5.00,instagram,bank_transfer,Suri,DEMO-IN-009,receipts/2026-10/order_2026-10-09_suri.png,matched,DEMO-IN-009,
+T0014,2026-10-09,expense,shipping,Courier settlement for nine weekly parcels,,,36.00,,bank_transfer,Demo Parcel Desk,DEMO-OUT-003,receipts/2026-10/receipt_shipping.png,matched,DEMO-OUT-003,
+T0015,2026-10-10,income,sales,1 Beaded keychain,P01,1,5.00,bazaar,cash,Aina,,receipts/2026-10/message_2026-10-10.txt,cash_declared,,
+T0016,2026-10-10,income,sales,1 Beaded keychain,P01,1,5.00,bazaar,cash,Bella,,receipts/2026-10/message_2026-10-10.txt,cash_declared,,
+T0017,2026-10-10,income,sales,1 Beaded keychain,P01,1,5.00,bazaar,cash,Citra,,receipts/2026-10/message_2026-10-10.txt,cash_declared,,
+T0018,2026-10-10,income,sales,1 Beaded bracelet,P02,1,18.00,bazaar,cash,Dina,,receipts/2026-10/message_2026-10-10.txt,cash_declared,,
+T0019,2026-10-11,income,sales,1 Beaded keychain,P01,1,4.50,instagram,bank_transfer,Zahra,DEMO-IN-010,receipts/2026-10/order_2026-10-11_zahra.png,needs_review,DEMO-IN-010,Document RM5.00; bank RM4.50; bank amount used. Confirm underpayment.
+T0020,2026-10-11,expense,materials,Demo Bead Nook - bead materials top-up,,,9.00,,bank_transfer,,,,unmatched,DEMO-OUT-004,No document was found. Bank description names bead materials supplier; request receipt.
