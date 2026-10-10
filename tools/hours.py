@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 from collections import OrderedDict
+from decimal import Decimal
+import re
 
 from conventions import (
     in_week, is_counted, is_empty, round_half_away, text, to_date,
@@ -37,14 +39,45 @@ def _sort_key(line: dict):
     )
 
 
+def _event_minutes(event: dict) -> int:
+    """Convert read times or stated hours; never accept model computed minutes."""
+    start, end = text(event.get("start")), text(event.get("end"))
+    stated = text(event.get("stated_hours"))
+    if "minutes" in event:
+        raise ValueError("pass start/end or stated_hours, not calculated minutes")
+    if start or end:
+        if stated:
+            raise ValueError("event has both clock times and stated hours")
+        if not all(re.fullmatch(r"(?:[01]\d|2[0-3]):[0-5]\d", t)
+                   for t in (start, end)):
+            raise ValueError("event needs readable 24 hour start and end times")
+        start_h, start_m = map(int, start.split(":"))
+        end_h, end_m = map(int, end.split(":"))
+        minutes = (end_h * 60 + end_m) - (start_h * 60 + start_m)
+        if minutes <= 0:
+            raise ValueError("event end is not after its start")
+        return minutes
+    match = re.fullmatch(r"(\d+(?:\.\d+)?)\s*(?:hours?|hrs?|h)?", stated,
+                         flags=re.IGNORECASE)
+    if not match:
+        raise ValueError("event stated hours are unreadable or unsupported: %r" % stated)
+    minutes = Decimal(match.group(1)) * 60
+    if minutes <= 0 or minutes != minutes.to_integral_value():
+        raise ValueError("event duration must yield positive whole minutes")
+    return int(minutes)
+
+
 def build_hours(transactions: list, hours: list, plan, week: str,
                 events=(), payslip_day: bool = False):
     """Rebuild the week's hours lines. Returns (all hours lines, warnings).
 
     Production and fulfilment lines of the week are rebuilt from the ledger
     on every run. The admin line is rebuilt on payslip day. Event lines are
-    kept, and each event in `events` (date, minutes, message_date) is added
-    once.
+    kept, and each event is added once. Event dicts contain date and either
+    start/end (HH:MM) or stated_hours (the read text), plus optional
+    message_date. Calculated minutes are not accepted. Event warnings include
+    the date, reason and message reference for Payroll to append to review_items.md.
+    The caller must pass the open week; issued weeks must not be rebuilt.
     """
     warnings = []
     rebuilt = {"production", "fulfilment"} | ({"admin"} if payslip_day else set())
@@ -90,11 +123,24 @@ def build_hours(transactions: list, hours: list, plan, week: str,
                                ref, product_id, orders))
 
     for event in events:
-        ref = "message.%s" % to_date(event.get("message_date")
-                                     or event["date"]).isoformat()
-        line = _line(event["date"], "event", int(event["minutes"]), "stated", ref)
+        raw_date = event.get("date")
+        message_date = event.get("message_date") or raw_date
+        try:
+            day = to_date(raw_date).isoformat()
+            ref = "message.%s" % to_date(message_date).isoformat()
+        except (ValueError, TypeError):
+            warnings.append("%s: event date or message date is missing or unreadable; message.%s"
+                            % (text(raw_date) or "(missing date)",
+                               text(message_date) or "(missing date)"))
+            continue
+        try:
+            minutes = _event_minutes(event)
+        except ValueError as exc:
+            warnings.append("%s: %s; %s" % (day, exc, ref))
+            continue
+        line = _line(day, "event", minutes, "stated", ref)
         if not in_week(line["date"], week):
-            warnings.append("event on %s is outside %s" % (line["date"], week))
+            warnings.append("%s: event is outside %s; %s" % (day, week, ref))
             continue
         same = [l for l in lines if text(l["activity"]) == "event"
                 and _sort_key(l) == _sort_key(line)]
@@ -109,6 +155,14 @@ def build_hours(transactions: list, hours: list, plan, week: str,
                            _source(corrected), ref))
 
     lines.sort(key=_sort_key)
-    for number, line in enumerate(lines, start=1):
+    reserved = {text(line["entry_id"]) for line in lines
+                if not in_week(line["date"], week)}
+    number = 1
+    for line in lines:
+        if not in_week(line["date"], week):
+            continue
+        while "H%04d" % number in reserved:
+            number += 1
         line["entry_id"] = "H%04d" % number
+        number += 1
     return lines, warnings

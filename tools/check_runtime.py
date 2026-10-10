@@ -1,5 +1,6 @@
 """Checks whether this host can run deterministic Python scripts, and which Python and libraries it has.
-Run from the repo root with: python tools/check_runtime.py"""
+Run from the repo root with: python -B tools/check_runtime.py
+The business_numbers.py module name avoids shadowing the standard library."""
 
 import csv
 import datetime
@@ -8,6 +9,9 @@ import platform
 import sys
 import tempfile
 from decimal import Decimal, ROUND_HALF_UP
+from pathlib import Path
+
+WORKSPACE = Path(__file__).resolve().parent.parent / "workspace"
 
 OPENPYXL = None
 
@@ -106,10 +110,16 @@ def check_xlsx():
         ws.title = "transactions"
         ws.append(XLSX_HEADER)
         ws.append(XLSX_ROW)
-        wb.save(path)
+        try:
+            wb.save(path)
+        finally:
+            wb.close()
         wb2 = OPENPYXL.load_workbook(path)
-        ws2 = wb2["transactions"]
-        rows = [list(r) for r in ws2.iter_rows(values_only=True)]
+        try:
+            ws2 = wb2["transactions"]
+            rows = [list(r) for r in ws2.iter_rows(values_only=True)]
+        finally:
+            wb2.close()
     ok = rows == [XLSX_HEADER, XLSX_ROW]
     if ok:
         return ok, "sheet transactions saved and reopened; text, 23.5 and empty cell match"
@@ -128,6 +138,21 @@ def check_write_access():
     return ok, "created and deleted a file in temp directory %s" % tmp
 
 
+def check_workspace_write_access():
+    path = None
+    try:
+        with tempfile.NamedTemporaryFile(
+                mode="w", encoding="utf-8", prefix="runtime_probe_",
+                suffix=".txt", dir=WORKSPACE, delete=False) as handle:
+            path = Path(handle.name)
+            handle.write("runtime probe")
+        ok = path.read_text(encoding="utf-8") == "runtime probe"
+    finally:
+        if path is not None:
+            path.unlink(missing_ok=True)
+    return ok and not path.exists(), "write, read and cleanup in %s" % WORKSPACE
+
+
 def main():
     try:
         if hasattr(sys.stdout, "reconfigure"):
@@ -144,6 +169,8 @@ def main():
     results["openpyxl_import"] = run_check("openpyxl_import", check_openpyxl)
     results["xlsx_round_trip"] = run_check("xlsx_round_trip", check_xlsx)
     results["write_access"] = run_check("write_access", check_write_access)
+    results["workspace_write_access"] = run_check(
+        "workspace_write_access", check_workspace_write_access)
 
     total = len(results)
     ok_count = sum(1 for passed in results.values() if passed)
@@ -156,7 +183,8 @@ def main():
     else:
         mode = "none"
     print("SCRIPT MODE: %s" % mode)
+    return 0 if all(results.values()) else 1
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

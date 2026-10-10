@@ -28,6 +28,20 @@ def _money(sen):
 
 
 def compute(transactions: list, hours: list, plan, week: str) -> dict:
+    invalid = []
+    for row in transactions:
+        if not is_counted(row):
+            continue
+        category, kind = text(row.get("category")), text(row.get("type"))
+        if category not in CATEGORIES:
+            invalid.append("%s: empty or unknown category %r"
+                           % (text(row.get("txn_id")), category))
+        elif kind not in ("income", "expense") or (category == "sales") != (kind == "income"):
+            invalid.append("%s: category and type disagree"
+                           % text(row.get("txn_id")))
+    if invalid:
+        raise ValueError("counted rows need category classification: "
+                         + "; ".join(invalid))
     warnings = []
     rows = [r for r in transactions
             if is_counted(r) and in_week(r.get("date"), week)]

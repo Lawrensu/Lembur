@@ -11,12 +11,11 @@ Thumbs.db
 *.key
 
 # Local agent settings
-.claude/
-/.workbuddy-ai
+.workbuddy-ai/
 
 # Workspace runtime outputs (keep .gitkeep stubs, ignore everything else)
-workspace/*.xlsx
-workspace/plan/*.xlsx
+workspace/*.csv
+workspace/plan/*.csv
 workspace/payslips/*
 workspace/receipts/*
 workspace/boardroom/*/

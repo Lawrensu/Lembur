@@ -9,13 +9,20 @@ Three layers of comparison:
   2. Derived figures -- category totals, take home, hourly rate, product
      profit, review IDs -- recalculated from the workspace ledger and
      compared against calculation.json.
-  3. Plan state -- workspace plan.xlsx must have the correction applied
+  3. Plan state -- the workspace plan CSV files must have the correction applied
      (P01 minutes_per_unit = 15, one change_log row).
 
 Usage:
     python compare_outputs.py
     python compare_outputs.py --workspace path/to/workspace
     python compare_outputs.py --workspace workspace --answer-key-dir data/answer_key
+
+Files are CSV, one per sheet, named <book>_<sheet>.csv (SYSTEM_DESIGN section 3.1):
+    workspace/ledger_*.csv, workspace/plan/plan_*.csv, data/answer_key/ledger_*.csv
+
+Not compared, because an agent writes them in its own words: the notes and
+description columns of transactions. Hours lines are matched by date, activity,
+product and assumption reference, never by entry_id (PLAN section 10).
 
 Outputs:
     Console           -- human-readable PASS/FAIL summary
@@ -26,6 +33,7 @@ Outputs:
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 import sys
 from collections import defaultdict
@@ -33,7 +41,6 @@ from datetime import date, datetime
 from decimal import Decimal, ROUND_HALF_UP
 from pathlib import Path
 
-import openpyxl
 
 # ---------------------------------------------------------------------------
 # Paths
@@ -126,15 +133,22 @@ def norm_row(row_dict, columns):
 
 
 # ---------------------------------------------------------------------------
-# Workbook reader
+# CSV reader
 # ---------------------------------------------------------------------------
 
-def read_sheet(workbook, sheet_name, columns):
-    """Read a sheet into a list of normalised dicts keyed by column name."""
-    if sheet_name not in workbook.sheetnames:
-        return None  # sheet missing entirely
-    ws = workbook[sheet_name]
-    rows = list(ws.values)
+def read_rows(path):
+    """Read one CSV file into a list of rows, header first. None when it is missing."""
+    if not Path(path).is_file():
+        return None
+    with open(path, encoding="utf-8-sig", newline="") as handle:
+        return [row for row in csv.reader(handle)]
+
+
+def read_sheet(base, sheet_name, columns):
+    """Read <base>_<sheet_name>.csv into a list of normalised dicts keyed by column name."""
+    rows = read_rows(f"{base}_{sheet_name}.csv")
+    if rows is None:
+        return None  # file missing entirely
     if not rows:
         return []
     headers = [str(h).strip() for h in rows[0]]
@@ -150,18 +164,16 @@ def read_sheet(workbook, sheet_name, columns):
 
 
 def read_ledger(path):
-    """Read a ledger workbook (3 sheets) into a dict."""
-    wb = openpyxl.load_workbook(path, data_only=True)
+    """Read the three ledger CSV files that share the base path into a dict."""
     return {
-        "transactions": read_sheet(wb, "transactions", TX_COLS),
-        "bank_lines": read_sheet(wb, "bank_lines", BANK_COLS),
-        "hours": read_sheet(wb, "hours", HOURS_COLS),
+        "transactions": read_sheet(path, "transactions", TX_COLS),
+        "bank_lines": read_sheet(path, "bank_lines", BANK_COLS),
+        "hours": read_sheet(path, "hours", HOURS_COLS),
     }
 
 
 def read_plan(path):
-    """Read a plan workbook (4 sheets) into a dict."""
-    wb = openpyxl.load_workbook(path, data_only=True)
+    """Read the four plan CSV files that share the base path into a dict."""
     sheets = {}
     for name, cols in [
         ("products", "product_id name price_rm material_cost_rm packaging_cost_rm minutes_per_unit".split()),
@@ -169,11 +181,10 @@ def read_plan(path):
         ("assumptions", "admin_hours_per_week planned_margin_percent target_hourly_rate_rm".split()),
         ("change_log", "changed_at field old_value new_value reason source".split()),
     ]:
-        ws = wb[name] if name in wb.sheetnames else None
-        if ws is None:
+        rows = read_rows(f"{path}_{name}.csv")
+        if rows is None:
             sheets[name] = None
             continue
-        rows = list(ws.values)
         if not rows:
             sheets[name] = []
             continue
@@ -218,7 +229,21 @@ def read_plan(path):
 # Layer 1: Ledger sheet comparison
 # ---------------------------------------------------------------------------
 
-def compare_rows(expected_rows, actual_rows, id_col, sheet_name):
+FREE_TEXT = {"transactions": ("notes", "description")}
+
+
+def keyed_hours(rows):
+    """Key hours lines by date, activity, product and reference, never by entry_id."""
+    keyed = []
+    for row in rows:
+        line = {k: v for k, v in row.items() if k != "entry_id"}
+        line["_key"] = "|".join(str(row.get(k) or "") for k in
+                                ("date", "activity", "product_id", "assumption_ref"))
+        keyed.append(line)
+    return keyed
+
+
+def compare_rows(expected_rows, actual_rows, id_col, sheet_name, ignore=()):
     """Compare two lists of rows by their ID column. Return a diff dict."""
     exp_by_id = {r[id_col]: r for r in expected_rows} if id_col else {}
     act_by_id = {r[id_col]: r for r in actual_rows} if id_col else {}
@@ -235,7 +260,7 @@ def compare_rows(expected_rows, actual_rows, id_col, sheet_name):
         exp = exp_by_id[rid]
         act = act_by_id[rid]
         for col in exp:
-            if col == id_col:
+            if col == id_col or col in ignore:
                 continue
             ev = exp.get(col)
             av = act.get(col)
@@ -678,17 +703,18 @@ def main():
     out = args.output_dir
 
     # --- Check files exist ---
-    ws_ledger_path = ws / "ledger.xlsx"
-    ws_plan_path = ws / "plan" / "plan.xlsx"
-    exp_ledger_path = ak / "expected_ledger.xlsx"
+    # Base paths: the files are <base>_<sheet>.csv.
+    ws_ledger_path = ws / "ledger"
+    ws_plan_path = ws / "plan" / "plan"
+    exp_ledger_path = ak / "ledger"
     calc_path = ak / ".expected_ledger.ref" / "calculation.json"
 
     errors = []
-    if not ws_ledger_path.exists():
+    if not Path(f"{ws_ledger_path}_transactions.csv").exists():
         errors.append(f"Workspace ledger not found: {ws_ledger_path}")
-    if not ws_plan_path.exists():
+    if not Path(f"{ws_plan_path}_products.csv").exists():
         errors.append(f"Workspace plan not found: {ws_plan_path}")
-    if not exp_ledger_path.exists():
+    if not Path(f"{exp_ledger_path}_transactions.csv").exists():
         errors.append(f"Expected ledger not found: {exp_ledger_path}")
     if not calc_path.exists():
         errors.append(f"Calculation JSON not found: {calc_path}")
@@ -723,7 +749,7 @@ def main():
     for sheet_name, id_col, cols in [
         ("transactions", "txn_id", TX_COLS),
         ("bank_lines", "bank_reference", BANK_COLS),
-        ("hours", "entry_id", HOURS_COLS),
+        ("hours", "_key", HOURS_COLS),
     ]:
         exp_rows = expected_ledger[sheet_name]
         act_rows = workspace_ledger[sheet_name]
@@ -737,7 +763,10 @@ def main():
             print(f"  {sheet_name}: ERROR -- workspace sheet missing or columns wrong")
             continue
 
-        diff = compare_rows(exp_rows, act_rows, id_col, sheet_name)
+        if sheet_name == "hours":
+            exp_rows, act_rows = keyed_hours(exp_rows), keyed_hours(act_rows)
+        diff = compare_rows(exp_rows, act_rows, id_col, sheet_name,
+                            ignore=FREE_TEXT.get(sheet_name, ()))
         ledger_diffs[sheet_name] = diff
         n = (len(diff["missing_ids"]) + len(diff["extra_ids"]) +
              len(diff["field_differences"]))

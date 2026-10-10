@@ -41,7 +41,11 @@ RUNTIME_DIRS = [
 ]
 
 # Top-level workspace files to remove
-RUNTIME_FILES = ["ledger.xlsx"]
+RUNTIME_FILES = ["ledger_transactions.csv", "ledger_bank_lines.csv", "ledger_hours.csv"]
+
+# The baseline plan: one CSV file per sheet (SYSTEM_DESIGN section 3.1)
+PLAN_FILES = ["plan_products.csv", "plan_channels.csv", "plan_assumptions.csv",
+              "plan_change_log.csv"]
 
 # Day-to-file mapping (from messages.md daily "Files:" lines)
 DAY_FILES = {
@@ -53,8 +57,8 @@ DAY_FILES = {
     ],
     "2026-10-06": [
         "order_2026-10-06_farah.png",
-        "order_2026-10-06_nisa.png",
         "order_2026-10-06_hana.png",
+        "order_2026-10-06_nisa.png",
     ],
     "2026-10-07": [
         "order_2026-10-07_iman.png",
@@ -104,13 +108,14 @@ def clean_workspace():
 
 
 def copy_plan():
-    """Copy the baseline plan.xlsx to workspace/plan/."""
-    src = DEMO / "plan.xlsx"
-    dst = WORKSPACE / "plan" / "plan.xlsx"
-    if not src.exists():
-        print(f"ERROR: baseline plan not found: {src}")
+    """Copy the baseline plan CSV files to workspace/plan/."""
+    missing = [name for name in PLAN_FILES if not (DEMO / name).exists()]
+    if missing:
+        print(f"ERROR: baseline plan files not found in {DEMO}: {', '.join(missing)}")
         return False
-    shutil.copy2(src, dst)
+    (WORKSPACE / "plan").mkdir(parents=True, exist_ok=True)
+    for name in PLAN_FILES:
+        shutil.copy2(DEMO / name, WORKSPACE / "plan" / name)
     return True
 
 
@@ -118,6 +123,7 @@ def copy_inbox_files(filenames):
     """Copy the given inbox files from data/demo/inbox/ to workspace/inbox/."""
     src_dir = DEMO / "inbox"
     dst_dir = WORKSPACE / "inbox"
+    dst_dir.mkdir(parents=True, exist_ok=True)
     copied = 0
     missing = []
     for fname in filenames:
@@ -164,7 +170,7 @@ def main():
     if not copy_plan():
         print("\nABORT: cannot proceed without plan file")
         return 1
-    print("  plan.xlsx -> workspace/plan/plan.xlsx")
+    print("  plan_*.csv -> workspace/plan/")
 
     # --- Copy inbox files ---
     if args.day:
