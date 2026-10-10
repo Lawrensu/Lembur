@@ -1,0 +1,272 @@
+# Synthetic fixture rule check
+
+- Result: 202 passed; 0 failed. This is fixture validation, not an end-to-end application certification.
+- Scope: PLAN.md section 10; SYSTEM_DESIGN.md sections 2-4; demo plan, expected ledger, nightly messages, every inbox file, and raw_documents from render_manifest.json.
+- Independence: no independent calculator, fixture builder or renderer files read/imported; no expected manifest transactions, bank lines or computed correction used as an oracle. Reconciliation and hours were derived anew; money calculations use integer sen and exact rational rates.
+- Writes: only check_rules.py and rule_check.md in data/answer_key/.expected_ledger.ref. No input, git, file name or directory is modified, renamed or deleted.
+- Reproduce from any working directory: `"C:/Users/user/.workbuddy-ai/binaries/python/envs/lembur/Scripts/python.exe" -B "C:/Users/user/Documents/Hackerdorm/Lembur/data/answer_key/.expected_ledger.ref/check_rules.py"`.
+- Exit code: 0 when all implemented checks pass; 1 for a failed check or incomplete validation. Re-running refreshes only this report.
+
+## Failures
+
+- None detected in the checks executed.
+
+## Findings
+
+- Review entries: T0004 duplicate - Duplicate of T0003; exclude from totals and hours.; T0012 needs_review - Amount unreadable at intake; request a clearer receipt. Do not infer an amount.; T0019 needs_review - Document RM5.00; bank RM4.50; bank amount used. Confirm underpayment.; T0020 unmatched - No document was found. Bank description names bead materials supplier; request receipt.
+- Category totals: sales RM108.50; materials RM27.00; packaging RM6.00; platform_fees RM0.00; shipping RM36.00; other_expenses RM0.00.
+- Take home RM39.50; 938 minutes (15.6 displayed hours); hourly rate RM2.53. Unknown thread cost remains excluded, so take home is provisional.
+- P01 Beaded keychain: 11 units; revenue RM54.50; unit costs RM33.00; channel costs RM32.00; profit -RM10.50; 225 direct minutes; profit per hour -RM2.80.
+- P02 Beaded bracelet: 3 units; revenue RM54.00; unit costs RM18.00; channel costs RM4.00; profit RM32.00; 113 direct minutes; profit per hour RM16.99.
+- Reality margin 36% versus planned 40%; hourly rate RM2.53 versus target RM12.00.
+- Expected Auditor direction, inferred rather than compared to a separate ruling: retain all four review entries; request the missing/clearer receipts and resolve Zahra's underpayment; treat take home as provisional; challenge growth in the loss-making keychain channel and below-target time return.
+- Correction replay: append one products.P01.minutes_per_unit change from 20 to 15 dated 2026-10-07, with the student's exact reason and message.2026-10-07 source; update the working plan only. Baseline input remains unchanged. Before correction: 4 units x 20 = 80 minutes; on/after: 7 units x 15 = 105 minutes.
+- Manual visual review on 2026-10-10: all ten order images and four distinct receipt images were inspected; the additional bead copy is checked by byte identity. Each inspected image visibly says SYNTHETIC DEMO and NOT A REAL ORDER/RECEIPT. Visible source dates, amounts, identities, products and references agreed with the recorded observations at inspection. Current applicability requires the corresponding hash/metadata checks to pass.
+- Blurry receipt: date 2026-10-08, Demo Thread Stop, Thread refill and Cash remain readable; the whole amount band is obscured and no numeric total is legible elsewhere. No amount was inferred or recovered.
+- Mismatch visual: Zahra's order prints RM5.00 and DEMO-IN-010; CSV has RM4.50 on that same reference. No-reference visuals: Dana and Mira each print RM5.00 on 2026-10-05 and have no payment-reference field.
+
+## Limitations and explicit interpretations
+
+- Visual OCR is not automated. PNG decoding and SHA-256 checks cannot read text or prove unreadability. Recorded manual observations cover the inspected bytes only; any changed image fails its evidence check and requires fresh visual inspection.
+- The manifest is source fixture metadata, not independently extracted image text. Only raw_documents is used to reconstruct intake; manual observations reduce, but do not eliminate, shared-authoring-error risk.
+- Missing-receipt absence is checked against the complete supplied inbox and raw-document inventory. The Sunday message acknowledges the missing receipt; it is not treated as a replacement receipt. No claim is made about files outside this supplied scope.
+- Filed receipts/... paths are replay destinations. Each basename is checked against inbox or the exact dated message section; physical workspace filing and saved message text files were not created or tested.
+- Sharon's approved interpretation is applied: pre-correction production source is estimate; P01 source is corrected for dates on/after 2026-10-07. The literal design sentence about values coming from change_log could otherwise label old_value-backed dates differently.
+- The baseline plan intentionally has no change_log row. The correction is reconstructed from Wednesday's message in memory. Append-only history and corrected working-plan persistence are runtime behaviors, not proved by this baseline fixture.
+- Restock size has no numeric acceptance threshold in PLAN. The check uses largest known materials purchase below both weekly sales and take home, plus restock/top-up wording. The unreadable thread amount remains unknown; no claim is made that its true cost is modest.
+- All channel percentage/per-order fees in this fixture are zero. Half-away rounding and per-order fee rounding are checked with separate in-memory arithmetic controls; the fixture itself does not exercise nonzero fees.
+- Message parsing is deliberately limited to this fixture's wording. Stated-duration scanning examines nightly Message lines, not replay instructions; Wednesday's minutes-per-unit correction is not an extra stated-hours entry.
+- Category totals, take home, rates, product profits and ruling direction are derived here. answer_key.md, other calculators, payslip output and the actual Auditor ruling were outside the supplied comparison scope and were not read or compared.
+- Review membership is checked from exact expected-ledger statuses and explanatory notes; no runtime review-list artifact is present in the supplied inputs.
+- Actual intake, reconciliation rerun/idempotence, late-document arrival, Sunday-only bank-row creation, saved filing, unclear-event handling and approval behavior are not executed. The in-memory reconstruction and repeatability checks do not certify those application paths.
+- Dates are naive ISO strings interpreted in Malaysia time, as stated by the messages. No timezone conversion or real banking activity is implied. All persons, suppliers and transactions are synthetic.
+
+## Reproducible checks
+
+- PASS - Output scope
+- PASS - Arithmetic: halves away from zero
+- PASS - Arithmetic: fees rounded per order
+- PASS - Arithmetic: sub-sen input rejected, blanks preserved
+- PASS - Arithmetic: zero-minute rate suppressed
+- PASS - Schema contract agrees with design: products
+- PASS - Schema contract agrees with design: channels
+- PASS - Schema contract agrees with design: assumptions
+- PASS - Schema contract agrees with design: change_log
+- PASS - Schema contract agrees with design: transactions
+- PASS - Schema contract agrees with design: bank_lines
+- PASS - Schema contract agrees with design: hours
+- PASS - Schema: plan.xlsx sheets: ['products', 'channels', 'assumptions', 'change_log']
+- PASS - Schema: plan.xlsx/products exact headers: product_id, name, price_rm, material_cost_rm, packaging_cost_rm, minutes_per_unit
+- PASS - Literal fixture cells: plan.xlsx/products: Formula cells: []
+- PASS - No blank data rows: plan.xlsx/products
+- PASS - Money displayed with two decimals: plan.xlsx/products: Nonconforming cells: []
+- PASS - Schema: plan.xlsx/channels exact headers: channel, fee_percent, fee_per_order_rm, shipping_cost_per_order_rm, fulfilment_minutes_per_order
+- PASS - Literal fixture cells: plan.xlsx/channels: Formula cells: []
+- PASS - No blank data rows: plan.xlsx/channels
+- PASS - Money displayed with two decimals: plan.xlsx/channels: Nonconforming cells: []
+- PASS - Schema: plan.xlsx/assumptions exact headers: admin_hours_per_week, planned_margin_percent, target_hourly_rate_rm
+- PASS - Literal fixture cells: plan.xlsx/assumptions: Formula cells: []
+- PASS - No blank data rows: plan.xlsx/assumptions
+- PASS - Money displayed with two decimals: plan.xlsx/assumptions: Nonconforming cells: []
+- PASS - Schema: plan.xlsx/change_log exact headers: changed_at, field, old_value, new_value, reason, source
+- PASS - Literal fixture cells: plan.xlsx/change_log: Formula cells: []
+- PASS - No blank data rows: plan.xlsx/change_log
+- PASS - Money displayed with two decimals: plan.xlsx/change_log: Nonconforming cells: []
+- PASS - Schema: expected_ledger.xlsx sheets: ['transactions', 'bank_lines', 'hours']
+- PASS - Schema: expected_ledger.xlsx/transactions exact headers: txn_id, date, type, category, description, product_id, quantity, amount_rm, channel, payment_method, counterparty, reference, source_file, reconciliation_status, bank_reference, notes
+- PASS - Literal fixture cells: expected_ledger.xlsx/transactions: Formula cells: []
+- PASS - No blank data rows: expected_ledger.xlsx/transactions
+- PASS - Money displayed with two decimals: expected_ledger.xlsx/transactions: Nonconforming cells: []
+- PASS - Schema: expected_ledger.xlsx/bank_lines exact headers: date, description, type, amount_rm, bank_reference
+- PASS - Literal fixture cells: expected_ledger.xlsx/bank_lines: Formula cells: []
+- PASS - No blank data rows: expected_ledger.xlsx/bank_lines
+- PASS - Money displayed with two decimals: expected_ledger.xlsx/bank_lines: Nonconforming cells: []
+- PASS - Schema: expected_ledger.xlsx/hours exact headers: entry_id, date, person, activity, product_id, quantity, minutes, source, assumption_ref
+- PASS - Literal fixture cells: expected_ledger.xlsx/hours: Formula cells: []
+- PASS - No blank data rows: expected_ledger.xlsx/hours
+- PASS - Money displayed with two decimals: expected_ledger.xlsx/hours: Nonconforming cells: []
+- PASS - Plan keys and single assumptions row
+- PASS - Plan IDs and channel labels
+- PASS - Plan nonnegative costs and whole production/packing minutes
+- PASS - Plan assumption domains
+- PASS - Nightly message 2026-10-05: weekday and single message
+- PASS - Nightly message 2026-10-06: weekday and single message
+- PASS - Nightly message 2026-10-07: weekday and single message
+- PASS - Nightly message 2026-10-08: weekday and single message
+- PASS - Nightly message 2026-10-09: weekday and single message
+- PASS - Nightly message 2026-10-10: weekday and single message
+- PASS - Nightly message 2026-10-11: weekday and single message
+- PASS - One ISO week, messages cover Monday-Sunday exactly: 2026-10-05, 2026-10-06, 2026-10-07, 2026-10-08, 2026-10-09, 2026-10-10, 2026-10-11
+- PASS - Every inbox file listed exactly once and every listed basename exists: 16 inbox files
+- PASS - No nested or unaccounted inbox sources
+- PASS - Synthetic fixture explicitly declared; Malaysia-time week
+- PASS - Bank statement is CSV, not a photo
+- PASS - CSV exact schema
+- PASS - CSV money spelling: two decimals, positive
+- PASS - CSV equals expected bank_lines, all fields and row order: 14 lines compared
+- PASS - Bank CSV round-trip from workbook is lossless
+- PASS - Bank references all present and globally unique
+- PASS - Bank statement arrives only on Sunday
+- PASS - Raw intake uses transaction schema
+- PASS - Raw intake has no bank assignments or settled statuses
+- PASS - Unique valid IDs: transactions
+- PASS - Unique valid IDs: raw intake
+- PASS - Unique valid IDs: hours
+- PASS - ISO dates within specified week: transactions
+- PASS - ISO dates within specified week: raw documents
+- PASS - ISO dates within specified week: bank lines
+- PASS - ISO dates within specified week: hours
+- PASS - Transactions and hours span all seven dates
+- PASS - Payment enum exact on raw and expected rows
+- PASS - Category/type rule and required transaction fields
+- PASS - Bank type/positive amount
+- PASS - Reconciliation status enum exact
+- PASS - Blank amount only for unreadable intake
+- PASS - No n/a or empty-string stand-ins
+- PASS - One product per order, valid quantity and channel
+- PASS - Expense-only fields are empty
+- PASS - No sales source split into multiple product rows
+- PASS - Every source basename/file or dated message exists: Unresolved rows: []; message paths resolve to dated sections, not pre-existing workspace files
+- PASS - Every rendered image has exactly one raw source row
+- PASS - Cash source exact: every declared order once, no extra orders: 4 separate cash orders; total RM33.00
+- PASS - Cash orders have no invented references
+- PASS - Manual rendering evidence current: order_2026-10-05_dana.png: Hash matches visually inspected bytes and raw metadata matches recorded visible fields; not OCR
+- PASS - Manual rendering evidence current: order_2026-10-05_mira.png: Hash matches visually inspected bytes and raw metadata matches recorded visible fields; not OCR
+- PASS - Manual rendering evidence current: order_2026-10-06_farah.png: Hash matches visually inspected bytes and raw metadata matches recorded visible fields; not OCR
+- PASS - Manual rendering evidence current: order_2026-10-06_hana.png: Hash matches visually inspected bytes and raw metadata matches recorded visible fields; not OCR
+- PASS - Manual rendering evidence current: order_2026-10-06_nisa.png: Hash matches visually inspected bytes and raw metadata matches recorded visible fields; not OCR
+- PASS - Manual rendering evidence current: order_2026-10-07_iman.png: Hash matches visually inspected bytes and raw metadata matches recorded visible fields; not OCR
+- PASS - Manual rendering evidence current: order_2026-10-08_lina.png: Hash matches visually inspected bytes and raw metadata matches recorded visible fields; not OCR
+- PASS - Manual rendering evidence current: order_2026-10-08_rina.png: Hash matches visually inspected bytes and raw metadata matches recorded visible fields; not OCR
+- PASS - Manual rendering evidence current: order_2026-10-09_suri.png: Hash matches visually inspected bytes and raw metadata matches recorded visible fields; not OCR
+- PASS - Manual rendering evidence current: order_2026-10-11_zahra.png: Hash matches visually inspected bytes and raw metadata matches recorded visible fields; not OCR
+- PASS - Manual rendering evidence current: receipt_beads.png: Hash matches visually inspected bytes and raw metadata matches recorded visible fields; not OCR
+- PASS - Manual rendering evidence current: receipt_pouches.png: Hash matches visually inspected bytes and raw metadata matches recorded visible fields; not OCR
+- PASS - Manual rendering evidence current: receipt_shipping.png: Hash matches visually inspected bytes and raw metadata matches recorded visible fields; not OCR
+- PASS - Manual rendering evidence current: receipt_thread_blurred.png: Hash matches visually inspected bytes and raw metadata matches recorded visible fields; not OCR
+- PASS - Rendered order payment labels
+- PASS - Rendered inventory covered by manual review or byte-identical duplicate
+- PASS - All PNG files decode completely: []
+- PASS - Exactly the intended duplicate image bytes: [['receipt_beads.png', 'receipt_beads_copy.png']]
+- PASS - Independent reconciliation produces exactly expected row IDs
+- PASS - Independent reconciliation: T0001: ambiguous_resolved; bank DEMO-IN-001; RM5.00; differing fields: []
+- PASS - Ambiguity explained: T0001: Candidates: DEMO-IN-001, DEMO-IN-002
+- PASS - Independent reconciliation: T0002: ambiguous_resolved; bank DEMO-IN-002; RM5.00; differing fields: []
+- PASS - Ambiguity explained: T0002: Candidates: DEMO-IN-001, DEMO-IN-002
+- PASS - Independent reconciliation: T0003: matched; bank DEMO-OUT-001; RM18.00; differing fields: []
+- PASS - Independent reconciliation: T0004: duplicate; bank none; RM18.00; differing fields: []
+- PASS - Duplicate receipt: original named, noncash, excluded and reviewed: T0004 duplicates T0003
+- PASS - Duplicate receipt: date/type/amount/supplier/printed reference identical
+- PASS - Independent reconciliation: T0005: matched; bank DEMO-IN-003; RM5.00; differing fields: []
+- PASS - Independent reconciliation: T0006: matched; bank DEMO-IN-004; RM5.00; differing fields: []
+- PASS - Independent reconciliation: T0007: matched; bank DEMO-IN-005; RM18.00; differing fields: []
+- PASS - Independent reconciliation: T0008: matched; bank DEMO-IN-006; RM5.00; differing fields: []
+- PASS - Independent reconciliation: T0009: matched; bank DEMO-OUT-002; RM6.00; differing fields: []
+- PASS - Independent reconciliation: T0010: matched; bank DEMO-IN-007; RM5.00; differing fields: []
+- PASS - Independent reconciliation: T0011: matched; bank DEMO-IN-008; RM18.00; differing fields: []
+- PASS - Independent reconciliation: T0012: needs_review; bank none; unknown; differing fields: []
+- PASS - Blurry receipt: intake flag overrides cash, blank amount, no totals, source retained: T0012; total not guessed
+- PASS - Independent reconciliation: T0013: matched; bank DEMO-IN-009; RM5.00; differing fields: []
+- PASS - Independent reconciliation: T0014: matched; bank DEMO-OUT-003; RM36.00; differing fields: []
+- PASS - Independent reconciliation: T0015: cash_declared; bank none; RM5.00; differing fields: []
+- PASS - Independent reconciliation: T0016: cash_declared; bank none; RM5.00; differing fields: []
+- PASS - Independent reconciliation: T0017: cash_declared; bank none; RM5.00; differing fields: []
+- PASS - Independent reconciliation: T0018: cash_declared; bank none; RM18.00; differing fields: []
+- PASS - Independent reconciliation: T0019: needs_review; bank DEMO-IN-010; RM4.50; differing fields: []
+- PASS - Mismatch: same printed reference, bank amount used, both notes amounts: T0019: document RM5.00, bank RM4.50
+- PASS - Independent reconciliation: T0020: unmatched; bank DEMO-OUT-004; RM9.00; differing fields: []
+- PASS - Missing receipt: supplier clear, blank source, counted and reviewed: T0020: Demo Bead Nook - bead materials top-up; RM9.00
+- PASS - Missing receipt: no raw document or image evidence for bank reference/date: Sunday message acknowledges absence, rather than supplying an expense receipt
+- PASS - Exact review membership for all planted problem rows: T0004, T0012, T0019, T0020
+- PASS - Exactly one duplicate, blurry, mismatch and missing receipt
+- PASS - Every bank assignment exists, every line used exactly once
+- PASS - Bank assignment: DEMO-IN-001: T0001
+- PASS - Bank assignment: DEMO-IN-002: T0002
+- PASS - Bank assignment: DEMO-OUT-001: T0003
+- PASS - Bank assignment: DEMO-IN-003: T0005
+- PASS - Bank assignment: DEMO-IN-004: T0006
+- PASS - Bank assignment: DEMO-IN-005: T0007
+- PASS - Bank assignment: DEMO-IN-006: T0008
+- PASS - Bank assignment: DEMO-OUT-002: T0009
+- PASS - Bank assignment: DEMO-IN-007: T0010
+- PASS - Bank assignment: DEMO-IN-008: T0011
+- PASS - Bank assignment: DEMO-IN-009: T0013
+- PASS - Bank assignment: DEMO-OUT-003: T0014
+- PASS - Bank assignment: DEMO-IN-010: T0019
+- PASS - Bank assignment: DEMO-OUT-004: T0020
+- PASS - Same-amount no-reference transfers really are ambiguous
+- PASS - All reference-bearing transfers assigned to their printed reference
+- PASS - Ambiguous pair uses different justified bank assignments
+- PASS - One midweek production correction from actual message
+- PASS - Baseline preserved, correction not pre-applied
+- PASS - Correction reply, field, old/new/date/source agree
+- PASS - Corrected product sold before, on and after correction: 4 units before; 7 units from October 7
+- PASS - One nightly event, stated duration unambiguous: Saturday 10:00am-6:00pm = 480 minutes
+- PASS - Stated hours are for events only: Other duration-bearing nightly messages: []
+- PASS - Exact hours multiset: grouping, quantity, minutes, source and reference: 20 actual / 20 independently derived lines; IDs not used to manufacture grouping
+- PASS - Hours line H0001: 2026-10-05; production; P01; quantity 2; 40 minutes; estimate; products.P01.minutes_per_unit
+- PASS - Hours line H0002: 2026-10-05; fulfilment; P01; quantity 2; 10 minutes; estimate; channels.instagram.fulfilment_minutes_per_order
+- PASS - Hours line H0003: 2026-10-06; production; P01; quantity 2; 40 minutes; estimate; products.P01.minutes_per_unit
+- PASS - Hours line H0004: 2026-10-06; production; P02; quantity 1; 35 minutes; estimate; products.P02.minutes_per_unit
+- PASS - Hours line H0005: 2026-10-06; fulfilment; P01; quantity 2; 10 minutes; estimate; channels.instagram.fulfilment_minutes_per_order
+- PASS - Hours line H0006: 2026-10-06; fulfilment; P02; quantity 1; 5 minutes; estimate; channels.instagram.fulfilment_minutes_per_order
+- PASS - Hours line H0007: 2026-10-07; production; P01; quantity 1; 15 minutes; corrected; products.P01.minutes_per_unit
+- PASS - Hours line H0008: 2026-10-07; fulfilment; P01; quantity 1; 5 minutes; estimate; channels.instagram.fulfilment_minutes_per_order
+- PASS - Hours line H0009: 2026-10-08; production; P01; quantity 1; 15 minutes; corrected; products.P01.minutes_per_unit
+- PASS - Hours line H0010: 2026-10-08; production; P02; quantity 1; 35 minutes; estimate; products.P02.minutes_per_unit
+- PASS - Hours line H0011: 2026-10-08; fulfilment; P01; quantity 1; 5 minutes; estimate; channels.instagram.fulfilment_minutes_per_order
+- PASS - Hours line H0012: 2026-10-08; fulfilment; P02; quantity 1; 3 minutes; estimate; channels.telegram.fulfilment_minutes_per_order
+- PASS - Hours line H0013: 2026-10-09; production; P01; quantity 1; 15 minutes; corrected; products.P01.minutes_per_unit
+- PASS - Hours line H0014: 2026-10-09; fulfilment; P01; quantity 1; 5 minutes; estimate; channels.instagram.fulfilment_minutes_per_order
+- PASS - Hours line H0015: 2026-10-10; production; P01; quantity 3; 45 minutes; corrected; products.P01.minutes_per_unit
+- PASS - Hours line H0016: 2026-10-10; production; P02; quantity 1; 35 minutes; estimate; products.P02.minutes_per_unit
+- PASS - Hours line H0017: 2026-10-10; event; shared; quantity None; 480 minutes; stated; message.2026-10-10
+- PASS - Hours line H0018: 2026-10-11; production; P01; quantity 1; 15 minutes; corrected; products.P01.minutes_per_unit
+- PASS - Hours line H0019: 2026-10-11; fulfilment; P01; quantity 1; 5 minutes; estimate; channels.instagram.fulfilment_minutes_per_order
+- PASS - Hours line H0020: 2026-10-11; admin; shared; quantity None; 120 minutes; estimate; assumptions.admin_hours_per_week
+- PASS - No duplicate hours groups/events/admin
+- PASS - Hours person and activity/source enums
+- PASS - Hours quantities/empties and zero-fulfilment omission
+- PASS - Approved correction labels: estimate before October 7, corrected from October 7
+- PASS - Only corrected field receives corrected label
+- PASS - Admin closes week on Sunday and event uses message reference
+- PASS - Independent hours reconstruction is repeatable
+- PASS - All category totals agree with independent reconciliation: sales RM108.50; materials RM27.00; packaging RM6.00; platform_fees RM0.00; shipping RM36.00; other_expenses RM0.00
+- PASS - Week minutes agree with independent hours: 938 minutes
+- PASS - Shared hours not allocated to products: direct 338; shared 600
+- PASS - Planted bestseller has strictly negative plan-based profit: P01: 11 units, profit -RM10.50; P02: 3 units, profit RM32.00
+- PASS - Two bases remain separate: product profit not forced to equal take home: Product profit sum RM21.50; take home RM39.50
+- PASS - Materials restock size: largest known purchase below take home and sales: Largest RM18.00; total known materials RM27.00; take home RM39.50. Operational proxy, not a specified numeric threshold.
+- PASS - Materials wording supports restock/top-up rather than bulk capital stock
+- PASS - Courier expense is not a sale and covers nine parcel labels once: 9 shipped orders; RM36.00
+- PASS - Negative control: equal-amount bank reference swap detected
+- PASS - Negative control: one-minute hours error detected
+- PASS - Negative control: incorrect pre-correction label detected
+- PASS - Negative control: duplicate hours line detected
+- PASS - Negative control: counted-row exclusions distinguish zero from unknown
+- PASS - All permitted input bytes unchanged during validation
+
+## Input fingerprints
+
+- `data/answer_key/.expected_ledger.ref/render_manifest.json`: `390674dfd410dfbdc3516d10a32fd689becc35db5fea2e5d3e283bbc5197c648`
+- `data/answer_key/expected_ledger.xlsx`: `b9fb5e9631e03f7dea1b82ce907286702480e684725247c9789e7ef6df0183f3`
+- `data/demo/inbox/bank_statement_2026-W41_SYNTHETIC.csv`: `848827a7410d607c44a7ede4f6ce96ae9cb6ef753323807d8dbde11d0d41e38b`
+- `data/demo/inbox/order_2026-10-05_dana.png`: `5d9fb21d22b7ebd294ca7268786a3cf046aed2cc3270f5b38a43fe36586da6af`
+- `data/demo/inbox/order_2026-10-05_mira.png`: `eb7c9461292c40cfa04d34c4427a16ae06169c202df0c7df4e40bd24fe9ed4f9`
+- `data/demo/inbox/order_2026-10-06_farah.png`: `8aeb78dab505818dbc97ff12306172e5edb65fedaf18222473af3ab9f144f18a`
+- `data/demo/inbox/order_2026-10-06_hana.png`: `59042ba63fd16eb9fcb2403f907ee317418459d2697b94166823034413cee582`
+- `data/demo/inbox/order_2026-10-06_nisa.png`: `aca7ee08b8e9ff38ca750d72fa527fbd87367e07264b8c9106e74423f69e5478`
+- `data/demo/inbox/order_2026-10-07_iman.png`: `0028e34871653080c3198d02edab0d4d9f6351cec98266f42e59e82c16a52f05`
+- `data/demo/inbox/order_2026-10-08_lina.png`: `bae94791df8492c87eedb31e064d5091e49a66dfaf97e376ecbbd1abc8143ea9`
+- `data/demo/inbox/order_2026-10-08_rina.png`: `dbba022cc4bfa86c7704d51fc07b7e91944bcdb814eee737ca86eb7c7e433fee`
+- `data/demo/inbox/order_2026-10-09_suri.png`: `457a1165192d7c31ee85c78fa58301a69db4620a9b01d3fbd9ec6d582a9b8a0a`
+- `data/demo/inbox/order_2026-10-11_zahra.png`: `b51353a294ba30574ff6ff019d654a623a41095d5e6c34b3003ddb83b32c620c`
+- `data/demo/inbox/receipt_beads.png`: `58f2010d99a74db5b01dca1969b7cf1850cb93f02f4c77061746b081de835add`
+- `data/demo/inbox/receipt_beads_copy.png`: `58f2010d99a74db5b01dca1969b7cf1850cb93f02f4c77061746b081de835add`
+- `data/demo/inbox/receipt_pouches.png`: `89027eb6c17281be56536eae0d5d50c45c0618eca38077e65866eaf82df07ef9`
+- `data/demo/inbox/receipt_shipping.png`: `af540321667891715f1ed0540091f841782995035313709595e8a6e6531d863c`
+- `data/demo/inbox/receipt_thread_blurred.png`: `941767990d765f2b0192b4910ec64237cd4200e75215feb894c1aae14de0edd7`
+- `data/demo/messages.md`: `f1152e8091d0e0fb2dcff2afd5c56be7af3e2984fe6f3c139c80dfc8546899da`
+- `data/demo/plan.xlsx`: `c350019e48255500732734371d83460c5b398abe77661211b741bdb1088870f9`
+- `docs/PLAN.md`: `ce8a4b6cafe2e1f2982a3f433e1f5a9d7d65fa26b00f740eaac5b90f5f79c1c3`
+- `docs/SYSTEM_DESIGN.md`: `2aa9fa270677c00ece3f28892b32d34d84cf21f4493fac4f728bfc90e7d7af7b`

@@ -1,0 +1,50 @@
+{
+  "category_sen": {
+    "sales": 10850,
+    "materials": 2700,
+    "packaging": 600,
+    "platform_fees": 0,
+    "shipping": 3600,
+    "other_expenses": 0
+  },
+  "take_home_sen": 3950,
+  "total_minutes": 938,
+  "display_hours": "15.6",
+  "hourly_rate": "2.53",
+  "margin_percent": "36",
+  "activity_minutes": {
+    "production": 290,
+    "fulfilment": 48,
+    "event": 480,
+    "admin": 120
+  },
+  "shared_minutes": 600,
+  "products": {
+    "P01": {
+      "units": 11,
+      "revenue_sen": 5450,
+      "unit_cost_sen": 3300,
+      "channel_cost_sen": 3200,
+      "profit_sen": -1050,
+      "direct_minutes": 225,
+      "profit_per_hour": "-2.80",
+      "loses_money": true
+    },
+    "P02": {
+      "units": 3,
+      "revenue_sen": 5400,
+      "unit_cost_sen": 1800,
+      "channel_cost_sen": 400,
+      "profit_sen": 3200,
+      "direct_minutes": 113,
+      "profit_per_hour": "16.99",
+      "loses_money": false
+    }
+  },
+  "review_ids": [
+    "T0004",
+    "T0012",
+    "T0019",
+    "T0020"
+  ]
+}
