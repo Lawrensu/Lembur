@@ -24,15 +24,17 @@
 * [x] Prepare labelled fixture HTML and export a four page A4 sample PDF without installing anything. Record the export method and timing in PLAN section 12; this is not a completed check 11 pass.
 * [x] Damian: review the sample PDF look. Approved at 17:23 on 10 October with “the sample pdf looks good”. This is sample visual approval, not real run validation.
 * [ ] Law: confirm the repeatable PDF conversion method for Payroll and verify populated real output pagination. HTML remains available as the fallback.
-* [ ] Hand `submission/payslip_template.html` to Law. Law's receipt and acceptance must be confirmed, not assumed.
+* [ ] Law or the builder agent: read `submission/payslip_handoff.md` and confirm receipt and acceptance of `submission/payslip_template.html`. The written handoff is ready; acceptance and production integration are not assumed.
 * [ ] Review the identity file with Law for the skill instructions.
 
 ## Law: build and evidence
 
-* [ ] Finish the entry point fixes listed in PLAN section 13: Windows output encoding and guards on plan corrections.
+* [x] Merge the Windows output encoding and plan correction guards into the entry point. PLAN section 13's older task snapshot predates these changes; runtime acceptance remains separate from merged code.
 * [ ] Fill Damian's template from `audit/<week>/numbers.json` through the payslip command, after the ruling.
-* [ ] Build Bookkeeper, Payroll, Auditor and Growth coach skills in the documented order.
-* [ ] Implement individual approval by reply in the skills: “approve N” moves that draft into `approvals/<week>/approved/`; “skip N” leaves it pending. The system never posts or sends drafts.
+* [x] Write the Bookkeeper, Payroll, Auditor and Growth coach skill instruction files and run order in the repository. Written files do not establish installation or execution.
+* [x] Specify individual approval by reply in the Growth coach instructions: “approve N” moves that draft into `approvals/<week>/approved/`; “skip N” leaves it pending. The system never posts or sends drafts.
+* [ ] Verify installation, role handoff and approval file moves in an actual recorded run. Resolve intended parallel recommendations versus common sequential handoff wording through check 5.
+* [ ] Clarify the raise plan mapping where an upheld recommendation needs no draft. Growth coach instructions allow this case; SYSTEM_DESIGN section 7 expects a draft reference. Do not fabricate a draft or add a field.
 * [ ] Run checks 5 and 8. Record visible team execution and the credit balance change of a complete run.
 * [ ] Supply actual recommendation, ruling, audit and draft files for Damian's final content.
 * [ ] Give explicit build authorisation before implementing price only projections after the first full run, or Day Zero after the midnight checkpoint. Both designs are agreed, not built.
@@ -50,7 +52,8 @@
 
 ## Damian: story and final outputs
 
-* [ ] Refresh and approve `board_meeting_layout.md`, `deck_outline.md`, `video_script.md` and `qa_sheet.md` against the latest source docs.
+* [x] Refresh `board_meeting_layout.md`, `deck_outline.md`, `video_script.md` and `qa_sheet.md` against the merged rules. Preserve the board structure, proposed nine slides, seven scenes and evidence placeholders; this is a content refresh, not final approval or run validation.
+* [ ] Damian: approve the refreshed board presentation, proposed deck sequence, narration and Q&A wording.
 * [ ] Confirm the organisers' video limit and the scene timings. Leave timing slots unfilled until confirmed.
 * [ ] Keep trigger, scheduling and morning message scenes conditional until checks 1, 3 and 9 establish them.
 * [ ] Show approval by reply rather than a button or automatic posting. End at individual approval; the student sends approved drafts herself.
