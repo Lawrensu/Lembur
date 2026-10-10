@@ -192,7 +192,7 @@
 ## What remains open before submission?
 
 - Open proofs: 1 to 5 (PLAN section 12).
-- Which model fills each role (proofs 1 and 2), and who takes the agent orchestration and Telegram packages, which is marked [confirm] (PLAN sections 13 and 18).
+- Which model fills each role (proofs 1 and 2), and the times of the rewritten timeline, which are marked [confirm] (PLAN sections 14 and 18).
 - The organisers' exact wording of the rule change (PLAN section 1).
 - Sharon's story and key sign-off and the actual run comparison.
 - Day Zero and the raise projection: agreed designs, not built, on Law's word.

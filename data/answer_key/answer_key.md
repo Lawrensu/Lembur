@@ -128,14 +128,12 @@
 
 ## Reproduction and handoff
 
-- The CSV files data/demo/plan_*.csv and data/answer_key/ledger_*.csv are the source of truth, and data/test_harness/compare_outputs.py checks a run against them with no installed package. The scripts listed below built the first .xlsx version. They are kept as a record and no longer run: the workbooks they read were removed on 10 October. Keep data/answer_key/.expected_ledger.ref/calculation.json, which the comparator still reads.
-- Paths below are relative to the repository root.
-- Baseline workbook: data/demo/.plan.ref/build.py.
-- Expected ledger and primary numbers: data/answer_key/.expected_ledger.ref/build.py.
-- Derived sources: render_receipts.py, render_orders.py and render_bank.py in data/answer_key/.expected_ledger.ref/.
+- The CSV files data/demo/plan_*.csv and data/answer_key/ledger_*.csv are the source of truth, and data/test_harness/compare_outputs.py checks a run against them with no installed package.
+- The first version of this fixture was built as .xlsx workbooks. Those workbooks and the scripts that read them were removed on 10 October. What they produced is kept in the two .ref folders beside this file.
+- Primary numbers: data/answer_key/.expected_ledger.ref/calculation.json. The comparator still reads it, so keep that folder.
+- Independent rebuild: data/answer_key/.independent.ref/independent_result.json and independent_notes.md. It received only the transactions and bank lines, never the expected hours or the primary calculation.
+- Exact comparison of the two: data/answer_key/.expected_ledger.ref/cross_check.json. Rule checks: rule_check.md in the same folder.
+- Derived sources: render_receipts.py, render_orders.py and render_bank.py in data/answer_key/.expected_ledger.ref/ drew the inbox images. They need Pillow.
 - Nightly text and intake batches: data/demo/messages.md.
-- Independent rebuild: data/answer_key/.independent.ref/independent_calc.py, using its isolated two-sheet input. Refresh that isolated input from transactions and bank_lines if the fixture changes; never include expected hours or primary calculation code.
-- Rule checks: data/answer_key/.expected_ledger.ref/check_rules.py.
-- Exact comparison and this draft: data/answer_key/.expected_ledger.ref/verify_and_write_key.py.
 - Run inputs only: copy baseline plan and each day's inbox batch/message into workspace. Never copy data/answer_key into workspace or give it to the production agents during the demo.
 - Next gate: Sharon signs off on the story and answer key. Later, compare Law's real outputs row-by-row, including amounts to the sen, statuses, sources and minutes. No observed-run comparison has happened yet.

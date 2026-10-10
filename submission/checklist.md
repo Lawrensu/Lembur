@@ -1,7 +1,7 @@
 # Lembur team checklist
 
 * Sources of truth: `README.md`, then `docs/PLAN.md`, then `docs/SYSTEM_DESIGN.md`.
-* Follow PLAN section 13 for task ownership and order of work. The remaining build is three packages: the backend (Law, first), agent orchestration and the Telegram connection. Who takes the last two is marked [confirm]. Ask Law about missing requirements or build authorisation; Damian owns the look, story, recording and editing.
+* Follow PLAN section 13 for task ownership and order of work. The remaining build is three packages: the backend (Sharon, first), agent orchestration (Law) and the Telegram connection (Damian). Ask Law about missing requirements or build authorisation; Damian owns the look, story, recording and editing.
 * Use demo data only. No secrets, attribution lines, tables or dashes in prose. WorkBuddy is the build platform, not part of the running product: name it only for what it really did (PLAN section 11).
 * The product is our own chat bot, redesigned on 10 October. Older tasks that depended on running inside WorkBuddy have been removed.
 
@@ -24,47 +24,48 @@
 
 ## Where things stand
 
-* From PLAN section 13, 10 October 23:30.
+* From PLAN section 13, 10 October 23:45.
 * **Working, merged into `dev`**: the tools and the command line with their tests, the payslip command and Damian's template, the dataset, the answer key, the comparator and the redesigned docs.
 * **Not built**: everything in `app/` and `prompts/`. Do not tick or present any of it as done until its proof in PLAN section 12 is recorded.
 * **Order of work**: the backend first, merged into `dev`. Meanwhile the prompts are drafted and the bot is built against a stand in. Then the runner and the bot in parallel, then the join, then recording.
 * **Seams**: design sections 6.3 and 6.4 fix what each package calls. Stay in your own files. If a seam does not fit, tell Law.
 * **Result shape**: the owner of a proof writes the result under it in PLAN section 12 as `**Result, <date> <time>, <name>**: pass, fail or fallback taken. What was done. What happened.`
 
-## Package 1, backend: Law, first
+## Package 1, backend: Sharon, first
 
-* [ ] Proof 1, the reading model accepts an image through the gateway: send `data/demo/inbox/order_2026-10-11_zahra.png` and expect the four values listed under proof 1. Fallback: another model that accepts images, behind the same module.
-* [ ] Build `app/model.py` and `.env.example` (design section 6.3). The key never appears in the repository, a prompt, a log or a reply.
-* [ ] Build `app/tools.py`: the seven tools of design section 6.4, inside the workspace only, with the list of what each agent may use.
+* [ ] Build `app/tools.py` first: the seven tools of design section 6.4, inside the workspace only, with the list of what each agent may use.
+* [ ] Build `app/model.py` and `.env.example` (design section 6.3). Law gives you the gateway address, the example request and a key privately. The key goes only into your `.env`.
 * [ ] Tests for both that run without a key and without a network.
-* [ ] Merge the backend into `dev` and tell the other two.
-* [ ] Proof 5, one recorded run of our agents inside WorkBuddy: install the four instruction files from `skills/` as WorkBuddy skills, run the night of 2026-10-05 with the Bookkeeper skill, then the Payroll skill, and record the screen. It is insurance and the fallback demo.
-* [ ] Add the organisers' exact message about the rule change to PLAN section 1 [confirm].
-* [ ] Give explicit build authorisation before anyone implements price only projections or Day Zero. Both designs are agreed, not built.
+* [ ] Proof 1, the reading model accepts an image through the gateway: send `data/demo/inbox/order_2026-10-11_zahra.png` and expect the four values listed under proof 1. Fallback: another model that accepts images, behind the same module.
+* [ ] Open a pull request into `dev` and tell the other two. `app/tools.py` can go in ahead of `app/model.py`.
 
-## Package 2, agent orchestration: Sharon [confirm]
+## Package 2, agent orchestration: Law
 
 * [ ] Draft the four prompts in `prompts/` from the instruction files in `skills/` (design section 6.4). This needs no backend.
+* [ ] Proof 5, one recorded run of our agents inside WorkBuddy: install the four instruction files from `skills/` as WorkBuddy skills, run the night of 2026-10-05 with the Bookkeeper skill, then the Payroll skill, and record the screen. It is insurance and the fallback demo. This needs no backend either.
 * [ ] Build `app/runner.py`: the plan for the night, the agent loop and the order of steps (design sections 6.1, 6.3 and 6.4).
 * [ ] Replay the demo week through the runner with a scripted model inside the tests.
 * [ ] Proof 2, the reasoning model can run one night as an agent: the night of 2026-10-05 through the runner, with four rows, T0004 marked `duplicate` and a saved `numbers.json`, and no manual help.
 * [ ] 03:00 decision point: one night runs through the runner with the real model, or the fallback is taken (PLAN section 15).
 * [ ] Proof 4, the whole demo week passes the comparator: replay the seven nights with the real models, then `python -B data/test_harness/compare_outputs.py` must print PASS with no difference.
 * [ ] Supply actual recommendation, ruling, audit and draft files for Damian's final content.
+* [ ] Give Sharon the gateway address, the example request and a key privately.
+* [ ] Add the organisers' exact message about the rule change to PLAN section 1 [confirm].
+* [ ] Give explicit build authorisation before anyone implements price only projections or Day Zero. Both designs are agreed, not built.
 
-## Package 3, Telegram connection: Damian [confirm]
+## Package 3, Telegram connection: Damian
 
-* [ ] Create a bot with `@BotFather` and put its token in `.env`. Never put a bot token in the repository or a chat.
+* [ ] Create a bot with `@BotFather` and put its token in `.env`. Never put a bot token in the repository.
 * [ ] Build `app/bot.py` against a stand in `run_night` that returns the night summary of design section 6.3. It saves files into `inbox/`, answers `payslip`, `review`, `approve N` and `skip N`, and passes anything else to `run_night` (design section 6.5).
 * [ ] Write the fixed sentences the bot says and the morning message, “Your board meeting is ready”. Figures in them are copied from `numbers.json`, so only the wording is yours.
 * [ ] Proof 3, the bot receives a message and a photo and replies with a file: send a text and a photo, then the word `payslip`. The photo must be in the inbox of that chat's workspace and the payslip file must arrive in the chat. Fallback: run the night from the command line and show the files.
-* [ ] Join the bot to the real `run_night` once package 2 is in `dev`.
+* [ ] Join the bot to the real `run_night` once the runner is in `dev`.
 
 ## Sharon: data and checks
 
 * [ ] Sign off the demo persona and the answer key. `answer_key.md` and `messages.md` were aligned for you on 10 October: CSV paths, Hana as T0006 and Nisa as T0007 on 6 October, and a generic university name. Read those changes first.
 * [ ] Review the CSV test harness and report any problem to Law.
-* [ ] Compare every full run with the answer key using `python -B data/test_harness/compare_outputs.py`. A mismatch is a bug to fix, not something to explain away.
+* [ ] Read the comparator's report for every full run: `python -B data/test_harness/compare_outputs.py`. A mismatch is a bug to fix, not something to explain away.
 * [ ] Build Day Zero only after Law authorises it.
 
 ## Damian: story and final outputs

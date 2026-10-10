@@ -87,9 +87,9 @@ submission/             payslip template, deck, video script, question and answe
 * **B. Data and business (Sharon)**: the demo dataset, the answer key, the comparator, checking every run against the key.
 * **C. Design and story (Damian)**: agent identities, the payslip template, the wording of the bot's replies, the deck, the video.
 * **The remaining build is three packages** (PLAN section 13)
-  1. **Backend**, Law, first: `app/model.py` and `app/tools.py`.
-  2. **Agent orchestration**: `app/runner.py` and `prompts/`.
-  3. **Telegram connection**: `app/bot.py`.
+  1. **Backend**, Sharon, first: `app/tools.py` and `app/model.py`.
+  2. **Agent orchestration**, Law: `app/runner.py` and `prompts/`.
+  3. **Telegram connection**, Damian: `app/bot.py`.
 * **Order of work and checkpoints**: PLAN sections 13 and 14.
 
 ## Branches

@@ -143,7 +143,7 @@ Moved to `docs/SYSTEM_DESIGN.md`. Old section numbers map as follows.
   * `data/demo/messages.md`: each nightly message and the correction reply, with its date.
   * `data/answer_key/ledger_transactions.csv`, `data/answer_key/ledger_bank_lines.csv`, `data/answer_key/ledger_hours.csv`: the expected ledger.
   * `data/answer_key/answer_key.md`: every other expected figure and flag.
-* **Checking the key itself**: the hand calculation is confirmed by a second, independent calculation before anyone builds against it. The scripts of both calculations are kept as a record in the `.ref` folders beside the data. They read the removed workbooks and no longer run. The comparator still reads `data/answer_key/.expected_ledger.ref/calculation.json`, so that folder must stay.
+* **Checking the key itself**: the hand calculation is confirmed by a second, independent calculation before anyone builds against it. The results of both calculations are kept as a record in the `.ref` folders beside the answer key. The comparator still reads `data/answer_key/.expected_ledger.ref/calculation.json`, so that folder must stay.
 * **Intake order**: the Bookkeeper reads inbox files in file name order, then adds rows that come only from the message. Transaction IDs follow that order.
 * **Two kinds of run are checked**: a replay with the fake model, inside the tests, and a run with the real models (section 12, proof 4). Both use `workspace/` and the same comparator.
 * **Pass condition**: the run's outputs match the answer key exactly (statuses, minutes, and money to the sen). A mismatch is a bug to fix, not something to explain away in the demo.
@@ -180,25 +180,25 @@ Each proof answers one question before we build on the answer. The owner writes 
    * **Steps**: deploy the model in the gateway dashboard. Send one request with `data/demo/inbox/order_2026-10-11_zahra.png` and ask for the date, the amount, the customer and the payment reference.
    * **Pass when**: it returns 2026-10-11, RM5.00, Zahra and DEMO-IN-010.
    * **Fallback**: another model that accepts images, behind the same module.
-   * **Owner**: Law.
+   * **Owner**: Sharon. Law gives her the gateway address and a key privately.
 2. **The reasoning model can run one night as an agent**
    * **Why**: agents act by asking for tools in a fixed reply format (design section 6.4). A model that drifts from the format cannot run a night.
    * **Steps**: run the night of 2026-10-05 through the runner with the real model.
    * **Pass when**: four rows, T0004 marked `duplicate`, and a saved `numbers.json`, with no manual help.
    * **Fallback**: a stronger model in the same role.
-   * **Owner**: the owner of package 2 (section 13).
+   * **Owner**: Law.
 3. **The bot receives a message and a photo and replies with a file**
    * **Why**: the chat is the whole interface.
    * **Steps**: create a bot with `@BotFather`. Put its token in `.env`. Send the bot a text and a photo, then the word `payslip`.
    * **Pass when**: the photo is in the inbox of that chat's workspace, and the payslip file arrives in the chat.
    * **Fallback**: run the night from the command line and show the files.
-   * **Owner**: the owner of package 3 (section 13).
+   * **Owner**: Damian.
 4. **The whole demo week passes the comparator**
    * **Why**: this is the pass condition of section 10.
    * **Steps**: replay the seven nights of `data/demo/messages.md` through the runner with the real models, then run `python -B data/test_harness/compare_outputs.py`.
    * **Pass when**: it prints PASS with no difference.
    * **Fallback**: fix the prompt or the runner. A mismatch is a bug, not something to explain away.
-   * **Owner**: the owner of package 2. Sharon reads the comparator's report either way.
+   * **Owner**: Law. Sharon reads the comparator's report.
 5. **One recorded run of our agents inside WorkBuddy**
    * **Why**: insurance, and the fallback demo (section 15). The judging slide still names WorkBuddy as the execution platform (section 1).
    * **Steps**: install the four instruction files from `skills/` as WorkBuddy skills. Run the night of 2026-10-05 with the Bookkeeper skill, then the Payroll skill. Record the screen.
@@ -217,44 +217,43 @@ Each proof answers one question before we build on the answer. The owner writes 
 
 ## 13. Team split
 
-* **Roles, unchanged**
+* **Roles**
   * **A. Builder (Law)**: integration and the final say on the build.
   * **B. Data and business (Sharon)**: the demo dataset, the answer key, the comparator, checking every run against the key.
   * **C. Design and story (Damian)**: agent identities, the payslip template, the wording of the bot's replies, the deck, the video.
-* **The remaining build is three packages**, decided by Law at 23:30 on 10 October. Each package has one owner and its own files. The seams between them are fixed in design sections 6.3 and 6.4, so nobody waits for another person's code to know what to call.
-  1. **Backend, Law, first**
-     * **Files**: `app/model.py`, `app/tools.py`, `.env.example`, and their tests in `app/tests/`.
-     * **What it is**: the only code that calls a language model, and the only code that runs a tool for an agent.
-     * **Done when**: proof 1 passes, and the tests show that each of the seven tools works, stays inside the workspace and respects the list of what each agent may use.
-  2. **Agent orchestration, Sharon** [confirm]
-     * **Files**: `app/runner.py`, `prompts/bookkeeper.md`, `prompts/payroll.md`, `prompts/growth_coach.md`, `prompts/auditor.md`, and the replay test.
+* **The remaining build is three packages**, decided by Law on 10 October. Each package has one owner and its own files. The seams between them are fixed in design sections 6.3 and 6.4, so nobody waits for another person's code to know what to call.
+  1. **Backend, Sharon, first**
+     * **Files**: `app/tools.py`, `app/model.py`, `.env.example`, and their tests in `app/tests/`.
+     * **What it is**: the only code that runs a tool for an agent, and the only code that calls a language model.
+     * **Order inside the package**: `app/tools.py` first. The runner can be built and tested on it with a scripted model before the gateway works.
+     * **Done when**: the tests show that each of the seven tools works, stays inside the workspace and respects the list of what each agent may use, and proof 1 passes.
+     * **The gateway**: Law holds the account. He gives Sharon the address, the example request and a key privately. The key goes only into her `.env`.
+  2. **Agent orchestration, Law**
+     * **Files**: `app/runner.py`, `prompts/bookkeeper.md`, `prompts/payroll.md`, `prompts/growth_coach.md`, `prompts/auditor.md`, and the replay test in `app/tests/`.
      * **What it is**: the plan for the night, the loop in which an agent asks for tools, and the order of the steps.
      * **Done when**: the demo week replays through the runner with a scripted model inside the tests, then proofs 2 and 4 pass with the real models.
-     * **Why Sharon**: the pass condition is her answer key and her comparator.
-  3. **Telegram connection, Damian** [confirm]
-     * **Files**: `app/bot.py` and its tests.
+  3. **Telegram connection, Damian**
+     * **Files**: `app/bot.py` and its tests in `app/tests/`.
      * **What it is**: the chat front door of design section 6.5, and the fixed sentences the bot says.
      * **Done when**: proof 3 passes.
-     * **Why Damian**: the bot's wording and the morning message are already his.
-* **Who takes package 2 and who takes package 3** [confirm]: Law named the two packages for Sharon and Damian. The pairing above is a recommendation. Swap the two names if you agree otherwise, and tell Law.
 * **Order**
-  1. **Backend first**: Law builds it and merges it into `dev`.
-  2. **Meanwhile, with no backend needed**: package 2 drafts the four prompts from `skills/`. Package 3 creates the Telegram bot with `@BotFather` and builds `app/bot.py` against a stand in `run_night` that returns the night summary of design section 6.3.
-  3. **After the backend is in `dev`**: packages 2 and 3 pull `dev` and build in parallel.
+  1. **Backend first**: Sharon builds it and opens a pull request into `dev`. `app/tools.py` can go in ahead of `app/model.py`.
+  2. **Meanwhile, with no backend needed**: Law drafts the four prompts from `skills/` and records proof 5. Damian creates the Telegram bot with `@BotFather` and builds `app/bot.py` against a stand in `run_night` that returns the night summary of design section 6.3.
+  3. **After the backend is in `dev`**: Law pulls `dev` and builds the runner. Damian finishes the bot.
   4. **Join**: the bot calls the real `run_night`. First full run through the chat.
   5. **Recording**: from real run outputs.
 * **Rules for all three packages**
   * **Stay in your files**: do not edit another package's files, `tools/`, or the docs. If a seam does not fit, tell Law. The seam is changed in the design first, then in the code.
   * **Standard library only**: no package is installed.
-  * **Secrets**: the key and the bot token live in `.env`. Never paste one into a chat, a prompt, a file or a commit.
+  * **Secrets**: the key and the bot token live in `.env`. Never put one into a prompt, a file, a log or a commit.
   * **Tests run without a key and without a network**: they use a scripted model.
   * **Pull `dev` first, then work on your own branch.** Pull requests go into `dev`, never into `main`.
   * **Capture evidence as you go** (section 11): a screenshot of each WorkBuddy session that builds your package.
-* **Still with each role, beside the package**
+* **Beside the package**
   * **Law**: proof 5, the recorded run inside WorkBuddy. It is also the fallback demo (section 15).
-  * **Sharon**: sign off the answer key. Compare every full run with the key.
-  * **Damian**: the deck, the video script, the question and answer sheet, the evidence pack layout.
-* **Where things stand, 10 October 23:30**
+  * **Sharon**: sign off the answer key. Read the comparator's report for every full run.
+  * **Damian**: the deck, the video script, the question and answer sheet.
+* **Where things stand, 10 October 23:45**
   * **Working, merged into `dev`**: the tools and the command line with their tests, the payslip command and Damian's template, the dataset, the answer key, the comparator, and the redesigned docs.
   * **Not built**: everything in `app/` and `prompts/`.
   * **Not run**: any proof of section 12.
@@ -263,15 +262,15 @@ Each proof answers one question before we build on the answer. The owner writes 
 
 ## 14. Timeline (to 9:00am)
 
-* **Rewritten at 23:30 on 10 October** [confirm]: the earlier schedule assumed the build would start at 18:00. It started at 23:30. Law decides the times below.
-* **23:30 to 01:00**
-  * **Law**: the backend. Proof 1 as soon as the gateway address is known.
-  * **Sharon**: the four prompts drafted from `skills/`.
+* **Rewritten at 23:45 on 10 October** [confirm]: the earlier schedule assumed the build would start at 18:00. Law decides the times below.
+* **23:45 to 01:00**
+  * **Sharon**: the backend. `app/tools.py` first, then `app/model.py` and proof 1.
+  * **Law**: the four prompts drafted from `skills/`. Proof 5 recorded.
   * **Damian**: the Telegram bot created, `app/bot.py` against the stand in.
-  * **01:00: the backend is merged into `dev`.**
+  * **01:00: the backend is in `dev`.**
 * **01:00 to 03:00**
-  * **Law**: proof 5 recorded. Then help where a package is stuck.
-  * **Sharon**: the runner on the scripted model, then proof 2.
+  * **Law**: the runner on the scripted model, then proof 2.
+  * **Sharon**: the answer key signed off. Then help where a package is stuck.
   * **Damian**: the bot finished, proof 3.
   * **03:00: decision point. One night runs through the runner with the real model, or the fallback of section 15 is taken.**
 * **03:00 to 04:30**
@@ -342,9 +341,8 @@ One character, told across time. The whole story happens in her chat app.
   * **Shared figures and audit**: Payroll saves `audit/<week>/numbers.json`, and the Auditor compares a recomputation with that file. The payslip is built once.
   * **Agent style, decided by Damian**: professional colleagues, using role titles.
   * **Raise projection and Day Zero**: agreed as designs. Built only on Law's word.
-  * **Three packages** (10 October, 23:30): backend, agent orchestration, Telegram connection. Law builds the backend first.
+  * **Three packages** (10 October): Sharon builds the backend first, Law the agent orchestration, Damian the Telegram connection.
 * **Still open**
-  * **Who takes package 2 and who takes package 3** (section 13).
   * **The times in the timeline** (section 14).
   * **Which model fills each role** (proofs 1 and 2).
   * **The organisers' exact wording of the rule change** (section 1).
