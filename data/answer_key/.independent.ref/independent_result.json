@@ -1,0 +1,2072 @@
+{
+  "schema": "lembur-independent-rebuild-v1",
+  "week": {
+    "iso_week": "2026-W41",
+    "monday": "2026-10-05",
+    "sunday": "2026-10-11",
+    "timezone": "Asia/Kuala_Lumpur",
+    "scope": "Prepared complete-week synthetic fixture, not live activity"
+  },
+  "input_sha256": {
+    "docs/PLAN.md": "ce8a4b6cafe2e1f2982a3f433e1f5a9d7d65fa26b00f740eaac5b90f5f79c1c3",
+    "docs/SYSTEM_DESIGN.md": "2aa9fa270677c00ece3f28892b32d34d84cf21f4493fac4f728bfc90e7d7af7b",
+    "data/demo/plan.xlsx": "c350019e48255500732734371d83460c5b398abe77661211b741bdb1088870f9",
+    "data/demo/messages.md": "f1152e8091d0e0fb2dcff2afd5c56be7af3e2984fe6f3c139c80dfc8546899da",
+    "data/answer_key/.independent.ref/input_transactions_bank.xlsx": "09db13da8cc69f0fe9d37f7270e2f747a209f6a909f8986880462f7a7e4e12c4"
+  },
+  "conventions": {
+    "money_calculation": "integer sen",
+    "time_calculation": "integer minutes",
+    "display_rounding": "Decimal ROUND_HALF_UP",
+    "ratio_storage": "exact integer numerator and denominator plus rounded display",
+    "hours_id_order": [
+      "date",
+      "production/fulfilment/event/admin",
+      "product_id",
+      "channel",
+      "assumption_ref"
+    ]
+  },
+  "baseline_plan": {
+    "products": [
+      {
+        "product_id": "P01",
+        "name": "Beaded keychain",
+        "price_rm": 5,
+        "material_cost_rm": 2.5,
+        "packaging_cost_rm": 0.5,
+        "minutes_per_unit": 20
+      },
+      {
+        "product_id": "P02",
+        "name": "Beaded bracelet",
+        "price_rm": 18,
+        "material_cost_rm": 5,
+        "packaging_cost_rm": 1,
+        "minutes_per_unit": 35
+      }
+    ],
+    "channels": [
+      {
+        "channel": "instagram",
+        "fee_percent": 0,
+        "fee_per_order_rm": 0,
+        "shipping_cost_per_order_rm": 4,
+        "fulfilment_minutes_per_order": 5
+      },
+      {
+        "channel": "telegram",
+        "fee_percent": 0,
+        "fee_per_order_rm": 0,
+        "shipping_cost_per_order_rm": 0,
+        "fulfilment_minutes_per_order": 3
+      },
+      {
+        "channel": "bazaar",
+        "fee_percent": 0,
+        "fee_per_order_rm": 0,
+        "shipping_cost_per_order_rm": 0,
+        "fulfilment_minutes_per_order": 0
+      }
+    ],
+    "assumptions": [
+      {
+        "admin_hours_per_week": 2,
+        "planned_margin_percent": 40,
+        "target_hourly_rate_rm": 12
+      }
+    ],
+    "change_log": []
+  },
+  "corrected_plan_in_memory": {
+    "products": [
+      {
+        "product_id": "P01",
+        "name": "Beaded keychain",
+        "price_rm": 5,
+        "material_cost_rm": 2.5,
+        "packaging_cost_rm": 0.5,
+        "minutes_per_unit": 15
+      },
+      {
+        "product_id": "P02",
+        "name": "Beaded bracelet",
+        "price_rm": 18,
+        "material_cost_rm": 5,
+        "packaging_cost_rm": 1,
+        "minutes_per_unit": 35
+      }
+    ],
+    "channels": [
+      {
+        "channel": "instagram",
+        "fee_percent": 0,
+        "fee_per_order_rm": 0,
+        "shipping_cost_per_order_rm": 4,
+        "fulfilment_minutes_per_order": 5
+      },
+      {
+        "channel": "telegram",
+        "fee_percent": 0,
+        "fee_per_order_rm": 0,
+        "shipping_cost_per_order_rm": 0,
+        "fulfilment_minutes_per_order": 3
+      },
+      {
+        "channel": "bazaar",
+        "fee_percent": 0,
+        "fee_per_order_rm": 0,
+        "shipping_cost_per_order_rm": 0,
+        "fulfilment_minutes_per_order": 0
+      }
+    ],
+    "assumptions": [
+      {
+        "admin_hours_per_week": 2,
+        "planned_margin_percent": 40,
+        "target_hourly_rate_rm": 12
+      }
+    ],
+    "change_log": [
+      {
+        "changed_at": "2026-10-07",
+        "field": "products.P01.minutes_per_unit",
+        "old_value": 20,
+        "new_value": 15,
+        "reason": "I timed myself today, keychains take 15 minutes not 20",
+        "source": "message.2026-10-07"
+      }
+    ]
+  },
+  "corrections_applied_in_memory": [
+    {
+      "changed_at": "2026-10-07",
+      "field": "products.P01.minutes_per_unit",
+      "old_value": 20,
+      "new_value": 15,
+      "reason": "I timed myself today, keychains take 15 minutes not 20",
+      "source": "message.2026-10-07"
+    }
+  ],
+  "events_parsed": [
+    {
+      "date": "2026-10-10",
+      "minutes": 480,
+      "source": "stated",
+      "assumption_ref": "message.2026-10-10",
+      "message_text": "I ran the campus bazaar today from 10:00am to 6:00pm, eight hours in total. Cash orders, all separate: Aina bought one P01 beaded keychain for RM5.00; Bella bought one P01 beaded keychain for RM5.00; Citra bought one P01 beaded keychain for RM5.00; Dina bought one P02 beaded bracelet for RM18.00. All four orders were at the bazaar. I handed them over at the stall. Please record each once from this message."
+    }
+  ],
+  "hours": [
+    {
+      "date": "2026-10-05",
+      "person": "person_1",
+      "activity": "production",
+      "product_id": "P01",
+      "channel": null,
+      "quantity": 2,
+      "minutes": 40,
+      "source": "estimate",
+      "assumption_ref": "products.P01.minutes_per_unit",
+      "value_in_force": 20,
+      "correction_message": null,
+      "transaction_ids": [
+        "T0001",
+        "T0002"
+      ],
+      "entry_id": "H0001"
+    },
+    {
+      "date": "2026-10-05",
+      "person": "person_1",
+      "activity": "fulfilment",
+      "product_id": "P01",
+      "channel": "instagram",
+      "quantity": 2,
+      "minutes": 10,
+      "source": "estimate",
+      "assumption_ref": "channels.instagram.fulfilment_minutes_per_order",
+      "value_in_force": 5,
+      "correction_message": null,
+      "transaction_ids": [
+        "T0001",
+        "T0002"
+      ],
+      "entry_id": "H0002"
+    },
+    {
+      "date": "2026-10-06",
+      "person": "person_1",
+      "activity": "production",
+      "product_id": "P01",
+      "channel": null,
+      "quantity": 2,
+      "minutes": 40,
+      "source": "estimate",
+      "assumption_ref": "products.P01.minutes_per_unit",
+      "value_in_force": 20,
+      "correction_message": null,
+      "transaction_ids": [
+        "T0005",
+        "T0006"
+      ],
+      "entry_id": "H0003"
+    },
+    {
+      "date": "2026-10-06",
+      "person": "person_1",
+      "activity": "production",
+      "product_id": "P02",
+      "channel": null,
+      "quantity": 1,
+      "minutes": 35,
+      "source": "estimate",
+      "assumption_ref": "products.P02.minutes_per_unit",
+      "value_in_force": 35,
+      "correction_message": null,
+      "transaction_ids": [
+        "T0007"
+      ],
+      "entry_id": "H0004"
+    },
+    {
+      "date": "2026-10-06",
+      "person": "person_1",
+      "activity": "fulfilment",
+      "product_id": "P01",
+      "channel": "instagram",
+      "quantity": 2,
+      "minutes": 10,
+      "source": "estimate",
+      "assumption_ref": "channels.instagram.fulfilment_minutes_per_order",
+      "value_in_force": 5,
+      "correction_message": null,
+      "transaction_ids": [
+        "T0005",
+        "T0006"
+      ],
+      "entry_id": "H0005"
+    },
+    {
+      "date": "2026-10-06",
+      "person": "person_1",
+      "activity": "fulfilment",
+      "product_id": "P02",
+      "channel": "instagram",
+      "quantity": 1,
+      "minutes": 5,
+      "source": "estimate",
+      "assumption_ref": "channels.instagram.fulfilment_minutes_per_order",
+      "value_in_force": 5,
+      "correction_message": null,
+      "transaction_ids": [
+        "T0007"
+      ],
+      "entry_id": "H0006"
+    },
+    {
+      "date": "2026-10-07",
+      "person": "person_1",
+      "activity": "production",
+      "product_id": "P01",
+      "channel": null,
+      "quantity": 1,
+      "minutes": 15,
+      "source": "corrected",
+      "assumption_ref": "products.P01.minutes_per_unit",
+      "value_in_force": 15,
+      "correction_message": "message.2026-10-07",
+      "transaction_ids": [
+        "T0008"
+      ],
+      "entry_id": "H0007"
+    },
+    {
+      "date": "2026-10-07",
+      "person": "person_1",
+      "activity": "fulfilment",
+      "product_id": "P01",
+      "channel": "instagram",
+      "quantity": 1,
+      "minutes": 5,
+      "source": "estimate",
+      "assumption_ref": "channels.instagram.fulfilment_minutes_per_order",
+      "value_in_force": 5,
+      "correction_message": null,
+      "transaction_ids": [
+        "T0008"
+      ],
+      "entry_id": "H0008"
+    },
+    {
+      "date": "2026-10-08",
+      "person": "person_1",
+      "activity": "production",
+      "product_id": "P01",
+      "channel": null,
+      "quantity": 1,
+      "minutes": 15,
+      "source": "corrected",
+      "assumption_ref": "products.P01.minutes_per_unit",
+      "value_in_force": 15,
+      "correction_message": "message.2026-10-07",
+      "transaction_ids": [
+        "T0010"
+      ],
+      "entry_id": "H0009"
+    },
+    {
+      "date": "2026-10-08",
+      "person": "person_1",
+      "activity": "production",
+      "product_id": "P02",
+      "channel": null,
+      "quantity": 1,
+      "minutes": 35,
+      "source": "estimate",
+      "assumption_ref": "products.P02.minutes_per_unit",
+      "value_in_force": 35,
+      "correction_message": null,
+      "transaction_ids": [
+        "T0011"
+      ],
+      "entry_id": "H0010"
+    },
+    {
+      "date": "2026-10-08",
+      "person": "person_1",
+      "activity": "fulfilment",
+      "product_id": "P01",
+      "channel": "instagram",
+      "quantity": 1,
+      "minutes": 5,
+      "source": "estimate",
+      "assumption_ref": "channels.instagram.fulfilment_minutes_per_order",
+      "value_in_force": 5,
+      "correction_message": null,
+      "transaction_ids": [
+        "T0010"
+      ],
+      "entry_id": "H0011"
+    },
+    {
+      "date": "2026-10-08",
+      "person": "person_1",
+      "activity": "fulfilment",
+      "product_id": "P02",
+      "channel": "telegram",
+      "quantity": 1,
+      "minutes": 3,
+      "source": "estimate",
+      "assumption_ref": "channels.telegram.fulfilment_minutes_per_order",
+      "value_in_force": 3,
+      "correction_message": null,
+      "transaction_ids": [
+        "T0011"
+      ],
+      "entry_id": "H0012"
+    },
+    {
+      "date": "2026-10-09",
+      "person": "person_1",
+      "activity": "production",
+      "product_id": "P01",
+      "channel": null,
+      "quantity": 1,
+      "minutes": 15,
+      "source": "corrected",
+      "assumption_ref": "products.P01.minutes_per_unit",
+      "value_in_force": 15,
+      "correction_message": "message.2026-10-07",
+      "transaction_ids": [
+        "T0013"
+      ],
+      "entry_id": "H0013"
+    },
+    {
+      "date": "2026-10-09",
+      "person": "person_1",
+      "activity": "fulfilment",
+      "product_id": "P01",
+      "channel": "instagram",
+      "quantity": 1,
+      "minutes": 5,
+      "source": "estimate",
+      "assumption_ref": "channels.instagram.fulfilment_minutes_per_order",
+      "value_in_force": 5,
+      "correction_message": null,
+      "transaction_ids": [
+        "T0013"
+      ],
+      "entry_id": "H0014"
+    },
+    {
+      "date": "2026-10-10",
+      "person": "person_1",
+      "activity": "production",
+      "product_id": "P01",
+      "channel": null,
+      "quantity": 3,
+      "minutes": 45,
+      "source": "corrected",
+      "assumption_ref": "products.P01.minutes_per_unit",
+      "value_in_force": 15,
+      "correction_message": "message.2026-10-07",
+      "transaction_ids": [
+        "T0015",
+        "T0016",
+        "T0017"
+      ],
+      "entry_id": "H0015"
+    },
+    {
+      "date": "2026-10-10",
+      "person": "person_1",
+      "activity": "production",
+      "product_id": "P02",
+      "channel": null,
+      "quantity": 1,
+      "minutes": 35,
+      "source": "estimate",
+      "assumption_ref": "products.P02.minutes_per_unit",
+      "value_in_force": 35,
+      "correction_message": null,
+      "transaction_ids": [
+        "T0018"
+      ],
+      "entry_id": "H0016"
+    },
+    {
+      "date": "2026-10-10",
+      "person": "person_1",
+      "activity": "event",
+      "product_id": null,
+      "channel": null,
+      "quantity": null,
+      "minutes": 480,
+      "source": "stated",
+      "assumption_ref": "message.2026-10-10",
+      "value_in_force": null,
+      "correction_message": null,
+      "transaction_ids": [],
+      "entry_id": "H0017"
+    },
+    {
+      "date": "2026-10-11",
+      "person": "person_1",
+      "activity": "production",
+      "product_id": "P01",
+      "channel": null,
+      "quantity": 1,
+      "minutes": 15,
+      "source": "corrected",
+      "assumption_ref": "products.P01.minutes_per_unit",
+      "value_in_force": 15,
+      "correction_message": "message.2026-10-07",
+      "transaction_ids": [
+        "T0019"
+      ],
+      "entry_id": "H0018"
+    },
+    {
+      "date": "2026-10-11",
+      "person": "person_1",
+      "activity": "fulfilment",
+      "product_id": "P01",
+      "channel": "instagram",
+      "quantity": 1,
+      "minutes": 5,
+      "source": "estimate",
+      "assumption_ref": "channels.instagram.fulfilment_minutes_per_order",
+      "value_in_force": 5,
+      "correction_message": null,
+      "transaction_ids": [
+        "T0019"
+      ],
+      "entry_id": "H0019"
+    },
+    {
+      "date": "2026-10-11",
+      "person": "person_1",
+      "activity": "admin",
+      "product_id": null,
+      "channel": null,
+      "quantity": null,
+      "minutes": 120,
+      "source": "estimate",
+      "assumption_ref": "assumptions.admin_hours_per_week",
+      "value_in_force": 2,
+      "correction_message": null,
+      "transaction_ids": [],
+      "entry_id": "H0020"
+    }
+  ],
+  "daily_minutes": [
+    {
+      "date": "2026-10-05",
+      "minutes_by_activity": {
+        "production": 40,
+        "fulfilment": 10,
+        "event": 0,
+        "admin": 0
+      },
+      "total_minutes": 50,
+      "entry_ids": [
+        "H0001",
+        "H0002"
+      ]
+    },
+    {
+      "date": "2026-10-06",
+      "minutes_by_activity": {
+        "production": 75,
+        "fulfilment": 15,
+        "event": 0,
+        "admin": 0
+      },
+      "total_minutes": 90,
+      "entry_ids": [
+        "H0003",
+        "H0004",
+        "H0005",
+        "H0006"
+      ]
+    },
+    {
+      "date": "2026-10-07",
+      "minutes_by_activity": {
+        "production": 15,
+        "fulfilment": 5,
+        "event": 0,
+        "admin": 0
+      },
+      "total_minutes": 20,
+      "entry_ids": [
+        "H0007",
+        "H0008"
+      ]
+    },
+    {
+      "date": "2026-10-08",
+      "minutes_by_activity": {
+        "production": 50,
+        "fulfilment": 8,
+        "event": 0,
+        "admin": 0
+      },
+      "total_minutes": 58,
+      "entry_ids": [
+        "H0009",
+        "H0010",
+        "H0011",
+        "H0012"
+      ]
+    },
+    {
+      "date": "2026-10-09",
+      "minutes_by_activity": {
+        "production": 15,
+        "fulfilment": 5,
+        "event": 0,
+        "admin": 0
+      },
+      "total_minutes": 20,
+      "entry_ids": [
+        "H0013",
+        "H0014"
+      ]
+    },
+    {
+      "date": "2026-10-10",
+      "minutes_by_activity": {
+        "production": 80,
+        "fulfilment": 0,
+        "event": 480,
+        "admin": 0
+      },
+      "total_minutes": 560,
+      "entry_ids": [
+        "H0015",
+        "H0016",
+        "H0017"
+      ]
+    },
+    {
+      "date": "2026-10-11",
+      "minutes_by_activity": {
+        "production": 15,
+        "fulfilment": 5,
+        "event": 0,
+        "admin": 120
+      },
+      "total_minutes": 140,
+      "entry_ids": [
+        "H0018",
+        "H0019",
+        "H0020"
+      ]
+    }
+  ],
+  "numbers": {
+    "category_totals_sen": {
+      "sales": 10850,
+      "materials": 2700,
+      "packaging": 600,
+      "platform_fees": 0,
+      "shipping": 3600,
+      "other_expenses": 0
+    },
+    "category_totals_rm": {
+      "sales": "108.50",
+      "materials": "27.00",
+      "packaging": "6.00",
+      "platform_fees": "0.00",
+      "shipping": "36.00",
+      "other_expenses": "0.00"
+    },
+    "expense_total_sen": 6900,
+    "expense_total_rm": "69.00",
+    "take_home_sen": 3950,
+    "take_home_rm": "39.50",
+    "minutes_by_activity": {
+      "production": 290,
+      "fulfilment": 48,
+      "event": 480,
+      "admin": 120
+    },
+    "hours_display_by_activity": {
+      "production": "4.8",
+      "fulfilment": "0.8",
+      "event": "8.0",
+      "admin": "2.0"
+    },
+    "total_minutes": 938,
+    "total_hours_display": "15.6",
+    "shared_minutes": 600,
+    "shared_hours_display": "10.0",
+    "hourly_rate_rm": {
+      "exact_numerator": 237000,
+      "exact_denominator": 93800,
+      "unit": "RM/hour",
+      "display": "2.53"
+    },
+    "margin_percent": {
+      "exact_numerator": 395000,
+      "exact_denominator": 10850,
+      "unit": "percent",
+      "display": "36"
+    },
+    "planned_margin_percent": 40,
+    "target_hourly_rate_rm": "12.00",
+    "below_planned_margin": true,
+    "below_target_hourly_rate": true,
+    "product_profit_total_sen": 2150,
+    "basis_warning": "Take home uses paid ledger expenses; product profit uses plan unit/channel costs. They are intentionally different bases. Unknown expense is excluded, not valued at zero."
+  },
+  "products": [
+    {
+      "product_id": "P01",
+      "name": "Beaded keychain",
+      "units": 11,
+      "orders": 11,
+      "revenue_sen": 5450,
+      "revenue_rm": "54.50",
+      "material_unit_cost_sen": 250,
+      "packaging_unit_cost_sen": 50,
+      "material_cost_sen": 2750,
+      "packaging_cost_sen": 550,
+      "unit_costs_sen": 3300,
+      "unit_costs_rm": "33.00",
+      "channel_costs_sen": 3200,
+      "channel_costs_rm": "32.00",
+      "channels": {
+        "bazaar": {
+          "orders": 3,
+          "units": 3,
+          "revenue_sen": 1500,
+          "percentage_fee_sen": 0,
+          "fixed_fee_sen": 0,
+          "shipping_cost_sen": 0,
+          "total_channel_cost_sen": 0
+        },
+        "instagram": {
+          "orders": 8,
+          "units": 8,
+          "revenue_sen": 3950,
+          "percentage_fee_sen": 0,
+          "fixed_fee_sen": 0,
+          "shipping_cost_sen": 3200,
+          "total_channel_cost_sen": 3200
+        }
+      },
+      "profit_sen": -1050,
+      "profit_rm": "-10.50",
+      "loses_money": true,
+      "direct_minutes_by_activity": {
+        "production": 185,
+        "fulfilment": 40
+      },
+      "direct_minutes": 225,
+      "direct_hours_display": "3.8",
+      "profit_per_hour_rm": {
+        "exact_numerator": -63000,
+        "exact_denominator": 22500,
+        "unit": "RM/hour",
+        "display": "-2.80"
+      }
+    },
+    {
+      "product_id": "P02",
+      "name": "Beaded bracelet",
+      "units": 3,
+      "orders": 3,
+      "revenue_sen": 5400,
+      "revenue_rm": "54.00",
+      "material_unit_cost_sen": 500,
+      "packaging_unit_cost_sen": 100,
+      "material_cost_sen": 1500,
+      "packaging_cost_sen": 300,
+      "unit_costs_sen": 1800,
+      "unit_costs_rm": "18.00",
+      "channel_costs_sen": 400,
+      "channel_costs_rm": "4.00",
+      "channels": {
+        "bazaar": {
+          "orders": 1,
+          "units": 1,
+          "revenue_sen": 1800,
+          "percentage_fee_sen": 0,
+          "fixed_fee_sen": 0,
+          "shipping_cost_sen": 0,
+          "total_channel_cost_sen": 0
+        },
+        "instagram": {
+          "orders": 1,
+          "units": 1,
+          "revenue_sen": 1800,
+          "percentage_fee_sen": 0,
+          "fixed_fee_sen": 0,
+          "shipping_cost_sen": 400,
+          "total_channel_cost_sen": 400
+        },
+        "telegram": {
+          "orders": 1,
+          "units": 1,
+          "revenue_sen": 1800,
+          "percentage_fee_sen": 0,
+          "fixed_fee_sen": 0,
+          "shipping_cost_sen": 0,
+          "total_channel_cost_sen": 0
+        }
+      },
+      "profit_sen": 3200,
+      "profit_rm": "32.00",
+      "loses_money": false,
+      "direct_minutes_by_activity": {
+        "production": 105,
+        "fulfilment": 8
+      },
+      "direct_minutes": 113,
+      "direct_hours_display": "1.9",
+      "profit_per_hour_rm": {
+        "exact_numerator": 192000,
+        "exact_denominator": 11300,
+        "unit": "RM/hour",
+        "display": "16.99"
+      }
+    }
+  ],
+  "per_order_channel_costs": [
+    {
+      "txn_id": "T0001",
+      "product_id": "P01",
+      "channel": "instagram",
+      "revenue_sen": 500,
+      "fee_percent": 0,
+      "percentage_fee_sen": 0,
+      "fixed_fee_sen": 0,
+      "shipping_cost_sen": 400,
+      "total_channel_cost_sen": 400
+    },
+    {
+      "txn_id": "T0002",
+      "product_id": "P01",
+      "channel": "instagram",
+      "revenue_sen": 500,
+      "fee_percent": 0,
+      "percentage_fee_sen": 0,
+      "fixed_fee_sen": 0,
+      "shipping_cost_sen": 400,
+      "total_channel_cost_sen": 400
+    },
+    {
+      "txn_id": "T0005",
+      "product_id": "P01",
+      "channel": "instagram",
+      "revenue_sen": 500,
+      "fee_percent": 0,
+      "percentage_fee_sen": 0,
+      "fixed_fee_sen": 0,
+      "shipping_cost_sen": 400,
+      "total_channel_cost_sen": 400
+    },
+    {
+      "txn_id": "T0006",
+      "product_id": "P01",
+      "channel": "instagram",
+      "revenue_sen": 500,
+      "fee_percent": 0,
+      "percentage_fee_sen": 0,
+      "fixed_fee_sen": 0,
+      "shipping_cost_sen": 400,
+      "total_channel_cost_sen": 400
+    },
+    {
+      "txn_id": "T0007",
+      "product_id": "P02",
+      "channel": "instagram",
+      "revenue_sen": 1800,
+      "fee_percent": 0,
+      "percentage_fee_sen": 0,
+      "fixed_fee_sen": 0,
+      "shipping_cost_sen": 400,
+      "total_channel_cost_sen": 400
+    },
+    {
+      "txn_id": "T0008",
+      "product_id": "P01",
+      "channel": "instagram",
+      "revenue_sen": 500,
+      "fee_percent": 0,
+      "percentage_fee_sen": 0,
+      "fixed_fee_sen": 0,
+      "shipping_cost_sen": 400,
+      "total_channel_cost_sen": 400
+    },
+    {
+      "txn_id": "T0010",
+      "product_id": "P01",
+      "channel": "instagram",
+      "revenue_sen": 500,
+      "fee_percent": 0,
+      "percentage_fee_sen": 0,
+      "fixed_fee_sen": 0,
+      "shipping_cost_sen": 400,
+      "total_channel_cost_sen": 400
+    },
+    {
+      "txn_id": "T0011",
+      "product_id": "P02",
+      "channel": "telegram",
+      "revenue_sen": 1800,
+      "fee_percent": 0,
+      "percentage_fee_sen": 0,
+      "fixed_fee_sen": 0,
+      "shipping_cost_sen": 0,
+      "total_channel_cost_sen": 0
+    },
+    {
+      "txn_id": "T0013",
+      "product_id": "P01",
+      "channel": "instagram",
+      "revenue_sen": 500,
+      "fee_percent": 0,
+      "percentage_fee_sen": 0,
+      "fixed_fee_sen": 0,
+      "shipping_cost_sen": 400,
+      "total_channel_cost_sen": 400
+    },
+    {
+      "txn_id": "T0015",
+      "product_id": "P01",
+      "channel": "bazaar",
+      "revenue_sen": 500,
+      "fee_percent": 0,
+      "percentage_fee_sen": 0,
+      "fixed_fee_sen": 0,
+      "shipping_cost_sen": 0,
+      "total_channel_cost_sen": 0
+    },
+    {
+      "txn_id": "T0016",
+      "product_id": "P01",
+      "channel": "bazaar",
+      "revenue_sen": 500,
+      "fee_percent": 0,
+      "percentage_fee_sen": 0,
+      "fixed_fee_sen": 0,
+      "shipping_cost_sen": 0,
+      "total_channel_cost_sen": 0
+    },
+    {
+      "txn_id": "T0017",
+      "product_id": "P01",
+      "channel": "bazaar",
+      "revenue_sen": 500,
+      "fee_percent": 0,
+      "percentage_fee_sen": 0,
+      "fixed_fee_sen": 0,
+      "shipping_cost_sen": 0,
+      "total_channel_cost_sen": 0
+    },
+    {
+      "txn_id": "T0018",
+      "product_id": "P02",
+      "channel": "bazaar",
+      "revenue_sen": 1800,
+      "fee_percent": 0,
+      "percentage_fee_sen": 0,
+      "fixed_fee_sen": 0,
+      "shipping_cost_sen": 0,
+      "total_channel_cost_sen": 0
+    },
+    {
+      "txn_id": "T0019",
+      "product_id": "P01",
+      "channel": "instagram",
+      "revenue_sen": 450,
+      "fee_percent": 0,
+      "percentage_fee_sen": 0,
+      "fixed_fee_sen": 0,
+      "shipping_cost_sen": 400,
+      "total_channel_cost_sen": 400
+    }
+  ],
+  "reconstructed_transactions": [
+    {
+      "txn_id": "T0001",
+      "date": "2026-10-05",
+      "type": "income",
+      "category": "sales",
+      "description": "1 Beaded keychain",
+      "product_id": "P01",
+      "quantity": 1,
+      "channel": "instagram",
+      "payment_method": "bank_transfer",
+      "counterparty": "Dana",
+      "reference": null,
+      "source_file": "receipts/2026-10/order_2026-10-05_dana.png",
+      "reconciliation_status": "ambiguous_resolved",
+      "bank_reference": "DEMO-IN-001",
+      "notes": "Amount/date candidates DEMO-IN-001, DEMO-IN-002, DEMO-IN-003, DEMO-IN-004; only DEMO-IN-001 names counterparty Dana",
+      "amount_sen": 500,
+      "counted": true
+    },
+    {
+      "txn_id": "T0002",
+      "date": "2026-10-05",
+      "type": "income",
+      "category": "sales",
+      "description": "1 Beaded keychain",
+      "product_id": "P01",
+      "quantity": 1,
+      "channel": "instagram",
+      "payment_method": "bank_transfer",
+      "counterparty": "Mira",
+      "reference": null,
+      "source_file": "receipts/2026-10/order_2026-10-05_mira.png",
+      "reconciliation_status": "ambiguous_resolved",
+      "bank_reference": "DEMO-IN-002",
+      "notes": "Amount/date candidates DEMO-IN-002, DEMO-IN-003, DEMO-IN-004; only DEMO-IN-002 names counterparty Mira",
+      "amount_sen": 500,
+      "counted": true
+    },
+    {
+      "txn_id": "T0003",
+      "date": "2026-10-05",
+      "type": "expense",
+      "category": "materials",
+      "description": "Small bead restock",
+      "product_id": null,
+      "quantity": null,
+      "channel": null,
+      "payment_method": "bank_transfer",
+      "counterparty": "Demo Bead Nook",
+      "reference": "DEMO-OUT-001",
+      "source_file": "receipts/2026-10/receipt_beads.png",
+      "reconciliation_status": "matched",
+      "bank_reference": "DEMO-OUT-001",
+      "notes": "Document reference, type and amount agree with bank",
+      "amount_sen": 1800,
+      "counted": true
+    },
+    {
+      "txn_id": "T0004",
+      "date": "2026-10-05",
+      "type": "expense",
+      "category": "materials",
+      "description": "Small bead restock",
+      "product_id": null,
+      "quantity": null,
+      "channel": null,
+      "payment_method": "bank_transfer",
+      "counterparty": "Demo Bead Nook",
+      "reference": "DEMO-OUT-001",
+      "source_file": "receipts/2026-10/receipt_beads_copy.png",
+      "reconciliation_status": "duplicate",
+      "bank_reference": null,
+      "notes": "Duplicate of T0003 on date, type, original amount, counterparty and reference",
+      "amount_sen": 1800,
+      "counted": false
+    },
+    {
+      "txn_id": "T0005",
+      "date": "2026-10-06",
+      "type": "income",
+      "category": "sales",
+      "description": "1 Beaded keychain",
+      "product_id": "P01",
+      "quantity": 1,
+      "channel": "instagram",
+      "payment_method": "bank_transfer",
+      "counterparty": "Farah",
+      "reference": "DEMO-IN-003",
+      "source_file": "receipts/2026-10/order_2026-10-06_farah.png",
+      "reconciliation_status": "matched",
+      "bank_reference": "DEMO-IN-003",
+      "notes": "Document reference, type and amount agree with bank",
+      "amount_sen": 500,
+      "counted": true
+    },
+    {
+      "txn_id": "T0006",
+      "date": "2026-10-06",
+      "type": "income",
+      "category": "sales",
+      "description": "1 Beaded keychain",
+      "product_id": "P01",
+      "quantity": 1,
+      "channel": "instagram",
+      "payment_method": "bank_transfer",
+      "counterparty": "Nisa",
+      "reference": "DEMO-IN-004",
+      "source_file": "receipts/2026-10/order_2026-10-06_nisa.png",
+      "reconciliation_status": "matched",
+      "bank_reference": "DEMO-IN-004",
+      "notes": "Document reference, type and amount agree with bank",
+      "amount_sen": 500,
+      "counted": true
+    },
+    {
+      "txn_id": "T0007",
+      "date": "2026-10-06",
+      "type": "income",
+      "category": "sales",
+      "description": "1 Beaded bracelet",
+      "product_id": "P02",
+      "quantity": 1,
+      "channel": "instagram",
+      "payment_method": "bank_transfer",
+      "counterparty": "Hana",
+      "reference": "DEMO-IN-005",
+      "source_file": "receipts/2026-10/order_2026-10-06_hana.png",
+      "reconciliation_status": "matched",
+      "bank_reference": "DEMO-IN-005",
+      "notes": "Document reference, type and amount agree with bank",
+      "amount_sen": 1800,
+      "counted": true
+    },
+    {
+      "txn_id": "T0008",
+      "date": "2026-10-07",
+      "type": "income",
+      "category": "sales",
+      "description": "1 Beaded keychain",
+      "product_id": "P01",
+      "quantity": 1,
+      "channel": "instagram",
+      "payment_method": "bank_transfer",
+      "counterparty": "Iman",
+      "reference": "DEMO-IN-006",
+      "source_file": "receipts/2026-10/order_2026-10-07_iman.png",
+      "reconciliation_status": "matched",
+      "bank_reference": "DEMO-IN-006",
+      "notes": "Document reference, type and amount agree with bank",
+      "amount_sen": 500,
+      "counted": true
+    },
+    {
+      "txn_id": "T0009",
+      "date": "2026-10-07",
+      "type": "expense",
+      "category": "packaging",
+      "description": "Small pouch restock",
+      "product_id": null,
+      "quantity": null,
+      "channel": null,
+      "payment_method": "bank_transfer",
+      "counterparty": "Demo Pouch Corner",
+      "reference": "DEMO-OUT-002",
+      "source_file": "receipts/2026-10/receipt_pouches.png",
+      "reconciliation_status": "matched",
+      "bank_reference": "DEMO-OUT-002",
+      "notes": "Document reference, type and amount agree with bank",
+      "amount_sen": 600,
+      "counted": true
+    },
+    {
+      "txn_id": "T0010",
+      "date": "2026-10-08",
+      "type": "income",
+      "category": "sales",
+      "description": "1 Beaded keychain",
+      "product_id": "P01",
+      "quantity": 1,
+      "channel": "instagram",
+      "payment_method": "bank_transfer",
+      "counterparty": "Lina",
+      "reference": "DEMO-IN-007",
+      "source_file": "receipts/2026-10/order_2026-10-08_lina.png",
+      "reconciliation_status": "matched",
+      "bank_reference": "DEMO-IN-007",
+      "notes": "Document reference, type and amount agree with bank",
+      "amount_sen": 500,
+      "counted": true
+    },
+    {
+      "txn_id": "T0011",
+      "date": "2026-10-08",
+      "type": "income",
+      "category": "sales",
+      "description": "1 Beaded bracelet",
+      "product_id": "P02",
+      "quantity": 1,
+      "channel": "telegram",
+      "payment_method": "bank_transfer",
+      "counterparty": "Rina",
+      "reference": "DEMO-IN-008",
+      "source_file": "receipts/2026-10/order_2026-10-08_rina.png",
+      "reconciliation_status": "matched",
+      "bank_reference": "DEMO-IN-008",
+      "notes": "Document reference, type and amount agree with bank",
+      "amount_sen": 1800,
+      "counted": true
+    },
+    {
+      "txn_id": "T0012",
+      "date": "2026-10-08",
+      "type": "expense",
+      "category": "materials",
+      "description": "Thread refill; total unreadable",
+      "product_id": null,
+      "quantity": null,
+      "channel": null,
+      "payment_method": "cash",
+      "counterparty": "Demo Thread Stop",
+      "reference": null,
+      "source_file": "receipts/2026-10/receipt_thread_blurred.png",
+      "reconciliation_status": "needs_review",
+      "bank_reference": null,
+      "notes": "Missing amount_rm; flag precedes cash classification",
+      "amount_sen": null,
+      "counted": false
+    },
+    {
+      "txn_id": "T0013",
+      "date": "2026-10-09",
+      "type": "income",
+      "category": "sales",
+      "description": "1 Beaded keychain",
+      "product_id": "P01",
+      "quantity": 1,
+      "channel": "instagram",
+      "payment_method": "bank_transfer",
+      "counterparty": "Suri",
+      "reference": "DEMO-IN-009",
+      "source_file": "receipts/2026-10/order_2026-10-09_suri.png",
+      "reconciliation_status": "matched",
+      "bank_reference": "DEMO-IN-009",
+      "notes": "Document reference, type and amount agree with bank",
+      "amount_sen": 500,
+      "counted": true
+    },
+    {
+      "txn_id": "T0014",
+      "date": "2026-10-09",
+      "type": "expense",
+      "category": "shipping",
+      "description": "Courier settlement for nine weekly parcels",
+      "product_id": null,
+      "quantity": null,
+      "channel": null,
+      "payment_method": "bank_transfer",
+      "counterparty": "Demo Parcel Desk",
+      "reference": "DEMO-OUT-003",
+      "source_file": "receipts/2026-10/receipt_shipping.png",
+      "reconciliation_status": "matched",
+      "bank_reference": "DEMO-OUT-003",
+      "notes": "Document reference, type and amount agree with bank",
+      "amount_sen": 3600,
+      "counted": true
+    },
+    {
+      "txn_id": "T0015",
+      "date": "2026-10-10",
+      "type": "income",
+      "category": "sales",
+      "description": "1 Beaded keychain",
+      "product_id": "P01",
+      "quantity": 1,
+      "channel": "bazaar",
+      "payment_method": "cash",
+      "counterparty": "Aina",
+      "reference": null,
+      "source_file": "receipts/2026-10/message_2026-10-10.txt",
+      "reconciliation_status": "cash_declared",
+      "bank_reference": null,
+      "notes": "Cash is declared; no bank line is expected",
+      "amount_sen": 500,
+      "counted": true
+    },
+    {
+      "txn_id": "T0016",
+      "date": "2026-10-10",
+      "type": "income",
+      "category": "sales",
+      "description": "1 Beaded keychain",
+      "product_id": "P01",
+      "quantity": 1,
+      "channel": "bazaar",
+      "payment_method": "cash",
+      "counterparty": "Bella",
+      "reference": null,
+      "source_file": "receipts/2026-10/message_2026-10-10.txt",
+      "reconciliation_status": "cash_declared",
+      "bank_reference": null,
+      "notes": "Cash is declared; no bank line is expected",
+      "amount_sen": 500,
+      "counted": true
+    },
+    {
+      "txn_id": "T0017",
+      "date": "2026-10-10",
+      "type": "income",
+      "category": "sales",
+      "description": "1 Beaded keychain",
+      "product_id": "P01",
+      "quantity": 1,
+      "channel": "bazaar",
+      "payment_method": "cash",
+      "counterparty": "Citra",
+      "reference": null,
+      "source_file": "receipts/2026-10/message_2026-10-10.txt",
+      "reconciliation_status": "cash_declared",
+      "bank_reference": null,
+      "notes": "Cash is declared; no bank line is expected",
+      "amount_sen": 500,
+      "counted": true
+    },
+    {
+      "txn_id": "T0018",
+      "date": "2026-10-10",
+      "type": "income",
+      "category": "sales",
+      "description": "1 Beaded bracelet",
+      "product_id": "P02",
+      "quantity": 1,
+      "channel": "bazaar",
+      "payment_method": "cash",
+      "counterparty": "Dina",
+      "reference": null,
+      "source_file": "receipts/2026-10/message_2026-10-10.txt",
+      "reconciliation_status": "cash_declared",
+      "bank_reference": null,
+      "notes": "Cash is declared; no bank line is expected",
+      "amount_sen": 1800,
+      "counted": true
+    },
+    {
+      "txn_id": "T0019",
+      "date": "2026-10-11",
+      "type": "income",
+      "category": "sales",
+      "description": "1 Beaded keychain",
+      "product_id": "P01",
+      "quantity": 1,
+      "channel": "instagram",
+      "payment_method": "bank_transfer",
+      "counterparty": "Zahra",
+      "reference": "DEMO-IN-010",
+      "source_file": "receipts/2026-10/order_2026-10-11_zahra.png",
+      "reconciliation_status": "needs_review",
+      "bank_reference": "DEMO-IN-010",
+      "notes": "Document RM5.00; bank RM4.50; bank amount used; confirm discrepancy",
+      "amount_sen": 450,
+      "counted": true
+    },
+    {
+      "txn_id": "T0020",
+      "date": "2026-10-11",
+      "type": "expense",
+      "category": "materials",
+      "description": "Demo Bead Nook - bead materials top-up",
+      "product_id": null,
+      "quantity": null,
+      "channel": null,
+      "payment_method": "bank_transfer",
+      "counterparty": null,
+      "reference": null,
+      "source_file": null,
+      "reconciliation_status": "unmatched",
+      "bank_reference": "DEMO-OUT-004",
+      "notes": "No document row represents this bank line; description supports category materials; request receipt",
+      "amount_sen": 900,
+      "counted": true
+    }
+  ],
+  "reconciliation_audit": [
+    {
+      "txn_id": "T0001",
+      "rule": "6: description disambiguation",
+      "input_status": "ambiguous_resolved",
+      "derived_status": "ambiguous_resolved",
+      "status_agrees": true,
+      "input_bank_reference": "DEMO-IN-001",
+      "derived_bank_reference": "DEMO-IN-001",
+      "bank_reference_agrees": true,
+      "input_amount_sen": 500,
+      "derived_amount_sen": 500,
+      "amount_agrees": true,
+      "original_document_amount_sen": 500,
+      "document_amount_evidence": "Supplied transaction amount; original document not inspected",
+      "bank_amount_sen": 500,
+      "counted": true,
+      "evidence": "Amount/date candidates DEMO-IN-001, DEMO-IN-002, DEMO-IN-003, DEMO-IN-004; only DEMO-IN-001 names counterparty Dana",
+      "amount_candidate_references": [
+        "DEMO-IN-001",
+        "DEMO-IN-002",
+        "DEMO-IN-003",
+        "DEMO-IN-004"
+      ]
+    },
+    {
+      "txn_id": "T0002",
+      "rule": "6: description disambiguation",
+      "input_status": "ambiguous_resolved",
+      "derived_status": "ambiguous_resolved",
+      "status_agrees": true,
+      "input_bank_reference": "DEMO-IN-002",
+      "derived_bank_reference": "DEMO-IN-002",
+      "bank_reference_agrees": true,
+      "input_amount_sen": 500,
+      "derived_amount_sen": 500,
+      "amount_agrees": true,
+      "original_document_amount_sen": 500,
+      "document_amount_evidence": "Supplied transaction amount; original document not inspected",
+      "bank_amount_sen": 500,
+      "counted": true,
+      "evidence": "Amount/date candidates DEMO-IN-002, DEMO-IN-003, DEMO-IN-004; only DEMO-IN-002 names counterparty Mira",
+      "amount_candidate_references": [
+        "DEMO-IN-002",
+        "DEMO-IN-003",
+        "DEMO-IN-004"
+      ]
+    },
+    {
+      "txn_id": "T0003",
+      "rule": "4: reference match",
+      "input_status": "matched",
+      "derived_status": "matched",
+      "status_agrees": true,
+      "input_bank_reference": "DEMO-OUT-001",
+      "derived_bank_reference": "DEMO-OUT-001",
+      "bank_reference_agrees": true,
+      "input_amount_sen": 1800,
+      "derived_amount_sen": 1800,
+      "amount_agrees": true,
+      "original_document_amount_sen": 1800,
+      "document_amount_evidence": "Supplied transaction amount; original document not inspected",
+      "bank_amount_sen": 1800,
+      "counted": true,
+      "evidence": "Document reference, type and amount agree with bank",
+      "amount_candidate_references": []
+    },
+    {
+      "txn_id": "T0004",
+      "rule": "3: duplicate",
+      "input_status": "duplicate",
+      "derived_status": "duplicate",
+      "status_agrees": true,
+      "input_bank_reference": null,
+      "derived_bank_reference": null,
+      "bank_reference_agrees": true,
+      "input_amount_sen": 1800,
+      "derived_amount_sen": 1800,
+      "amount_agrees": true,
+      "original_document_amount_sen": 1800,
+      "document_amount_evidence": "Supplied transaction amount; original document not inspected",
+      "bank_amount_sen": null,
+      "counted": false,
+      "evidence": "Duplicate of T0003 on date, type, original amount, counterparty and reference",
+      "amount_candidate_references": []
+    },
+    {
+      "txn_id": "T0005",
+      "rule": "4: reference match",
+      "input_status": "matched",
+      "derived_status": "matched",
+      "status_agrees": true,
+      "input_bank_reference": "DEMO-IN-003",
+      "derived_bank_reference": "DEMO-IN-003",
+      "bank_reference_agrees": true,
+      "input_amount_sen": 500,
+      "derived_amount_sen": 500,
+      "amount_agrees": true,
+      "original_document_amount_sen": 500,
+      "document_amount_evidence": "Supplied transaction amount; original document not inspected",
+      "bank_amount_sen": 500,
+      "counted": true,
+      "evidence": "Document reference, type and amount agree with bank",
+      "amount_candidate_references": []
+    },
+    {
+      "txn_id": "T0006",
+      "rule": "4: reference match",
+      "input_status": "matched",
+      "derived_status": "matched",
+      "status_agrees": true,
+      "input_bank_reference": "DEMO-IN-004",
+      "derived_bank_reference": "DEMO-IN-004",
+      "bank_reference_agrees": true,
+      "input_amount_sen": 500,
+      "derived_amount_sen": 500,
+      "amount_agrees": true,
+      "original_document_amount_sen": 500,
+      "document_amount_evidence": "Supplied transaction amount; original document not inspected",
+      "bank_amount_sen": 500,
+      "counted": true,
+      "evidence": "Document reference, type and amount agree with bank",
+      "amount_candidate_references": []
+    },
+    {
+      "txn_id": "T0007",
+      "rule": "4: reference match",
+      "input_status": "matched",
+      "derived_status": "matched",
+      "status_agrees": true,
+      "input_bank_reference": "DEMO-IN-005",
+      "derived_bank_reference": "DEMO-IN-005",
+      "bank_reference_agrees": true,
+      "input_amount_sen": 1800,
+      "derived_amount_sen": 1800,
+      "amount_agrees": true,
+      "original_document_amount_sen": 1800,
+      "document_amount_evidence": "Supplied transaction amount; original document not inspected",
+      "bank_amount_sen": 1800,
+      "counted": true,
+      "evidence": "Document reference, type and amount agree with bank",
+      "amount_candidate_references": []
+    },
+    {
+      "txn_id": "T0008",
+      "rule": "4: reference match",
+      "input_status": "matched",
+      "derived_status": "matched",
+      "status_agrees": true,
+      "input_bank_reference": "DEMO-IN-006",
+      "derived_bank_reference": "DEMO-IN-006",
+      "bank_reference_agrees": true,
+      "input_amount_sen": 500,
+      "derived_amount_sen": 500,
+      "amount_agrees": true,
+      "original_document_amount_sen": 500,
+      "document_amount_evidence": "Supplied transaction amount; original document not inspected",
+      "bank_amount_sen": 500,
+      "counted": true,
+      "evidence": "Document reference, type and amount agree with bank",
+      "amount_candidate_references": []
+    },
+    {
+      "txn_id": "T0009",
+      "rule": "4: reference match",
+      "input_status": "matched",
+      "derived_status": "matched",
+      "status_agrees": true,
+      "input_bank_reference": "DEMO-OUT-002",
+      "derived_bank_reference": "DEMO-OUT-002",
+      "bank_reference_agrees": true,
+      "input_amount_sen": 600,
+      "derived_amount_sen": 600,
+      "amount_agrees": true,
+      "original_document_amount_sen": 600,
+      "document_amount_evidence": "Supplied transaction amount; original document not inspected",
+      "bank_amount_sen": 600,
+      "counted": true,
+      "evidence": "Document reference, type and amount agree with bank",
+      "amount_candidate_references": []
+    },
+    {
+      "txn_id": "T0010",
+      "rule": "4: reference match",
+      "input_status": "matched",
+      "derived_status": "matched",
+      "status_agrees": true,
+      "input_bank_reference": "DEMO-IN-007",
+      "derived_bank_reference": "DEMO-IN-007",
+      "bank_reference_agrees": true,
+      "input_amount_sen": 500,
+      "derived_amount_sen": 500,
+      "amount_agrees": true,
+      "original_document_amount_sen": 500,
+      "document_amount_evidence": "Supplied transaction amount; original document not inspected",
+      "bank_amount_sen": 500,
+      "counted": true,
+      "evidence": "Document reference, type and amount agree with bank",
+      "amount_candidate_references": []
+    },
+    {
+      "txn_id": "T0011",
+      "rule": "4: reference match",
+      "input_status": "matched",
+      "derived_status": "matched",
+      "status_agrees": true,
+      "input_bank_reference": "DEMO-IN-008",
+      "derived_bank_reference": "DEMO-IN-008",
+      "bank_reference_agrees": true,
+      "input_amount_sen": 1800,
+      "derived_amount_sen": 1800,
+      "amount_agrees": true,
+      "original_document_amount_sen": 1800,
+      "document_amount_evidence": "Supplied transaction amount; original document not inspected",
+      "bank_amount_sen": 1800,
+      "counted": true,
+      "evidence": "Document reference, type and amount agree with bank",
+      "amount_candidate_references": []
+    },
+    {
+      "txn_id": "T0012",
+      "rule": "1: required-field intake flag",
+      "input_status": "needs_review",
+      "derived_status": "needs_review",
+      "status_agrees": true,
+      "input_bank_reference": null,
+      "derived_bank_reference": null,
+      "bank_reference_agrees": true,
+      "input_amount_sen": null,
+      "derived_amount_sen": null,
+      "amount_agrees": true,
+      "original_document_amount_sen": null,
+      "document_amount_evidence": "Supplied transaction amount; original document not inspected",
+      "bank_amount_sen": null,
+      "counted": false,
+      "evidence": "Missing amount_rm; flag precedes cash classification",
+      "amount_candidate_references": []
+    },
+    {
+      "txn_id": "T0013",
+      "rule": "4: reference match",
+      "input_status": "matched",
+      "derived_status": "matched",
+      "status_agrees": true,
+      "input_bank_reference": "DEMO-IN-009",
+      "derived_bank_reference": "DEMO-IN-009",
+      "bank_reference_agrees": true,
+      "input_amount_sen": 500,
+      "derived_amount_sen": 500,
+      "amount_agrees": true,
+      "original_document_amount_sen": 500,
+      "document_amount_evidence": "Supplied transaction amount; original document not inspected",
+      "bank_amount_sen": 500,
+      "counted": true,
+      "evidence": "Document reference, type and amount agree with bank",
+      "amount_candidate_references": []
+    },
+    {
+      "txn_id": "T0014",
+      "rule": "4: reference match",
+      "input_status": "matched",
+      "derived_status": "matched",
+      "status_agrees": true,
+      "input_bank_reference": "DEMO-OUT-003",
+      "derived_bank_reference": "DEMO-OUT-003",
+      "bank_reference_agrees": true,
+      "input_amount_sen": 3600,
+      "derived_amount_sen": 3600,
+      "amount_agrees": true,
+      "original_document_amount_sen": 3600,
+      "document_amount_evidence": "Supplied transaction amount; original document not inspected",
+      "bank_amount_sen": 3600,
+      "counted": true,
+      "evidence": "Document reference, type and amount agree with bank",
+      "amount_candidate_references": []
+    },
+    {
+      "txn_id": "T0015",
+      "rule": "2: cash",
+      "input_status": "cash_declared",
+      "derived_status": "cash_declared",
+      "status_agrees": true,
+      "input_bank_reference": null,
+      "derived_bank_reference": null,
+      "bank_reference_agrees": true,
+      "input_amount_sen": 500,
+      "derived_amount_sen": 500,
+      "amount_agrees": true,
+      "original_document_amount_sen": 500,
+      "document_amount_evidence": "Supplied transaction amount; original document not inspected",
+      "bank_amount_sen": null,
+      "counted": true,
+      "evidence": "Cash is declared; no bank line is expected",
+      "amount_candidate_references": []
+    },
+    {
+      "txn_id": "T0016",
+      "rule": "2: cash",
+      "input_status": "cash_declared",
+      "derived_status": "cash_declared",
+      "status_agrees": true,
+      "input_bank_reference": null,
+      "derived_bank_reference": null,
+      "bank_reference_agrees": true,
+      "input_amount_sen": 500,
+      "derived_amount_sen": 500,
+      "amount_agrees": true,
+      "original_document_amount_sen": 500,
+      "document_amount_evidence": "Supplied transaction amount; original document not inspected",
+      "bank_amount_sen": null,
+      "counted": true,
+      "evidence": "Cash is declared; no bank line is expected",
+      "amount_candidate_references": []
+    },
+    {
+      "txn_id": "T0017",
+      "rule": "2: cash",
+      "input_status": "cash_declared",
+      "derived_status": "cash_declared",
+      "status_agrees": true,
+      "input_bank_reference": null,
+      "derived_bank_reference": null,
+      "bank_reference_agrees": true,
+      "input_amount_sen": 500,
+      "derived_amount_sen": 500,
+      "amount_agrees": true,
+      "original_document_amount_sen": 500,
+      "document_amount_evidence": "Supplied transaction amount; original document not inspected",
+      "bank_amount_sen": null,
+      "counted": true,
+      "evidence": "Cash is declared; no bank line is expected",
+      "amount_candidate_references": []
+    },
+    {
+      "txn_id": "T0018",
+      "rule": "2: cash",
+      "input_status": "cash_declared",
+      "derived_status": "cash_declared",
+      "status_agrees": true,
+      "input_bank_reference": null,
+      "derived_bank_reference": null,
+      "bank_reference_agrees": true,
+      "input_amount_sen": 1800,
+      "derived_amount_sen": 1800,
+      "amount_agrees": true,
+      "original_document_amount_sen": 1800,
+      "document_amount_evidence": "Supplied transaction amount; original document not inspected",
+      "bank_amount_sen": null,
+      "counted": true,
+      "evidence": "Cash is declared; no bank line is expected",
+      "amount_candidate_references": []
+    },
+    {
+      "txn_id": "T0019",
+      "rule": "4: reference amount mismatch",
+      "input_status": "needs_review",
+      "derived_status": "needs_review",
+      "status_agrees": true,
+      "input_bank_reference": "DEMO-IN-010",
+      "derived_bank_reference": "DEMO-IN-010",
+      "bank_reference_agrees": true,
+      "input_amount_sen": 450,
+      "derived_amount_sen": 450,
+      "amount_agrees": true,
+      "original_document_amount_sen": 500,
+      "document_amount_evidence": "Original document amount reconstructed from supplied notes; image not inspected",
+      "bank_amount_sen": 450,
+      "counted": true,
+      "evidence": "Document RM5.00; bank RM4.50; bank amount used; confirm discrepancy",
+      "amount_candidate_references": [],
+      "bank_amount_in_notes_sen": 450,
+      "bank_note_agrees": true
+    },
+    {
+      "txn_id": "T0020",
+      "rule": "7: leftover bank line",
+      "input_status": "unmatched",
+      "derived_status": "unmatched",
+      "status_agrees": true,
+      "input_bank_reference": "DEMO-OUT-004",
+      "derived_bank_reference": "DEMO-OUT-004",
+      "bank_reference_agrees": true,
+      "input_amount_sen": 900,
+      "derived_amount_sen": 900,
+      "amount_agrees": true,
+      "original_document_amount_sen": null,
+      "document_amount_evidence": "No source document; reconstructed from leftover bank line",
+      "bank_amount_sen": 900,
+      "counted": true,
+      "evidence": "No document row represents this bank line; description supports category materials; request receipt",
+      "amount_candidate_references": [],
+      "derived_category": "materials",
+      "category_agrees": true
+    }
+  ],
+  "review_list": [
+    {
+      "txn_id": "T0004",
+      "status": "duplicate",
+      "amount_sen": 1800,
+      "amount_rm": "18.00",
+      "counted": false,
+      "reason": "Duplicate of T0003 on date, type, original amount, counterparty and reference"
+    },
+    {
+      "txn_id": "T0012",
+      "status": "needs_review",
+      "amount_sen": null,
+      "amount_rm": null,
+      "counted": false,
+      "reason": "Missing amount_rm; flag precedes cash classification"
+    },
+    {
+      "txn_id": "T0019",
+      "status": "needs_review",
+      "amount_sen": 450,
+      "amount_rm": "4.50",
+      "counted": true,
+      "reason": "Document RM5.00; bank RM4.50; bank amount used; confirm discrepancy"
+    },
+    {
+      "txn_id": "T0020",
+      "status": "unmatched",
+      "amount_sen": 900,
+      "amount_rm": "9.00",
+      "counted": true,
+      "reason": "No document row represents this bank line; description supports category materials; request receipt"
+    }
+  ],
+  "bank_mapping": [
+    {
+      "date": "2026-10-05",
+      "description": "Transfer from Dana - accessories",
+      "type": "income",
+      "bank_reference": "DEMO-IN-001",
+      "amount_sen": 500,
+      "amount_rm": "5.00",
+      "transaction_ids": [
+        "T0001"
+      ],
+      "statuses": [
+        "ambiguous_resolved"
+      ]
+    },
+    {
+      "date": "2026-10-05",
+      "description": "Transfer from Mira - accessories",
+      "type": "income",
+      "bank_reference": "DEMO-IN-002",
+      "amount_sen": 500,
+      "amount_rm": "5.00",
+      "transaction_ids": [
+        "T0002"
+      ],
+      "statuses": [
+        "ambiguous_resolved"
+      ]
+    },
+    {
+      "date": "2026-10-05",
+      "description": "Demo Bead Nook - bead materials restock",
+      "type": "expense",
+      "bank_reference": "DEMO-OUT-001",
+      "amount_sen": 1800,
+      "amount_rm": "18.00",
+      "transaction_ids": [
+        "T0003"
+      ],
+      "statuses": [
+        "matched"
+      ]
+    },
+    {
+      "date": "2026-10-06",
+      "description": "Transfer from Farah - accessories",
+      "type": "income",
+      "bank_reference": "DEMO-IN-003",
+      "amount_sen": 500,
+      "amount_rm": "5.00",
+      "transaction_ids": [
+        "T0005"
+      ],
+      "statuses": [
+        "matched"
+      ]
+    },
+    {
+      "date": "2026-10-06",
+      "description": "Transfer from Nisa - accessories",
+      "type": "income",
+      "bank_reference": "DEMO-IN-004",
+      "amount_sen": 500,
+      "amount_rm": "5.00",
+      "transaction_ids": [
+        "T0006"
+      ],
+      "statuses": [
+        "matched"
+      ]
+    },
+    {
+      "date": "2026-10-06",
+      "description": "Transfer from Hana - accessories",
+      "type": "income",
+      "bank_reference": "DEMO-IN-005",
+      "amount_sen": 1800,
+      "amount_rm": "18.00",
+      "transaction_ids": [
+        "T0007"
+      ],
+      "statuses": [
+        "matched"
+      ]
+    },
+    {
+      "date": "2026-10-07",
+      "description": "Transfer from Iman - accessories",
+      "type": "income",
+      "bank_reference": "DEMO-IN-006",
+      "amount_sen": 500,
+      "amount_rm": "5.00",
+      "transaction_ids": [
+        "T0008"
+      ],
+      "statuses": [
+        "matched"
+      ]
+    },
+    {
+      "date": "2026-10-07",
+      "description": "Demo Pouch Corner - packaging pouches",
+      "type": "expense",
+      "bank_reference": "DEMO-OUT-002",
+      "amount_sen": 600,
+      "amount_rm": "6.00",
+      "transaction_ids": [
+        "T0009"
+      ],
+      "statuses": [
+        "matched"
+      ]
+    },
+    {
+      "date": "2026-10-08",
+      "description": "Transfer from Lina - accessories",
+      "type": "income",
+      "bank_reference": "DEMO-IN-007",
+      "amount_sen": 500,
+      "amount_rm": "5.00",
+      "transaction_ids": [
+        "T0010"
+      ],
+      "statuses": [
+        "matched"
+      ]
+    },
+    {
+      "date": "2026-10-08",
+      "description": "Transfer from Rina - accessories",
+      "type": "income",
+      "bank_reference": "DEMO-IN-008",
+      "amount_sen": 1800,
+      "amount_rm": "18.00",
+      "transaction_ids": [
+        "T0011"
+      ],
+      "statuses": [
+        "matched"
+      ]
+    },
+    {
+      "date": "2026-10-09",
+      "description": "Transfer from Suri - accessories",
+      "type": "income",
+      "bank_reference": "DEMO-IN-009",
+      "amount_sen": 500,
+      "amount_rm": "5.00",
+      "transaction_ids": [
+        "T0013"
+      ],
+      "statuses": [
+        "matched"
+      ]
+    },
+    {
+      "date": "2026-10-09",
+      "description": "Demo Parcel Desk - nine weekly parcels",
+      "type": "expense",
+      "bank_reference": "DEMO-OUT-003",
+      "amount_sen": 3600,
+      "amount_rm": "36.00",
+      "transaction_ids": [
+        "T0014"
+      ],
+      "statuses": [
+        "matched"
+      ]
+    },
+    {
+      "date": "2026-10-11",
+      "description": "Transfer from Zahra - accessories",
+      "type": "income",
+      "bank_reference": "DEMO-IN-010",
+      "amount_sen": 450,
+      "amount_rm": "4.50",
+      "transaction_ids": [
+        "T0019"
+      ],
+      "statuses": [
+        "needs_review"
+      ]
+    },
+    {
+      "date": "2026-10-11",
+      "description": "Demo Bead Nook - bead materials top-up",
+      "type": "expense",
+      "bank_reference": "DEMO-OUT-004",
+      "amount_sen": 900,
+      "amount_rm": "9.00",
+      "transaction_ids": [
+        "T0020"
+      ],
+      "statuses": [
+        "unmatched"
+      ]
+    }
+  ],
+  "bank_and_cash_control_sen": {
+    "bank": {
+      "income": 7550,
+      "expense": 6900
+    },
+    "known_cash": {
+      "income": 3300,
+      "expense": 0
+    }
+  },
+  "conflicts": [],
+  "missing_evidence": [
+    {
+      "id": "E01",
+      "transaction_ids": [
+        "T0012"
+      ],
+      "detail": "The thread receipt amount is unknown. Excluded from totals, not treated as zero. Known-amount take home and hourly rate may overstate earnings after this expense is recovered."
+    },
+    {
+      "id": "E02",
+      "detail": "Original receipt/order images and the original statement file are outside the permitted inputs. Statuses are audited against supplied transaction fields, notes, messages and bank_lines, not independently against those original files. File existence and legibility are not verified."
+    },
+    {
+      "id": "E03",
+      "detail": "The original mismatched document amount is available only in transaction notes. The bank amount is independently checked against bank_lines. Whether the difference is underpayment or another error remains unresolved."
+    },
+    {
+      "id": "E04",
+      "detail": "Intake timestamps and nightly reconciliation state are absent. This audit reconstructs end-of-week decision evidence, not an observed execution history. Missing amount supports an intake flag; the noted amount discrepancy supports a later reference-match flag."
+    },
+    {
+      "id": "E05",
+      "detail": "Draft recommendations and an actual Auditor ruling are not permitted inputs. Only the evidence-supported direction of a ruling is derived; no projected raise is asserted. Day Zero volume and projection rules remain unconfirmed in SYSTEM_DESIGN.md:375-382."
+    }
+  ],
+  "auditor_direction": {
+    "bestseller_product_ids": [
+      "P01"
+    ],
+    "loss_making_bestseller_product_ids": [
+      "P01"
+    ],
+    "direction": "Favor improving hourly earnings and fixing loss-making keychain pricing/costs before growing their current sales mix; do not endorse volume growth on bestseller status alone. Bracelets have positive direct profit and higher direct profit per hour. Shared time remains unallocated.",
+    "basis": {
+      "hourly_rate_rm": "2.53",
+      "target_hourly_rate_rm": "12.00",
+      "products": [
+        {
+          "product_id": "P01",
+          "units": 11,
+          "profit_sen": -1050,
+          "direct_minutes": 225,
+          "profit_per_hour_rm": {
+            "exact_numerator": -63000,
+            "exact_denominator": 22500,
+            "unit": "RM/hour",
+            "display": "-2.80"
+          }
+        },
+        {
+          "product_id": "P02",
+          "units": 3,
+          "profit_sen": 3200,
+          "direct_minutes": 113,
+          "profit_per_hour_rm": {
+            "exact_numerator": 192000,
+            "exact_denominator": 11300,
+            "unit": "RM/hour",
+            "display": "16.99"
+          }
+        }
+      ]
+    },
+    "limitation": "This is an evidence-supported direction, not a verified existing ruling or a forecast. Actual gains need demand, feasibility and approved projection rules."
+  },
+  "audit": {
+    "checks": {
+      "display_half_up_positive_negative": true,
+      "whole_sen_rounding_half": true,
+      "per_order_fee_not_aggregate": true,
+      "all_transaction_statuses_agree": true,
+      "all_transaction_bank_references_agree": true,
+      "all_final_amounts_agree": true,
+      "noted_bank_amounts_agree": true,
+      "leftover_categories_agree": true,
+      "all_bank_lines_used_exactly_once": true,
+      "all_input_rows_audited": true,
+      "category_type_consistency": true,
+      "cash_orders_match_message": true,
+      "production_independent_per_sale_sum": true,
+      "fulfilment_independent_per_order_sum": true,
+      "nonzero_fulfilment_lines": true,
+      "unique_hours_ids": true,
+      "unique_hours_group_keys": true,
+      "whole_minutes": true,
+      "direct_plus_shared_minutes": true,
+      "daily_sum": true,
+      "product_revenues_sum": true,
+      "income_bank_plus_cash": true,
+      "expenses_bank_plus_known_cash": true,
+      "review_complete": true,
+      "baseline_change_log_still_empty": true,
+      "hours_rebuild_deterministic": true,
+      "source_labels": true,
+      "replay_correction_not_double_counted": true,
+      "correction_boundary_products.P01.minutes_per_unit": true,
+      "courier_nine_labels_match_instagram_orders": true,
+      "permitted_inputs_unchanged": true
+    },
+    "all_consistency_checks_pass": true,
+    "status_counts": {
+      "ambiguous_resolved": 2,
+      "cash_declared": 4,
+      "duplicate": 1,
+      "matched": 10,
+      "needs_review": 2,
+      "unmatched": 1
+    },
+    "source_counts": {
+      "corrected": 5,
+      "estimate": 14,
+      "stated": 1
+    },
+    "counted_rows": 18,
+    "excluded_rows": 2,
+    "conclusion": "Arithmetic and supplied-row evidence agree, with no unresolved specification conflict; this does not clear review items or replace original-document verification."
+  }
+}
