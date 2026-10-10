@@ -451,7 +451,9 @@ All figures use counted rows and hours lines dated in the week.
   * `write_file`: `path`, `text` and an optional `append` (`true` adds to the end of the file). It refuses the ledger and plan CSV files, `numbers.json` and the payslip, so those change only through `lembur`.
   * `move_file`: `from` and `to`.
   * `calendar`: `date`. Returns `week`, `week_start`, `payslip_day` (the Sunday that closes the week) and `is_payslip_day`. Agents never work a date out themselves.
-* **What `run_tool` returns**: always a dict with `ok`. When `ok` is `true`, the tool's result is beside it. When `ok` is `false`, `error` says why in plain words. A mistake by an agent never raises an exception: it comes back as `ok: false`.
+* **What `run_tool` returns**: always a dict with `ok`. When `ok` is `true`, the tool's result is beside it, under the names given above. When `ok` is `false`, `error` says why in plain words. A mistake by an agent never raises an exception: it comes back as `ok: false`.
+  * **For `lembur`**: `result` holds the JSON the command printed, whether it passed or failed. `ok` is `true` when the command exited 0. When it exited 1, `ok` is `false` and `error` is the command's own message, so the agent can read the details in `result` and adapt.
+  * **Loadable alone**: `app/tools.py` can be loaded from its file path with no key and no network. It reaches for `app/model.py` only when `ask` is left out and an image has to be read.
 * **Which agent may use what**: the tool layer checks this on every call. `agent` is `bookkeeper`, `payroll`, `growth_coach` or `auditor`.
   * **Bookkeeper**: `read_document`, `list_files`, `read_file`, `write_file`, `move_file`, `calendar`, and the commands `add-transactions`, `add-bank-lines`, `reconcile`, `resolve`, `classify`, `close-week` and `review`.
   * **Payroll**: `list_files`, `read_file`, `write_file`, `calendar`, and the commands `correct-plan`, `hours`, `numbers`, `review` and `payslip`.
