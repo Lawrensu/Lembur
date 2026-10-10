@@ -370,6 +370,42 @@ class EntryPointTests(unittest.TestCase):
         self.call("add-transactions", rows=[{"invented_field": "value"}], code=1)
         self.call("resolve", "--txn-id", "T9999", "--bank-reference", "", "--reason", "Unknown", code=1)
 
+    def test_correct_plan_refuses_invalid_or_negative_values_before_writing(self):
+        before = self.snapshot()
+        for value in ("unreadable", "", "-1", "-0.5", "NaN", "sNaN", "Infinity", "-Infinity"):
+            with self.subTest(value=value):
+                result = self.call("correct-plan", "--field", "products.P01.minutes_per_unit",
+                                   "--new-value=" + value, "--changed-at", "2026-10-07",
+                                   "--reason", "Timed production", code=1)
+                self.assertIn("number", result["error"])
+                self.assertEqual(before, self.snapshot())
+
+    def test_correct_plan_refuses_equal_values_and_retries_without_new_log_rows(self):
+        before = self.snapshot()
+        self.call("correct-plan", "--field", "products.P01.minutes_per_unit",
+                  "--new-value", "20.0", "--changed-at", "2026-10-07",
+                  "--reason", "No change", code=1)
+        self.assertEqual(before, self.snapshot())
+        self.call("correct-plan", "--field", "products.P01.minutes_per_unit",
+                  "--new-value", "15", "--changed-at", "2026-10-07", "--reason", "Timed production")
+        after = self.snapshot()
+        for value in ("15", "15.00"):
+            result = self.call("correct-plan", "--field", "products.P01.minutes_per_unit",
+                               "--new-value", value, "--changed-at", "2026-10-07",
+                               "--reason", "Timed production", code=1)
+            self.assertIn("already", result["error"])
+            self.assertEqual(after, self.snapshot())
+        book = sheets.load_book(self.workspace / "plan" / "plan", PLAN_SHEETS, fmt="csv")
+        self.assertEqual(len(book["change_log"]), 1)
+        self.assertEqual(book["products"][0]["minutes_per_unit"], "15")
+
+    def test_correct_plan_accepts_zero_and_fractional_nonnegative_values(self):
+        for field, value in (("channels.instagram.fulfilment_minutes_per_order", "0"),
+                             ("assumptions.admin_hours_per_week", "0.5")):
+            result = self.call("correct-plan", "--field", field, "--new-value", value,
+                               "--changed-at", "2026-10-07", "--reason", "Timed work")
+            self.assertEqual(result["correction"]["new_value"], value)
+
     def test_piped_json_preserves_unicode_with_restricted_console_encoding(self):
         label = "\u4e2d\U0001f600\u2192"
         row = sale()

@@ -3,13 +3,14 @@
 from __future__ import annotations
 
 import argparse
+from decimal import InvalidOperation
 import json
 from pathlib import Path
 import re
 import sys
 
 import business_numbers
-from conventions import add_note, in_week, is_counted, iso_week, rm, text, to_sen, week_bounds
+from conventions import add_note, in_week, is_counted, iso_week, rm, text, to_decimal, to_sen, week_bounds
 import hours as hours_tool
 from plan import Plan
 import reconcile as reconciliation
@@ -315,6 +316,14 @@ def run(args):
         if not text(args.reason):
             raise CommandError("a reason is required")
         plan = load_plan(workspace)
+        try:
+            value = to_decimal(args.new_value)
+        except InvalidOperation:
+            raise CommandError("new value must be a finite nonnegative number") from None
+        if not value.is_finite() or value < 0:
+            raise CommandError("new value must be a finite nonnegative number")
+        if value == plan.current(args.field):
+            raise CommandError("new value is already in the plan")
         entry = plan.correct(args.field, args.new_value, args.changed_at, text(args.reason))
         sheets.save_book(workspace / "plan" / "plan", PLAN_SHEETS, plan.book, fmt="csv")
         return {"correction": entry}
