@@ -12,3 +12,18 @@ Thumbs.db
 
 # Local agent settings
 .workbuddy-ai/
+
+# Workspace runtime outputs (keep .gitkeep stubs, ignore everything else)
+workspace/*.xlsx
+workspace/plan/*.xlsx
+workspace/payslips/*
+workspace/receipts/*
+workspace/boardroom/*/
+workspace/audit/*/
+workspace/approvals/*/
+workspace/inbox/*
+
+# Test harness generated reports
+data/test_harness/latest_report.json
+data/test_harness/run_report.md
+data/test_harness/mutation_report.json
