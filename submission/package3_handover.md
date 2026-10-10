@@ -110,6 +110,9 @@ For `payslip` and `review` the bot only reads: the payslip file, `numbers.json`,
 1. **No `app/runner.py`.** The bot needs the real `run_night` for a full night, and proof 3 needs a payslip to exist before it can arrive in the chat. Fixed commands and uploads work without it.
 2. **The photo half needs a person at the phone.** Someone must send the bot a text and a photo, then the word `payslip`. An agent cannot send Telegram messages as the student.
 3. **The token is now configured.** This blocker is cleared; the live token check passed.
+1. **No `.env`.** The token is not configured locally. Someone must create the bot with `@BotFather` and save the token as `TELEGRAM_BOT_TOKEN` in `D:\Github\Lembur\.env`. Never paste the token into chat, a file, a screenshot or a commit.
+2. **No `app/runner.py`.** The bot needs the real `run_night` for a full night. Fixed commands and uploads work without it.
+3. **Backend not in `dev`.** `app/tools.py` and `app/model.py` are another package's work.
 
 ## Proof 3, as written in PLAN section 12
 
