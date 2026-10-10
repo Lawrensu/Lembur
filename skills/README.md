@@ -18,9 +18,9 @@ Every command is run from the repository root. `workspace/` is the only folder t
   1. **Bookkeeper**: closes the week and classifies the new rows, before Payroll starts.
   2. **Payroll and the Growth coach**, at the same time: `payroll.md` and `growth.md`.
   3. **Auditor**: numbers check, hours trace, `ruling.md`, `audit_report.md`.
-  4. **Payroll**: the payslip, once.
-  5. **Auditor**: confirms the review list reached the payslip.
-  6. **Growth coach**: the drafts in `approvals/<week>/`.
+  4. **Growth coach**: the drafts in `approvals/<week>/`. They come before the payslip because the payslip points to them.
+  5. **Payroll**: the payslip, once.
+  6. **Auditor**: confirms the review list reached the payslip.
   7. **Morning message**: the last reply of the run. It says "Your board meeting is ready", gives the hourly rate copied from `numbers.json`, says where the payslip is, and lists the drafts waiting for "approve N".
 
 ## Starting a run

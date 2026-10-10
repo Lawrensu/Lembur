@@ -413,7 +413,8 @@ All figures use counted rows and hours lines dated in the week.
     * `raise_plan`: `text` and `draft_file`, one per recommendation the ruling upheld.
   * **Text sections**: `{{debate_summary}}` and `{{ruling}}`, copied from `boardroom/<week>/ruling.md`.
   * **A figure that is not shown**: its placeholder is filled with nothing. The wording around it belongs to Role C.
-  * **All field names**: the keys of `numbers.json` are the return value of the numbers tool (section 4.3). No field outside this list may be added to the template without asking.
+  * **All single value names**: `week`, `date_from`, `date_to`, `hourly_rate_rm`, `take_home_rm`, `shared_minutes`, `shared_hours`; `category_totals_rm.` followed by `sales`, `materials`, `packaging`, `platform_fees`, `shipping` or `other_expenses`; `minutes.` and `hours.` each followed by `production`, `fulfilment`, `event`, `admin` or `total`; `plan_versus_reality.` followed by `margin_percent`, `planned_margin_percent`, `hourly_rate_rm` or `target_hourly_rate_rm`. These are the keys of `numbers.json`, the return value of the numbers tool (section 4.3). No field outside this list and the blocks above may be added to the template without asking.
+  * **No conditions**: the template cannot show or hide a line depending on a value. Wording that must always be true is written as fixed text.
 * **`payroll.md` and `growth.md`**: each recommendation states the change and cites the figures it rests on, copied only from `audit/<week>/numbers.json`.
 * **`ruling.md`**: for each disagreement, which side is upheld and why, citing figures.
 * **`audit_report.md`**: each check in section 5.5 with pass or fail and the rows concerned.

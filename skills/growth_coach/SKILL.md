@@ -44,7 +44,7 @@ Start only after Payroll has saved `numbers.json` for the week. You and Payroll 
    * A post is written for the student's customers, for a channel in the plan. A supplier message is written to a supplier. Write a supplier message only when an upheld recommendation calls for one.
    * At the top of each draft, say in one line which upheld recommendation it serves.
    * Use plain language. Invent no figure, no discount and no promise that is not in the ruling. Where an amount is the student's decision, leave a marked blank for her to fill, written `[amount]`.
-4. **Give the approval list in your reply**: each draft's number, its file and one line on what it is, and which upheld recommendations needed no draft. The morning message carries it to the student.
+4. **Give the approval list in your reply**: each draft's number, its file and one line on what it is, and which upheld recommendations needed no draft. Payroll needs the draft file names for the payslip, and the morning message carries the list to the student.
 
 ## When the student replies to a draft
 

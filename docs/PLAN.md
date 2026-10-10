@@ -220,6 +220,12 @@ Moved to `docs/SYSTEM_DESIGN.md`. Old section numbers map as follows.
    * **Fallback**: run agents in sequence and show the `boardroom` folder as evidence.
    * **Owner**: Law.
    * **Find out**: whether four skills can work inside one task, whether two of them can run in parallel, and what the screen shows while they do. The guides describe an expert team under Experts in the sidebar and say a team run costs several times a single run.
+   * **Steps**
+     1. Install the four skills: copy each folder under `skills/` into the WorkBuddy skills folder, named after the `name` at the top of its `SKILL.md`. On Law's machine that folder is `.workbuddy-ai/skills/` in the user folder. Check that all four show as installed.
+     2. One night, two skills in a row. Run `python -B data/test_harness/reset_workspace.py --day 2026-10-05`. In a new conversation ask: "Run the Lembur Night Shift for the night of 2026-10-05. Use the lembur-bookkeeper skill first, then the lembur-payroll skill", and give Monday's message from `data/demo/messages.md`.
+     3. The team run. Start from a workspace that holds a finished week up to the saved numbers. Ask for the payslip day boardroom: Payroll and the Growth coach write their recommendations at the same time, then the Auditor rules, then the Growth coach drafts.
+   * **Pass when**: step 2 leaves four rows with T0004 marked `duplicate` and a saved `numbers.json`, and step 3 leaves `payroll.md`, `growth.md`, `ruling.md` and numbered drafts.
+   * **Also write down**: whether the skills were picked up by name, whether step 3 ran side by side or in sequence, what the screen showed, any prompt that needed a click, and the credits each step used.
 6. **A skill can run a deterministic script**
    * **Why**: arithmetic and matching. Also check which runtime and libraries are available.
    * **Fallback**: spreadsheet formulas inside the ledger.
@@ -286,36 +292,37 @@ Moved to `docs/SYSTEM_DESIGN.md`. Old section numbers map as follows.
   6. **Role A, Auditor and debate**: verified when the ruling points the expected way.
   7. **Role C, recording**: needs real run outputs from steps 4 to 6.
 * **What Role C does meanwhile**: look, identities, deck skeleton and script run in parallel from the start. The payslip order in design section 7 is fixed, so Role C and Payroll work to the same list.
-* **Current tasks, as of 10 October 16:30**: do them in the order listed. Anything unclear or not written here: ask Law before acting.
+* **Current tasks, as of 10 October 17:30**: do them in the order listed. Anything unclear or not written here: ask Law before acting.
 * **Keep it simple**: Law's rule for the rest of the build. Add no feature, file, field or check that is not written in these docs. If something looks missing, ask before building it.
 * **Where things stand**
-  * **Working**: the reconciliation, hours and numbers tools and the command entry point `tools/lembur.py`, checked by 82 tests. Replayed night by night through the commands, they rebuild Sharon's expected ledger and answer key exactly: every status, every hours line, take home RM39.50, 938 minutes, RM2.53 an hour.
+  * **Working**: the reconciliation, hours and numbers tools and the command entry point `tools/lembur.py`, checked by the test suite. Replayed night by night through the commands, they rebuild Sharon's expected ledger and answer key exactly: every status, every hours line, take home RM39.50, 938 minutes, RM2.53 an hour.
+  * **Written and rehearsed**: the four skills in `skills/`. One full pass of the demo week that followed only those files, the inbox images and the nightly messages matched the answer key with no difference. That pass was not run in WorkBuddy: check 5 does that.
   * **Decided today**: CSV files (check 7), scripts run from a skill (check 6), intake order, the payslip format (design section 7), who runs each remaining check (section 12), approval by reply and no automatic posting (design section 6.1).
   * **Agreed as designs, not to be built yet**: the price only raise projection and Day Zero (design section 8). Each waits for Law's word.
-  * **Not built yet**: the four skills and the payslip command. No run by the agents exists, so no real output exists yet.
+  * **Not built yet**: the payslip command, in progress. No run inside WorkBuddy exists yet, so no real output exists yet.
 * **Everyone**
   1. **Pull `dev` first**: it holds everything above. Work that started from an older `dev` may rest on rules that have since changed.
   2. **Pull requests go into `dev`**, never into `main`.
 * **Role B, Sharon**
-  1. **Sign off the answer key**: `data/answer_key/answer_key.md` is still marked draft. The tools reproduce every figure in it.
-  2. **Make the CSV files the only copy**: `data/demo/plan_*.csv` and `data/answer_key/ledger_*.csv` are the source of truth. Update the paths in `data/demo/messages.md` and `answer_key.md`. Remove the `.xlsx` workbooks from `data/demo/` and `data/answer_key/`, and either update the helper scripts to read the CSV files or remove them.
-  3. **Apply the intake order**: file name order, so on 6 October Hana is T0006 and Nisa is T0007. The CSV ledger already says so; `answer_key.md` does not yet.
-  4. **Persona**: replace the real university name with a generic one.
+  1. **Sign off the answer key**: `data/answer_key/answer_key.md` is still marked draft. The tools reproduce every figure in it. Its text was aligned for you on 10 October: CSV paths, Hana as T0006 and Nisa as T0007, and the two agreed designs. Read those changes, then sign off.
+  2. **Make the CSV files the only copy**: `data/demo/plan_*.csv` and `data/answer_key/ledger_*.csv` are the source of truth. The paths in `data/demo/messages.md` and `answer_key.md` are updated. Still yours: remove the `.xlsx` workbooks from `data/demo/` and `data/answer_key/`, and either update the helper scripts in the `.ref` folders to read the CSV files or remove them.
+  3. **Intake order**: file name order, so on 6 October Hana is T0006 and Nisa is T0007. The CSV ledger and `answer_key.md` both say so now.
+  4. **Persona**: the real university name in `messages.md` was replaced with a generic one. Change the wording if you prefer another.
   5. **Test harness in `data/test_harness/`**: it is now in `dev` and reads the CSV files with the standard library. It needs no installed package. What changed from your version is listed in section 10. Please read it through once and tell Law if anything is wrong.
   6. **Platform checks 1, 2, 3, 4, 9 and 10**: section 12 gives the steps. Write each result under its check. Run check 1 first: the others use its set up, and it answers whether a Telegram task can reach `workspace/`.
   7. **From 18:00**: compare the first real run with the answer key, using the harness. Waits on Role A.
   8. **Day Zero**: the design is agreed (design section 8). It is not built until Law says so after the midnight checkpoint. Do not spend time on it before then.
 * **Role C, Damian**
-  1. **`checklist.md`**: move it under `submission/`. Reword it as a task list for the three of us, with no "drafter" or "checker" roles. Keep the judging criterion as "Meaningful use of WorkBuddy". Remove the line about confirming cuts: section 15 is fixed. No dashes in prose.
+  1. **Your files were aligned for you on 10 October**: `checklist.md` moved to `submission/checklist.md`, and the six content files updated to today's decisions (approval by reply, nothing posted, agreed designs not built, check owners, placeholder names). Read the changes and tell Law if any wording is wrong.
   2. **`submission/payslip_template.html`, due 18:00**: built to the format and field names in design section 7. This replaces the layout note as the handoff to Role A.
   3. **Check 11**: section 12. Law wants the payslip as a PDF, so run it as soon as a first version of the template exists.
   4. **`board_meeting_layout.md`, `deck_outline.md`, `video_script.md`, `qa_sheet.md`**: all four can start now.
   5. **Sample figures**: until a real run exists, use the answer key figures and label them as samples. Never invent a figure.
   6. **Trigger scenes**: the Telegram trigger, the overnight schedule and the morning message are unproven until checks 1, 3 and 9 are recorded. Keep those scenes loose until then.
 * **Role A, Law**
-  1. **Entry point**: `tools/lembur.py`, the commands the skills call. Done; its commands are listed in design section 4. Two fixes remain: output containing text outside the Windows code page, and guards on plan corrections.
+  1. **Entry point**: `tools/lembur.py`, the commands the skills call. Done; its commands are listed in design section 4.
   2. **Payslip command**: fills Damian's template from `numbers.json`.
-  3. **The four skills**: Bookkeeper first, then Payroll, then the Auditor and the Growth coach. Approval by reply is part of their instructions (design section 6.1).
+  3. **The four skills**: written in `skills/` and rehearsed. Next is check 5, running them inside WorkBuddy.
   4. **Checks 5 and 8**: section 12.
 
 ---
@@ -383,7 +390,7 @@ One character, told across time.
 2. **Title card**: "Four weeks later…"
 3. **The Night Shift**: message before bed, messy folder, agents at work (time lapse), 7am "Your board meeting is ready."
 4. **Climax**: the payslip reveals the hourly rate, the agent debate, plan versus reality, and the raise plan with drafts.
-5. **Close**: one tap to approve. The student goes to class.
+5. **Close**: one reply to approve. The student goes to class.
 
 ---
 
