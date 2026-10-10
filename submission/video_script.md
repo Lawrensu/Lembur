@@ -115,7 +115,6 @@
 - Shot: `{evidence_pack_screenshots}` from `submission/evidence/`: WorkBuddy sessions, task lists and key exchanges, each with a caption of what was being built.
 - Proposed narration: “We built Lembur with WorkBuddy. Each of us gave it the docs as the source of truth, it wrote the code or the content, and we checked the result before merging.”
 - Scenarios to name, only those the evidence pack supports: the engine and its tests, the dataset and answer key, the story, and the early run of the agents as instruction files.
-- If proof 5 is recorded, show `{workbuddy_recorded_run_reference}` labelled as our agents inside WorkBuddy, kept as insurance.
 - Do not say or imply that the running product lives in WorkBuddy. Do not present work done or checked by other means as WorkBuddy's.
 - Evidence gate: every claim in this scene needs a matching item in the evidence pack.
 - Sources: PLAN sections 1, 11 and 12.

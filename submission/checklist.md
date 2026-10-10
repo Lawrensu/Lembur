@@ -41,8 +41,7 @@
 
 ## Package 2, agent orchestration: Law
 
-* [ ] Draft the four prompts in `prompts/` from the instruction files in `skills/` (design section 6.4). This needs no backend.
-* [ ] Proof 5, one recorded run of our agents inside WorkBuddy: install the four instruction files from `skills/` as WorkBuddy skills, run the night of 2026-10-05 with the Bookkeeper skill, then the Payroll skill, and record the screen. It is insurance and the fallback demo. This needs no backend either.
+* [x] Write the four prompts in `prompts/` (design section 6.4).
 * [ ] Build `app/runner.py`: the plan for the night, the agent loop and the order of steps (design sections 6.1, 6.3 and 6.4).
 * [ ] Replay the demo week through the runner with a scripted model inside the tests.
 * [ ] Proof 2, the reasoning model can run one night as an agent: the night of 2026-10-05 through the runner, with four rows, T0004 marked `duplicate` and a saved `numbers.json`, and no manual help.

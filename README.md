@@ -42,7 +42,7 @@ Hackerdorm × BuilderX, Track 2 (Agentic Solutions).
 
 * **Built and tested**: the deterministic tools, the tool layer, the model module, the runner, the four agent prompts, the Telegram bot, the payslip command and template, the demo dataset, the answer key and the comparator.
 * **Proved with the real models**: the reading model reads a receipt image, one night runs as agents, and the whole demo week replayed through the runner matches the answer key with no difference (PLAN section 12, proofs 1, 2 and 4).
-* **Not run yet**: the full round trip through the chat with the real runner, and the recorded run inside WorkBuddy (proofs 3 and 5).
+* **Not run yet**: the full round trip through the chat with the real runner (PLAN section 12, proof 3).
 * **Run a night yourself**: copy `.env.example` to `.env`, fill it in, then start the bot with `python -B -m app.bot` from the repository root.
 
 ## Read in this order
@@ -61,7 +61,6 @@ docs/SYSTEM_DESIGN.md   system design
 tools/                  deterministic tools and their tests (design section 4)
 app/                    model module, tool layer, runner and bot (design section 6.3)
 prompts/                one instruction file per agent (design section 6.4)
-skills/                 the same four agents as WorkBuddy skills: the fallback, and the source of the prompts
 workspace/              one student's files, used by the tests and the demo replay (design section 3.1)
 data/demo/              demo inputs: plan files, inbox files, nightly messages (Role B)
 data/answer_key/        answer key and expected ledger (Role B)

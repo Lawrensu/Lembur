@@ -34,7 +34,7 @@
 * **What makes a strong solution**, from the track brief
   1. **Real problem and user value**: a clear user and measurable value.
   2. **Agentic workflow**: task decomposition, multistep execution, tool calling, agent collaboration, parallel workflows, validation, adapting to outcomes.
-  3. **Meaningful use of WorkBuddy**: as written, WorkBuddy is the execution platform. Under the rule change we show it as our build platform (section 11), and we keep one recorded run of our agents inside WorkBuddy as insurance (section 12, proof 5).
+  3. **Meaningful use of WorkBuddy**: as written, WorkBuddy is the execution platform. Under the rule change we show it as our build platform (section 11).
   4. **End to end execution**: one prompt, one goal, no manual guiding of each step.
   5. **Usable and verifiable results**: reliable, complete, practical output.
 
@@ -204,17 +204,11 @@ Each proof answers one question before we build on the answer. The owner writes 
    * **Owner**: Law. Sharon reads the comparator's report.
    * **Result, 11 October 07:45, Law**: pass. The seven nights were replayed through the runner with the real models, started from a script and not from the chat. The run took about five minutes and the comparator printed PASS with no difference: 20 transactions, 14 bank lines, 20 hours lines, take home RM39.50, 15.6 hours, RM2.53 an hour.
    * **What to know**: the models do not answer the same way every time. Four earlier replays that morning differed from the key in one step each (a document not filed, the statement not added, a bazaar sale without its channel, two transfers left unresolved). Each cause was closed with a check in the runner or a clearer line in a prompt. One passing run is not a guarantee for every run: compare each recorded run again.
-5. **One recorded run of our agents inside WorkBuddy**
-   * **Why**: insurance, and the fallback demo (section 15). The judging slide still names WorkBuddy as the execution platform (section 1).
-   * **Steps**: install the four instruction files from `skills/` as WorkBuddy skills. Run the night of 2026-10-05 with the Bookkeeper skill, then the Payroll skill. Record the screen.
-   * **Pass when**: the same four rows and a saved `numbers.json`.
-   * **Fallback**: none needed. The evidence pack of section 11 stands by itself.
-   * **Owner**: Law.
 
 * **What we already know**, from before the redesign
   * **Our scripts run from a WorkBuddy skill**: passed on 10 October with its managed Python 3.13.
   * **The data files are CSV**: decided on 10 October. The `.xlsx` workbooks and the code that read them are removed.
-  * **The agents' instructions work**: one full pass of the demo week that followed only the files in `skills/`, the inbox images and the nightly messages matched the answer key with no difference. That pass was not run in WorkBuddy and used a different model from the one we will run on.
+  * **The agents' instructions work**: before the runner existed, one full pass of the demo week that followed only the agents' instruction files, the inbox images and the nightly messages matched the answer key with no difference. Those files became the prompts in `prompts/`.
   * **The payslip can become a PDF**: Damian printed the sample payslip to PDF with an installed browser and no install, and approved the look.
   * **The payslip template fills**: the payslip command filled Damian's template from the rehearsed week with no placeholder left.
 
@@ -243,7 +237,7 @@ Each proof answers one question before we build on the answer. The owner writes 
      * **Done when**: proof 3 passes.
 * **Order**
   1. **Backend first**: Sharon builds it and opens a pull request into `dev`. `app/tools.py` can go in ahead of `app/model.py`.
-  2. **Meanwhile, with no backend needed**: Law drafts the four prompts from `skills/` and records proof 5. Damian creates the Telegram bot with `@BotFather` and builds `app/bot.py` against a stand in `run_night` that returns the night summary of design section 6.3.
+  2. **Meanwhile, with no backend needed**: Law drafts the four prompts. Damian creates the Telegram bot with `@BotFather` and builds `app/bot.py` against a stand in `run_night` that returns the night summary of design section 6.3.
   3. **After the backend is in `dev`**: Law pulls `dev` and builds the runner. Damian finishes the bot.
   4. **Join**: the bot calls the real `run_night`. First full run through the chat.
   5. **Recording**: from real run outputs.
@@ -255,13 +249,12 @@ Each proof answers one question before we build on the answer. The owner writes 
   * **Pull `dev` first, then work on your own branch.** Pull requests go into `dev`, never into `main`.
   * **Capture evidence as you go** (section 11): a screenshot of each WorkBuddy session that builds your package.
 * **Beside the package**
-  * **Law**: proof 5, the recorded run inside WorkBuddy. It is also the fallback demo (section 15).
   * **Sharon**: sign off the answer key. Read the comparator's report for every full run.
   * **Damian**: the deck, the video script, the question and answer sheet.
 * **Where things stand, 11 October 07:50**
   * **Built and tested**: all three packages. The tool layer and the bot, the model module, the runner and the four prompts. 238 tests pass with no key and no network.
   * **Proved with the real models**: proofs 1, 2 and 4 (section 12).
-  * **Not run yet**: the full round trip through the chat with the real runner, which is the rest of proof 3, and proof 5. The bot saves a photo into the inbox in a live chat, as Damian reported.
+  * **Not run yet**: the full round trip through the chat with the real runner, which is the rest of proof 3. The bot saves a photo into the inbox in a live chat, as Damian reported.
   * **Who built what**: Sharon the tool layer, Damian the bot. The model module, the runner and the prompts were finished in Law's package in the last two hours.
 
 ---
@@ -271,7 +264,7 @@ Each proof answers one question before we build on the answer. The owner writes 
 * **Rewritten at 23:45 on 10 October** [confirm]: the earlier schedule assumed the build would start at 18:00. Law decides the times below.
 * **23:45 to 01:00**
   * **Sharon**: the backend. `app/tools.py` first, then `app/model.py` and proof 1.
-  * **Law**: the four prompts drafted from `skills/`. Proof 5 recorded.
+  * **Law**: the four prompts drafted.
   * **Damian**: the Telegram bot created, `app/bot.py` against the stand in.
   * **01:00: the backend is in `dev`.**
 * **01:00 to 03:00**
@@ -291,7 +284,7 @@ Each proof answers one question before we build on the answer. The owner writes 
 
 ## 15. Cut order if behind schedule
 
-* **If no night runs through the runner with the real model by 03:00**: the fallback is the run inside WorkBuddy with the instruction files in `skills/` (proof 5). The demo shows that run, and the bot becomes the roadmap. This is why proof 5 is recorded early.
+* **If the runner had not passed**: the demo would have shown the tested commands replaying the week from the command line. It was not needed: the runner passed on 11 October (section 12, proof 4).
 * **If the first full run checkpoint at 04:30 is missed, cut in this order**
   1. **Day Zero generation**: show the hand written plan as "the plan".
   2. **The bot**: start a night from the command line and show the files.

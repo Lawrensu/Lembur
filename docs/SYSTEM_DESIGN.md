@@ -464,7 +464,7 @@ All figures use counted rows and hours lines dated in the week.
   * A reply that is not valid JSON, or asks for an unknown tool, gets one reminder. A second failure fails the step.
   * A tool error is returned to the agent as data. The agent is expected to read it and adapt: for example, classify the rows the numbers tool refused, then run it again.
 * **Figures in what an agent writes**: after the recommendations and the ruling are written, the runner checks that every money and hours figure in them appears in `numbers.json`. A text with a figure that does not is sent back once to the agent that wrote it. A second failure fails the step (section 6.1). [confirm] whether a plan value, such as a current price, may be cited as well: `numbers.json` holds no price.
-* **The prompts**: `prompts/bookkeeper.md`, `payroll.md`, `growth_coach.md`, `auditor.md`. Each holds the agent's identity, its rules and its steps. They are derived from the instruction files in `skills/`, which were rehearsed against the answer key on 10 October.
+* **The prompts**: `prompts/bookkeeper.md`, `payroll.md`, `growth_coach.md`, `auditor.md`. Each holds the agent's identity, its rules and its steps.
 * **As built on 11 October**, where the runner differs from the lines above
   * **Turn limit**: 16 turns for one step.
   * **Reminders**: a reply that is not the agreed JSON gets up to two reminders. One bare action is read as a list of one, and a command named as the tool is read as the `lembur` tool.
@@ -537,7 +537,6 @@ All figures use counted rows and hours lines dated in the week.
 * **Turn limit**: settled when the runner is built. Its builder writes the number into section 6.4.
 * **PDF**: optional (section 7).
 * **WhatsApp, a container file, voice notes, posting through a connector**: future work. None is built.
-* **`skills/`**: the instruction files that ran the agents inside WorkBuddy. They stay until the runner passes the comparator, as the fallback and as the source of the prompts. Then they are removed.
 
 * **Agreed as designs, not built**: Law agreed the two designs below on 10 October. Neither is built until Law says so. Until then recommendations cite current figures only, and the hand written plan stands in for Day Zero (PLAN section 15).
 * **Day Zero formulas**, design agreed: break even point and predicted hourly rate need an expected sales volume, and the plan CSV files have no column for one.

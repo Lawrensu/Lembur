@@ -162,7 +162,6 @@
 - **Not part of the product**: Lembur is our own chat bot. WorkBuddy is the platform we built it with (PLAN section 11).
 - **How**: each of us works with WorkBuddy as the builder in our own checkout. We give it the docs as the source of truth, it writes the code or the content, and the result is checked before it is merged.
 - **Where and in what scenarios**: the engine and its tests, the runner and the bot (once built), the dataset and answer key, and the story (identities, payslip template, deck, video script, this sheet). Before the redesign the four agents also ran as WorkBuddy skills, and a skill run of our own script passed on 10 October.
-- **Insurance**: one recorded run of our agents inside WorkBuddy (PLAN section 12, proof 5). Show `{workbuddy_recorded_run_reference}` only once it is recorded.
 - **Evidence**: `{evidence_pack_references}` from `submission/evidence/`. Claim only what the evidence pack shows WorkBuddy really did. Work done or checked by other means is not presented as WorkBuddy's.
 - Sources: PLAN sections 1, 11 and 12.
 
@@ -176,7 +175,7 @@
 ## How long does a run take, and how reliable is it?
 
 - Already known, from before the redesign (PLAN section 12): our scripts run from a WorkBuddy skill, the data files are CSV, the agents' instructions matched the answer key in one pass that was not run in WorkBuddy and used a different model, and the payslip template fills.
-- Open: proofs 1 to 5 in PLAN section 12. Use `{recorded_proof_results}` from the owner of each proof, and `{measured_run_duration}` from Law; do not invent them.
+- Proofs 1, 2 and 4 passed on 11 October with the real models; proof 3, the chat round trip, is the one still open (PLAN section 12). Use `{recorded_proof_results}` from PLAN section 12 and `{measured_run_duration}` from Law; do not invent them.
 - If a fallback is used, disclose it. Do not present manual execution as scheduled overnight operation.
 - Cost per run, pricing, monetisation and security guarantees are not specified; ask the team rather than invent a business model or assurance.
 - Sources: PLAN sections 10, 12 and 15; DESIGN sections 0 and 8.
@@ -191,7 +190,7 @@
 
 ## What remains open before submission?
 
-- Open proofs: 1 to 5 (PLAN section 12).
+- Open proof: 3, the full round trip through the chat (PLAN section 12).
 - Which model fills each role (proofs 1 and 2), and the times of the rewritten timeline, which are marked [confirm] (PLAN sections 14 and 18).
 - The organisers' exact wording of the rule change (PLAN section 1).
 - Sharon's story and key sign-off and the actual run comparison.

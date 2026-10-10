@@ -11,7 +11,7 @@ PLAN section 11 asks for this folder. WorkBuddy is the platform we built Lembur 
 
 ## What each person adds
 
-* **Law**: the runner, the model module and the prompts being built; proof 5, the recorded run of the agents inside WorkBuddy.
+* **Law**: the runner, the model module and the prompts being built.
 * **Sharon**: the tool layer and its tests; the dataset, the answer key and the comparator work.
 * **Damian**: the payslip template, the agent identities, the story documents, and the Telegram bot.
 

@@ -16,7 +16,7 @@
 
 - Real problem and user value.
 - Agentic workflow.
-- Meaningful use of WorkBuddy: as written, WorkBuddy is the execution platform. Under the organisers' rule change we show it as our build platform (slide 9) and keep one recorded run of our agents inside WorkBuddy as insurance (PLAN section 12, proof 5). The organisers' exact wording is still to be added [confirm].
+- Meaningful use of WorkBuddy: as written, WorkBuddy is the execution platform. Under the organisers' rule change we show it as our build platform (slide 9).
 - End-to-end execution.
 - Usable and verifiable results.
 - Name WorkBuddy as the build platform and say only what it really did (PLAN section 11).
@@ -81,7 +81,7 @@
 - Growth coach: prioritises revenue and sales; proposes changes and prepares drafts after the ruling.
 - Auditor: reruns the numbers, checks sources and review coverage, and rules with cited reasons.
 - Agents interpret and recommend; deterministic tools calculate. Reconciliation is a tool, not an extra agent.
-- Each agent has its own prompt file in `prompts/` (design section 6.4). The prompts are not built yet; their content is derived from the four instruction files in `skills/`, which were rehearsed against the answer key.
+- Each agent has its own prompt file in `prompts/` (design section 6.4).
 - Proposed visual: four named roles with their responsibilities; show actual execution evidence only where available.
 - Source: DESIGN sections 4, 5 and 6.4; `submission/identities.md`.
 
@@ -134,7 +134,6 @@
   - **Building the dataset**: the synthetic receipts, orders, bank statement, nightly messages and the answer key, with a second independent calculation that had to agree with the first.
   - **Building the story**: agent identities, the payslip template, this deck outline, the video script and the question and answer sheet.
   - **Running our agents during development**: before the redesign, the four agents were instruction files that WorkBuddy ran as skills. A skill run of our own script passed on 10 October. That is where the agents' instructions were first shaped.
-- **Insurance**: one recorded run of our agents inside WorkBuddy (PLAN section 12, proof 5). Slot: `{workbuddy_recorded_run_reference}`. Show it only once it is recorded.
 - **Evidence pack**: `submission/evidence/`, with screenshots of our WorkBuddy sessions, task lists and key exchanges, and one line each on what was being built. Slot: `{evidence_pack_references}`. Every claim on this slide needs a matching item in it.
 - **What we say**: only what WorkBuddy really did. Work done or checked by other means is not presented as WorkBuddy's.
 - Proposed visual: session screenshots from the evidence pack beside a short line for each scenario.
