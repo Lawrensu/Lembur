@@ -1,0 +1,14 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Office lock and temp files
+~$*
+*.tmp
+
+# Secrets
+.env
+*.key
+
+# Local agent settings
+.claude/

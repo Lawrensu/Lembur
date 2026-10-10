@@ -1,0 +1,382 @@
+# Lembur: System Design
+
+How the system works: conventions, data, tools, agents, workflows and outputs.
+
+---
+
+## 0. How to use this file
+
+* **Source of truth for behaviour and data**: every skill, tool and template implements this file.
+* **`PLAN.md`**: covers the product, scope, roles, validation and schedule. Read it first.
+* **If the two files disagree**: this file wins on behaviour and data, `PLAN.md` wins on scope and schedule. Report the conflict to the team.
+* **Not written here**: ask the team, do not assume.
+* **[confirm]**: not agreed yet. Do not build on it.
+* **[pending check N]**: waits on a first hour check (PLAN section 12).
+
+---
+
+## 1. Overview
+
+* **Two modes, one engine**
+  * Day Zero plans a new business. The Night Shift runs an existing one.
+  * Both use the same four agents and the same plan file.
+  * Day Zero writes `plan/plan.xlsx`. The Night Shift reads it and compares every payslip against it.
+* **Build dependency**: the Night Shift needs the plan file, not Day Zero. It is built first against a hand written plan file.
+* **Stop rule**: if Day Zero needs its own agents or its own data shapes, stop and redesign. That would be two products.
+* **Agents read and argue, tools count**
+  * Agents read documents and messages, decide unclear cases and write recommendations.
+  * Every match, total, hours figure and rate comes from a deterministic tool (section 4).
+* **Night Shift in one line**: message and inbox → Bookkeeper → reconciliation tool → ledger → Payroll (hours, numbers) → on payslip day: recommendations, ruling, payslip, drafts → morning message → the student approves or corrects.
+
+---
+
+## 2. Conventions
+
+* **Dates**: `YYYY-MM-DD`, Malaysia time.
+* **Week**: Monday to Sunday, written as an ISO week. `2026-W41` is 5 to 11 October 2026. Used wherever a path shows `<week>`.
+* **Month folder**: `YYYY-MM`, wherever a path shows `<year_month>`.
+* **Payslip day**: Sunday night. It closes that week.
+* **Money**: ringgit with two decimals in files. Tools calculate in whole sen.
+* **Time**: whole minutes in files and tools. Hours exist only on display.
+* **Rounding**
+  * Applied at display only, with one exception in section 4.3 (channel fees).
+  * Halves round away from zero: 304.5 becomes 305.
+  * Hours show one decimal, money two decimals, percentages whole numbers.
+  * Python `round()` and Excel `ROUND` treat halves differently. Tools must apply the rule above explicitly.
+* **Empty cell**: means not known or not applicable. Never write 0 or "n/a" in its place.
+* **IDs**: `P01` for products, `T0001` for transactions, `H0001` for hours entries. A transaction ID is never reused.
+* **Person**: `person_1` is the student.
+* **Assumption reference**: names one plan value.
+  * `products.<product_id>.<column>`, for example `products.P01.minutes_per_unit`
+  * `channels.<channel>.<column>`
+  * `assumptions.<column>`
+* **Message reference**: `message.<date>` names the nightly message of that date, saved at `receipts/<year_month>/message_<date>.txt`.
+
+---
+
+## 3. Data model
+
+### 3.1 Folder layout
+
+`workspace/` is the folder WorkBuddy is authorised to read and write.
+
+```
+workspace/
+  inbox/                    student drops files here
+  plan/plan.xlsx            baseline: Day Zero output or hand written
+  ledger.xlsx               transactions, bank lines and hours
+  receipts/<year_month>/    filed source documents and saved nightly messages
+  boardroom/<week>/         payroll.md, growth.md, ruling.md
+  audit/<week>/             audit_report.md, intake_log.md
+  payslips/<week>.pdf       weekly payslip
+  approvals/<week>/         drafted posts and messages, one file per draft
+```
+
+* **Why this layout**: the Auditor traces numbers to receipts, judges open a ledger row and see the receipt behind it, and the folder is the handoff package if the student moves to accounting software.
+* **File format**: `.xlsx` [pending check 7]. Fallback: one CSV per sheet with the same columns.
+* **Sheets**: row 1 holds the column names exactly as written below, in the order listed.
+
+### 3.2 `plan/plan.xlsx`
+
+* **`products`**: one row per product.
+  * `product_id`
+  * `name`
+  * `price_rm`: selling price per unit
+  * `material_cost_rm`: per unit
+  * `packaging_cost_rm`: per unit
+  * `minutes_per_unit`: production time per unit
+* **`channels`**: one row per sales channel. Role B defines the rows.
+  * `channel`: short lowercase name
+  * `fee_percent`: share of the sale amount the channel takes; 0 where none
+  * `fee_per_order_rm`: 0 where none
+  * `shipping_cost_per_order_rm`: shipping the student pays per order; 0 where none
+  * `fulfilment_minutes_per_order`: packing and handover time per order; 0 where none
+* **`assumptions`**: one row.
+  * `admin_hours_per_week`
+  * `planned_margin_percent`
+  * `target_hourly_rate_rm`
+* **`change_log`**: one row per correction. Rows are only ever added.
+  * `changed_at`: date of the student's correction message
+  * `field`: assumption reference of the value changed
+  * `old_value`
+  * `new_value`
+  * `reason`: the student's words
+  * `source`: message reference
+* **Value in force on a date**: the `old_value` of the earliest `change_log` row for that field with `changed_at` later than the date. If there is none, the value now in the plan sheet.
+
+### 3.3 `ledger.xlsx`
+
+* **`transactions`**: one row per sale or expense.
+  * `txn_id`
+  * `date`: the date on the document
+  * `type`: `income` or `expense`
+  * `category`: `sales`, `materials`, `packaging`, `platform_fees`, `shipping` or `other_expenses`
+  * `description`: what was sold or bought
+  * `product_id`: sales rows only
+  * `quantity`: units sold, sales rows only
+  * `amount_rm`: always positive; empty only when it cannot be read
+  * `channel`: sales rows only; must equal a `channel` in the plan file
+  * `payment_method`: `cash` or `bank_transfer`
+  * `counterparty`: customer or supplier as written on the document
+  * `reference`: payment reference printed on the document
+  * `source_file`: workspace path of the filed document or saved message; empty for rows created from a bank line
+  * `reconciliation_status`: one of the six values in section 4.1
+  * `bank_reference`: reference of the bank line this row is paired with
+  * `notes`: the reason for any decision or flag
+* **Rules for `transactions`**
+  * `sales` is always `income`. Every other category is `expense`.
+  * One sales row is one order of one product.
+  * Required on every row: `date`, `type`, `category`, `amount_rm`, `payment_method`.
+  * Also required on sales rows: `product_id`, `quantity`, `channel`.
+* **`bank_lines`**: one row per bank statement line.
+  * `date`
+  * `description`
+  * `type`: `income` for money in, `expense` for money out
+  * `amount_rm`: always positive
+  * `bank_reference`: unique per line
+* **`hours`**: one row per hours line. Built by the hours tool (section 4.2).
+  * `entry_id`
+  * `date`
+  * `person`
+  * `activity`: `production`, `fulfilment`, `event` or `admin`
+  * `product_id`: production and fulfilment lines only
+  * `quantity`: units for production, orders for fulfilment, empty otherwise
+  * `minutes`
+  * `source`: `estimate`, `stated` or `corrected`
+  * `assumption_ref`: assumption reference for `estimate` and `corrected`, message reference for `stated`
+
+---
+
+## 4. Deterministic tools
+
+* **Mechanism**: a script run by a skill [pending check 6]. Fallback: spreadsheet formulas inside the ledger. The rules below hold either way.
+* **Boundary**: agents pass in what they have read (rows, event durations, corrections). They never calculate.
+* **Counted row**: a transaction row counts towards totals and hours unless its status is `duplicate` or its `amount_rm` is empty.
+
+### 4.1 Reconciliation tool
+
+* **Status values**
+  * `matched`: one bank line agrees with the row
+  * `ambiguous_resolved`: several bank lines fitted; the Bookkeeper chose one and wrote why
+  * `unmatched`: no bank line for this row, or no document for this bank line
+  * `duplicate`: a copy of an earlier row
+  * `needs_review`: a required field is missing, the amount disagrees with the bank, or the Bookkeeper could not decide
+  * `cash_declared`: a cash row; no bank evidence is expected
+* **A bank line is used**: when any transaction row carries its `bank_reference`.
+* **Steps, in order**. Each row takes the first status that applies.
+  1. **Flagged at intake**: a row already `needs_review` is left untouched.
+  2. **Cash**: `payment_method` is `cash` → `cash_declared`.
+  3. **Duplicate**: the row equals an earlier row (lower `txn_id`) on `date`, `type`, `amount_rm`, `counterparty` and `reference` → `duplicate`. `notes` names the original row.
+  4. **Reference match**: `reference` equals the `bank_reference` of an unused bank line of the same `type`.
+     * Amounts equal → `matched`.
+     * Amounts differ → `needs_review`. `amount_rm` is set to the bank amount and `notes` keeps both amounts.
+     * Either way `bank_reference` is filled.
+  5. **Amount match**: candidates are unused bank lines with the same `type`, the same amount, and a date within one day either side of the row's date.
+     * Exactly one candidate, and that line is a candidate for no other row → `matched`.
+     * No candidate → `unmatched`.
+     * Anything else → handed to the Bookkeeper as ambiguous.
+  6. **Ambiguous rows**: the Bookkeeper picks a bank line using `counterparty` and `description` → `ambiguous_resolved`, reason in `notes`. If it cannot decide → `needs_review`.
+  7. **Leftover bank lines**, on payslip day only: each unused bank line becomes a new transaction row.
+     * Copied from the bank line: `date`, `type`, `amount_rm`, `description`, `bank_reference`.
+     * `payment_method` is `bank_transfer`, `source_file` is empty, status is `unmatched`, `notes` says no document was found.
+     * The Bookkeeper sets `category` from the description. An unclear expense becomes `other_expenses`. Income becomes `sales` with `product_id` empty.
+* **Review list**: every row with status `unmatched`, `duplicate` or `needs_review`.
+* **Running again**: each run tests rows that are not cash and have an empty status, or are `unmatched` with an empty `bank_reference`. Settled rows are never changed.
+* **Known limit**: a document that arrives after step 7 turned its bank line into a row is not paired automatically. It shows as `unmatched` for the student to resolve.
+
+### 4.2 Hours tool
+
+* **Formula**: week hours = production + fulfilment + events + admin, summed from the `hours` lines dated in the week.
+* **Lines**
+  * **Production**: one line per date and product, from counted sales rows.
+    * `quantity` is the units sold.
+    * `minutes` = `quantity` × `minutes_per_unit` in force on that date.
+    * `assumption_ref` is `products.<product_id>.minutes_per_unit`.
+  * **Fulfilment**: one line per date, product and channel, from counted sales rows.
+    * `quantity` is the number of orders (rows).
+    * `minutes` = `quantity` × `fulfilment_minutes_per_order` in force on that date.
+    * `assumption_ref` is `channels.<channel>.fulfilment_minutes_per_order`.
+    * No line is written when the minutes are zero.
+  * **Event**: one line per event stated in a nightly message.
+    * `minutes` is the stated duration. "Bazaar 4 to 9" is 300.
+    * `source` is `stated`. `assumption_ref` is the message reference.
+  * **Admin**: one line per week, dated that week's Sunday, written on payslip day.
+    * `minutes` = `admin_hours_per_week` in force on that date × 60.
+    * `assumption_ref` is `assumptions.admin_hours_per_week`.
+* **`source` on production, fulfilment and admin lines**: `corrected` when the value in force comes from a `change_log` row, otherwise `estimate`.
+* **Sales rows without `product_id` or `quantity`**: produce no lines.
+* **Why production counts units sold, not units made**: it mirrors how accounting attaches cost to goods when they sell. A big production weekend does not distort one week's rate.
+* **Events**: Payroll reads the message and passes the date and the duration in minutes. If the duration is unclear, no line is written and the item goes on the review list.
+* **Stated hours for anything other than events**: not applied, and listed for review. Stated production time describes units made while estimates count units sold, so applying it would double count.
+* **Corrections**
+  * The student replies with a correction, for example "keychains take me 15 minutes".
+  * Payroll updates the plan cell and adds a `change_log` row.
+  * The new value applies to lines dated on or after `changed_at`. Earlier lines keep the old value.
+  * Only three values can be corrected: `minutes_per_unit`, `fulfilment_minutes_per_order`, `admin_hours_per_week`.
+* **Running again**: production, fulfilment and admin lines of the open week are rebuilt from the ledger on every run. An event line is written once per stated event.
+* **Worked example** (illustration only; real numbers come from the answer key)
+  * Keychains sold: 30 × 20 minutes = 600
+  * Bracelets sold: 6 × 35 minutes = 210
+  * Online orders packed: 10 × 5 minutes = 50
+  * Bazaars, stated: 360
+  * Admin: 2 hours = 120
+  * Total: 1,340 minutes, shown as 22.3 hours
+  * Hourly rate: RM68.00 ÷ 1,340 × 60 = RM3.04
+
+### 4.3 Numbers tool
+
+All figures use counted rows and hours lines dated in the week.
+
+* **Category totals**: the sum of `amount_rm` for each category.
+* **Take home**: sales total minus the totals of the five expense categories.
+* **Hourly rate**: take home ÷ week minutes × 60. Not shown when the week has no minutes.
+* **Product profit**, for each product
+  * **Revenue**: the sum of its sales rows.
+  * **Unit costs**: units sold × (`material_cost_rm` + `packaging_cost_rm`).
+  * **Channel costs**: for each of its sales rows, `amount_rm` × `fee_percent` ÷ 100 (rounded to the sen on each row) + `fee_per_order_rm` + `shipping_cost_per_order_rm`, using the row's channel.
+  * **Profit**: revenue minus unit costs minus channel costs.
+  * **Direct minutes**: its production and fulfilment lines.
+  * **Profit per hour**: profit ÷ direct minutes × 60.
+  * **Loses money**: profit is below zero.
+* **Two bases, on purpose**
+  * Take home uses ledger rows: what was actually paid, traceable to a receipt.
+  * Product profit uses plan costs: a bulk materials receipt cannot be split by product.
+  * Product profits therefore do not add up to take home. Do not try to reconcile them.
+* **Shared hours**: event plus admin minutes. They are not allocated to any product, because any split would be arbitrary. They appear as their own payslip line.
+* **Plan versus reality**
+  * **Margin**: take home ÷ sales total × 100, against `planned_margin_percent`. Not shown when sales are zero.
+  * **Hourly rate**: against `target_hourly_rate_rm`.
+
+---
+
+## 5. Agents
+
+### 5.1 Rules for every agent
+
+* **No invented numbers**: every figure traces to a ledger row, an hours line or a plan value.
+* **No arithmetic**: figures come from the tools in section 4 and are copied, never recalculated.
+* **Nothing leaves the building**: drafts go to `approvals`. Nothing is posted or sent without the student's approval.
+* **Uncertain means flag, not guess**: anything unclear goes on the review list.
+* **Why only four agents**: an agent exists only where it needs different tools, different context or a conflicting objective. Timekeeping is part of Payroll. Reconciliation is a tool.
+
+### 5.2 Bookkeeper
+
+* **Purpose**: turn messy inputs into clean records.
+* **Reads**: files in `inbox`, the nightly message.
+* **Does**
+  * Saves the nightly message to `receipts/<year_month>/message_<date>.txt`.
+  * Extracts transactions from the inbox files and from the message (for example cash sales the student reports).
+  * Extracts bank statement lines into `bank_lines`.
+  * Files each document into `receipts/<year_month>/`, using the month of the document date, or of the intake date when the date cannot be read. `inbox` ends empty.
+  * Sets `needs_review` on any row with a required field missing. An unreadable receipt still gets a row holding whatever could be read.
+  * Runs the reconciliation tool, resolves the ambiguous rows, and sets the category of rows created from bank lines.
+* **Writes**: `transactions` and `bank_lines` rows, `audit/<week>/intake_log.md`.
+* **Why a separate agent**: it is the only agent that reads images and raw documents.
+
+### 5.3 Payroll
+
+* **Purpose**: hours, take home, hourly rate, payslip.
+* **Reads**: ledger, plan file, nightly message.
+* **Does**
+  * Reads event durations and corrections from the message.
+  * Applies corrections to the plan file.
+  * Runs the hours tool, then the numbers tool.
+  * On payslip day, writes its recommendation, then builds the payslip after the ruling.
+* **Writes**: `hours` lines, plan corrections, `boardroom/<week>/payroll.md`, `payslips/<week>.pdf`.
+* **Objective**: maximise the student's hourly rate.
+
+### 5.4 Growth coach
+
+* **Purpose**: raise plan and drafted actions.
+* **Reads**: ledger, numbers tool output, plan file.
+* **Does**
+  * Proposes changes to pricing, product mix, channels and schedule.
+  * Writes its recommendation.
+  * After the ruling, drafts posts and supplier messages.
+* **Writes**: `boardroom/<week>/growth.md`, drafts in `approvals/<week>/`.
+* **Objective**: grow revenue and sales.
+* **Why a separate agent**: its objective conflicts with Payroll's. That conflict is the debate.
+
+### 5.5 Auditor
+
+* **Purpose**: check everyone's work and rule on disagreements.
+* **Reads**: ledger, draft payslip, both recommendations.
+* **Does**
+  * Runs the numbers tool again and compares the result with the draft payslip.
+  * Confirms every row with status `unmatched`, `duplicate` or `needs_review` is on the review list.
+  * Confirms every hours line traces to its source:
+    * `estimate`: the plan value named by `assumption_ref`
+    * `corrected`: the latest `change_log` row for that field with `changed_at` on or before the line date
+    * `stated`: the saved message named by `assumption_ref`
+  * Rejects any recommendation argument that does not cite figures.
+  * Writes a ruling with reasons.
+* **Writes**: `audit/<week>/audit_report.md`, `boardroom/<week>/ruling.md`, the final review list on the payslip.
+* **Why a separate agent**: the work is verified by an agent that did not produce it.
+
+---
+
+## 6. Workflows
+
+### 6.1 Night Shift
+
+* **Trigger**: the student sends one Telegram text message and drops files into `inbox`. Voice notes are a stretch goal.
+* **Every night**
+  1. **Intake**, Bookkeeper: transactions extracted, documents filed.
+  2. **Reconcile**, reconciliation tool then Bookkeeper: a status on every row.
+  3. **Ledger update**, Bookkeeper: ledger rows with source links.
+  4. **Hours**, Payroll: hours lines.
+  5. **Numbers**, Payroll: take home, hourly rate, profit per hour by product.
+* **Payslip day adds**
+  6. **Recommendations**, Payroll and Growth coach in parallel: `payroll.md`, `growth.md`.
+  7. **Audit and ruling**, Auditor: `audit_report.md`, `ruling.md`.
+  8. **Payslip**, Payroll: `payslips/<week>.pdf`.
+  9. **Drafts**, Growth coach: posts and supplier messages in `approvals`.
+  10. **Morning message**, WorkBuddy messaging: "Your board meeting is ready" plus the approval list.
+* **Approval**: the student approves each draft individually. Only then is it sent or posted.
+
+### 6.2 Day Zero
+
+* **Trigger**: the student describes the business idea in one message.
+* **Steps**
+  1. **Costing**, Bookkeeper: material, packaging, fee and shipping cost per unit and per channel.
+  2. **Pricing and launch**, Growth coach: prices, launch post drafts, supplier research.
+  3. **Time and predicted rate**, Payroll: minutes per unit labelled as assumptions, break even point, predicted hourly rate.
+  4. **Check**, Auditor: arithmetic checked, every assumption labelled.
+  5. **Plan file**, Payroll: `plan/plan.xlsx` in the format of section 3.2.
+* **Output to the student**: a plan summary with the predicted hourly rate, plus the plan file.
+
+---
+
+## 7. Outputs
+
+* **Payslip**, top to bottom
+  1. Week and date range
+  2. Hourly rate, as the headline
+  3. Take home, with totals by category
+  4. Hours by activity, with the total
+  5. Shared hours (section 4.3)
+  6. Profit per hour by product, with any product that loses money marked
+  7. Plan versus reality
+  8. Debate summary and the Auditor's ruling
+  9. Raise plan: the recommendations the ruling upheld, each pointing to its draft in `approvals`
+  10. Needs your review list
+* **Payslip rules**: wording and look belong to Role C. Every number is copied from the numbers tool.
+* **`payroll.md` and `growth.md`**: each recommendation states the change and cites the figures it rests on, taken from the numbers tool or the plan file.
+* **`ruling.md`**: for each disagreement, which side is upheld and why, citing figures.
+* **`audit_report.md`**: each check in section 5.5 with pass or fail and the rows concerned.
+* **`intake_log.md`**: each file read, where it was filed and the rows it produced.
+
+---
+
+## 8. Open items
+
+* **Tool mechanism and location in the repository**: decided by check 6.
+* **File format**: decided by check 7.
+* **Day Zero formulas** [confirm]: break even point and predicted hourly rate need an expected sales volume, and the plan file has no column for one. Do not build Day Zero until this is agreed.
+  * **Proposal, a planned week**: a new `planned_sales` sheet in the plan file (`product_id`, `channel`, `units_per_week`) holds the student's own expected volume, one unit per order.
+  * **Predicted figures**: the hours tool and the product profit rules of section 4.3 run over that planned week. Planned take home is the total of the product profits. Predicted hourly rate and `planned_margin_percent` come out of the same tools.
+  * **Break even**: the model has no fixed costs, so the classic break even point does not exist. It becomes the multiple of planned sales at which the hourly rate reaches `target_hourly_rate_rm`, or "not reachable at these prices".
+* **Raise plan projections** [confirm]: a claim such as "this would earn you RM2 more an hour" needs a deterministic calculation. Until this is agreed, recommendations cite current figures only.
+  * **Proposal, replay the week**: the numbers tool runs again on the same week with one change, either a new price or a new number of units for one product.
+  * **Projected figures**: take home plus the change in product profit, over week minutes plus the change in direct minutes.
+  * **Label**: every projection states the assumption it replays, for example "same units sold at RM18". The Auditor rejects any projection that is not tool output.
