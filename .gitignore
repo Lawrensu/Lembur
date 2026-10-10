@@ -13,6 +13,9 @@ Thumbs.db
 # Local agent settings
 .workbuddy-ai/
 
+# One workspace per student, created by the bot
+workspaces/
+
 # Workspace runtime outputs (keep .gitkeep stubs, ignore everything else)
 workspace/*.csv
 workspace/plan/*.csv

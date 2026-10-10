@@ -34,6 +34,7 @@ python -B tools/lembur.py correct-plan --workspace workspace --field <field> --n
 python -B tools/lembur.py hours        --workspace workspace --week <week> [--input <events json file>] [--payslip-day]
 python -B tools/lembur.py numbers      --workspace workspace --week <week>
 python -B tools/lembur.py review       --workspace workspace --week <week>
+python -B tools/lembur.py payslip      --workspace workspace --week <week> --input <json file>
 ```
 
 * **The week**: written like `2026-W41`. Never work it out yourself:
@@ -78,8 +79,13 @@ Start only after the Bookkeeper has finished. On payslip day that includes closi
    * Each recommendation states one change and cites the figures it rests on, copied from `numbers.json`.
    * Product profits do not add up to take home, on purpose. Never present them as if they did.
    * Run `review` first. If a row it prints has an empty `amount_rm`, take home and the hourly rate are provisional: an expense is missing from them. Say so and name the row.
-8. **Wait for the Auditor's ruling** in `workspace/boardroom/<week>/ruling.md`. Do not build the payslip before it exists. There is no draft payslip.
-9. **Build the payslip once.** [pending the payslip command] It fills `submission/payslip_template.html` from `numbers.json` and writes `workspace/payslips/<week>.html`. The review list on it comes from `review --week <week>`: every transaction row it prints and every review item.
+8. **Wait for the Auditor's ruling** in `workspace/boardroom/<week>/ruling.md`, and for the Growth coach's drafts in `workspace/approvals/<week>/`. Do not build the payslip before both exist: the payslip points to the drafts. There is no draft payslip.
+9. **Build the payslip once.** Write a JSON object with exactly these three keys to a file in the system temporary folder, then run `payslip` with `--input`.
+   * `debate_summary`: two or three plain sentences on what you and the Growth coach disagreed about. Figures only as they appear in `numbers.json`.
+   * `ruling`: the Auditor's ruling in a few sentences, taken from `ruling.md` with its figures unchanged.
+   * `raise_plan`: an array with one object per upheld recommendation. `text` is the recommendation in one sentence. `draft_file` is the path of its draft, written `approvals/<week>/<file name>`, or an empty string when it has no draft.
+   * The command fills `submission/payslip_template.html` from `numbers.json`, adds the review list itself, and writes `workspace/payslips/<week>.html`. You type no figure into the payslip.
+   * It works once. After the payslip exists the week is issued: `hours`, `numbers` and `close-week` refuse for that week. If the payslip is wrong, say so and stop. Do not delete it yourself.
 10. **Tell the Auditor** the payslip is built, so the Auditor can confirm both review sources reached it.
 
 ## What you leave behind

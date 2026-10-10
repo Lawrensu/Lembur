@@ -1,10 +1,10 @@
 # Demo nightly messages - 2026-W41
 
 - All people, orders and suppliers in this fixture are fictional. No real personal or banking data is used.
-- Persona: Aisyah, a fictional second-year student at Taylor's, selling handmade beaded accessories for four weeks.
+- Persona: Aisyah, a fictional second-year student at a Malaysian university, selling handmade beaded accessories for four weeks.
 - Week: Monday 2026-10-05 to Sunday 2026-10-11; Malaysia time.
 - Replay one dated message at a time. Copy only that date's listed files into workspace/inbox before intake. Save the message text, not these replay instructions, as receipts/2026-10/message_<date>.txt.
-- Start with data/demo/plan.xlsx copied to workspace/plan/plan.xlsx. It contains 20 minutes per keychain and no correction history.
+- Start with the plan CSV files data/demo/plan_*.csv copied into workspace/plan/. They contain 20 minutes per keychain and no correction history.
 - On Wednesday, apply the correction once: update P01 minutes_per_unit to 15 and append the dated 20-to-15 change_log row. Do not change the baseline demo input file.
 - The bank statement arrives on Sunday. Earlier unresolved transfers may remain unmatched until reconciliation with this statement. Create leftover-bank rows only on Sunday.
 - Files and fixture dates include Sunday even though this is a prepared demonstration, not a claim of actual activity.
@@ -16,7 +16,7 @@
 
 ## 2026-10-06 - Tuesday
 
-- Files: order_2026-10-06_farah.png; order_2026-10-06_nisa.png; order_2026-10-06_hana.png.
+- Files: order_2026-10-06_farah.png; order_2026-10-06_hana.png; order_2026-10-06_nisa.png.
 - Message: Farah and Nisa ordered one keychain each on Instagram. Hana ordered one bracelet on Instagram. Their order screenshots are in the folder.
 
 ## 2026-10-07 - Wednesday

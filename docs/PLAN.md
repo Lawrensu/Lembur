@@ -11,24 +11,32 @@
 * **Two sources of truth**
   * This file: the product, scope, validation, roles and schedule.
   * `docs/SYSTEM_DESIGN.md`: how the system works (data, tools, agents, workflows, outputs).
-* **Not written in either file**: ask the team, do not assume.
-* **Section numbers are stable**: sections 5 to 9 moved to the design file and keep a pointer here, so older references still resolve.
-* **Demo dataset and answer key**: separate files owned by Role B. Section 10 says what they must contain.
+* **Not written in either file**: ask Law, do not assume.
+* **Section numbers are stable**: sections 5 to 9 are a pointer block, and the other numbers keep their topics, so older references still resolve.
+* **Redesigned on 10 October, 18:00**: the product is now a chat bot of our own. It no longer runs inside WorkBuddy. Sections 1, 4, 11 to 15, 17 and 18 were rewritten. Sections 2, 3, 10 and 16 changed little.
+* **Keep it simple**: Law's rule for the rest of the build. Add no feature, file, field or proof that is not written in these docs. If something looks missing, ask before building it.
 
 ---
 
 ## 1. Context
 
-* **Hackathon**: Hackerdorm × BuilderX, Track 2 (Agentic Solutions, Tencent WorkBuddy).
-* **Theme**: how can AI help students and small businesses solve real business problems and operate more effectively?
-* **Rule**: implementation, slides and documentation are all delivered using WorkBuddy.
-* **Deadline**: 9:00am. We submit by 8:00am.
-* **What judges look for (Track 2 brief)**
-  * **Real problem and user value**: a clear user and measurable value.
-  * **Agentic workflow**: task breakdown, multistep execution, tool use, agent collaboration, parallel work, validation, adapting to outcomes.
-  * **Meaningful use of WorkBuddy**: WorkBuddy does the real work, not just chat.
-  * **End to end execution**: one prompt, one goal, no manual guiding of each step.
-  * **Usable and verifiable results**: reliable, complete, practical output.
+* **Hackathon**: Hackerdorm × BuilderX, Track 2 (Agentic Solutions).
+* **Problem statement**: how can AI agents autonomously solve real world problems by understanding goals, planning workflows, using tools and delivering complete end to end outcomes for users?
+* **Deadline**: 9:00am Sunday. We submit by 8:00am.
+* **Rule change, reported by the organisers on 10 October**: WorkBuddy does not have to be part of the final solution. We must show proof that we used it while building, and explain in the presentation how, where and in what scenarios. [confirm] Law adds the organisers' exact message here.
+* **What the agent should be capable of**, from the track brief, and where we show each
+  * **Understanding the goal**: the Bookkeeper and Payroll read the nightly message.
+  * **Planning tasks**: the plan for the night (design section 6.1).
+  * **Executing actions**: agents act through tools (design section 6.4).
+  * **Collaborating and validating**: Payroll argues against the Growth coach, and the Auditor rules.
+  * **Integrating results**: the payslip.
+  * **Delivering the final outcome**: the morning message with the payslip file.
+* **What makes a strong solution**, from the track brief
+  1. **Real problem and user value**: a clear user and measurable value.
+  2. **Agentic workflow**: task decomposition, multistep execution, tool calling, agent collaboration, parallel workflows, validation, adapting to outcomes.
+  3. **Meaningful use of WorkBuddy**: as written, WorkBuddy is the execution platform. Under the rule change we show it as our build platform (section 11), and we keep one recorded run of our agents inside WorkBuddy as insurance (section 12, proof 5).
+  4. **End to end execution**: one prompt, one goal, no manual guiding of each step.
+  5. **Usable and verifiable results**: reliable, complete, practical output.
 
 ---
 
@@ -36,7 +44,7 @@
 
 * **Name**: Lembur, Malay for working overtime. The agents do the overtime while the student sleeps.
 * **Modes**: Day Zero (planning) and Night Shift (running).
-* **One line**: an AI back office team on WorkBuddy that tells student founders what they really earn per hour of their time, before they start and every week after, and drafts the changes that would earn them more.
+* **One line**: an AI back office team in the student's chat app that tells student founders what they really earn per hour of their time, before they start and every week after, and drafts the changes that would earn them more.
 * **User**: a student running, or about to start, a side business while studying. Sells through Instagram, Telegram and campus bazaars. Gets paid in cash and bank transfers, with screenshots as proof.
 * **Core pain**: not knowing whether the business actually makes money, least of all per hour of their time.
 * **Why it happens**: the data is scattered and informal, nobody does data entry at 2am, and nobody tracks their own hours.
@@ -61,25 +69,30 @@
   * Unplanned time such as failed batches or supply runs is missed.
   * Day Zero estimates tend to be optimistic, which the plan versus reality loop exposes.
   * A big platform could add an hourly rate view. Our defence is the audience, the experience and working alongside their tools.
+* **Why not a general assistant**, such as OpenClaw, or WorkBuddy itself
+  * **Numbers you can trust**: a general assistant does money arithmetic with the model. Ours never does: every figure comes from tested tools and is checked against an answer key.
+  * **No set up**: our user is a student at 2am. She will not install an assistant, obtain model keys and write instructions.
+  * **Narrow by design**: it cannot run commands on her machine or send anything. Nothing leaves without her approval.
+  * **It has an opinion**: hourly rate, profit per hour by product, plan against reality. A general assistant gives those only to someone who already knows to ask.
+  * **One line for Q&A**: a general assistant is the workshop. Lembur is the finished tool, and we built it in such a workshop.
 
 ---
 
 ## 4. Scope
 
 * **In scope**
-  1. **Night Shift**: the nightly workflow for a running business. Build first.
-  2. **Day Zero**: the planning workflow for a new business. Build second. It writes the plan file the Night Shift reads.
-* **Wanted if the platform allows it**, decided by Law on 10 October
-  * **Voice note trigger**: the nightly message can be spoken. Waits on check 2. Fallback: a typed message.
-  * **Payslip as a PDF**: waits on check 11. Fallback: the HTML payslip.
+  1. **Night Shift**: the nightly workflow for a running business, through the chat bot. Build first.
+  2. **Day Zero**: the planning workflow for a new business. Design agreed, built only on Law's word (section 15).
 * **Out of scope**
-  * **All in one platform**: pulls build time into dashboards and logins, and weakens WorkBuddy's role.
+  * **A web app or dashboard**: the chat is the whole interface. A web app pulls build time into screens and logins.
+  * **WhatsApp**: future work. It needs a business account and a public address. Telegram is the channel we build.
+  * **Automatic posting of approved drafts**: the system never posts or sends a draft. The student sends an approved draft herself.
+  * **Voice notes**: future work. They need a speech to text service.
+  * **Hosting and a container file**: future work. The demo runs on the team's machine.
   * **Late and due payment tracking**: does not fit prepaid chat sellers.
-  * **Dress rehearsal simulation**: parked. It would be a third workflow.
-  * **Exam mode**: parked.
-  * **Automatic posting of approved drafts**: the system never posts or sends a draft. The student sends an approved draft herself. Posting through a connector is a roadmap line only.
   * **Multi person or helper features**: the `person` data field only, no features.
   * **Integrations with accounting or order tools**: roadmap slide only (section 16).
+  * **Dress rehearsal simulation, exam mode**: parked.
 
 ---
 
@@ -89,7 +102,7 @@ Moved to `docs/SYSTEM_DESIGN.md`. Old section numbers map as follows.
 
 * **5. Two modes, one engine**: design section 1.
 * **6. Time model**: design section 4.2.
-* **7. Agents**: design section 5. The deterministic tools are design section 4.
+* **7. Agents**: design section 5. How they act is design section 6.4. The deterministic tools are design section 4.
 * **8. Workflows**: design section 6.
 * **9. Data model**: design section 3. Conventions for dates, weeks, money and rounding are design section 2.
 
@@ -130,225 +143,123 @@ Moved to `docs/SYSTEM_DESIGN.md`. Old section numbers map as follows.
   * `data/demo/messages.md`: each nightly message and the correction reply, with its date.
   * `data/answer_key/ledger_transactions.csv`, `data/answer_key/ledger_bank_lines.csv`, `data/answer_key/ledger_hours.csv`: the expected ledger.
   * `data/answer_key/answer_key.md`: every other expected figure and flag.
-* **Checking the key itself**: the hand calculation is confirmed by a second, independent calculation before anyone builds against it.
+* **Checking the key itself**: the hand calculation is confirmed by a second, independent calculation before anyone builds against it. The scripts of both calculations are kept as a record in the `.ref` folders beside the data. They read the removed workbooks and no longer run. The comparator still reads `data/answer_key/.expected_ledger.ref/calculation.json`, so that folder must stay.
 * **Intake order**: the Bookkeeper reads inbox files in file name order, then adds rows that come only from the message. Transaction IDs follow that order.
+* **Two kinds of run are checked**: a replay with the fake model, inside the tests, and a run with the real models (section 12, proof 4). Both use `workspace/` and the same comparator.
 * **Pass condition**: the run's outputs match the answer key exactly (statuses, minutes, and money to the sen). A mismatch is a bug to fix, not something to explain away in the demo.
 * **How to check it**: the test harness in `data/test_harness/`, written by Sharon. Run each script from the repository root.
   * `python -B data/test_harness/compare_outputs.py`: compares `workspace/` with the answer key and prints PASS or FAIL. It checks every ledger row, recalculates the figures on its own, and checks that the plan correction was applied.
   * `python -B data/test_harness/reset_workspace.py --clean-only`: empties `workspace/` before a run. `--full` also copies the plan and every inbox file. `--day <date>` copies one day's files, but it empties the workspace first, so it cannot be used between the nights of one run.
   * `python -B data/test_harness/mutation_test.py`: proves the comparator catches eleven kinds of error. It works in a temporary folder and never touches `workspace/`.
   * **Not compared**: the `notes` and `description` columns of transactions, because an agent words them itself. Hours lines are matched by date, activity, product and assumption reference.
-  * **Changed on 10 October to fit the CSV decision**: the harness read `.xlsx` workbooks before. It also keyed hours lines by `entry_id`, compared the free text columns, and ran its mutation test inside `workspace/`.
 
 ---
 
 ## 11. How WorkBuddy is used
 
-* **One message before bed**: remote tasks through messaging apps (Telegram).
-* **The messy inbox folder**: reading authorised local folders, batch file processing.
-* **The agent team**: expert team and parallel tasks, each agent packaged as a skill.
-* **The Auditor**: task breakdown with verification, shown as its own agent.
-* **Payslip, books, board meeting deck**: native document, spreadsheet and presentation generation.
-* **Every night, automatically**: automation (scheduled tasks).
-* **Approval**: the student approves each draft with a short reply. Nothing is sent by the system in this version.
-* **Slides and documentation**: generated in WorkBuddy from the real demo run's outputs.
+WorkBuddy is our build platform. It is not part of the running product.
+
+* **How**: each of us works with WorkBuddy as the builder in our own checkout. We give it the docs as the source of truth, it writes the code or the content, and the result is checked before it is merged.
+* **Where and in what scenarios**
+  * **Building the engine**: the reconciliation, hours and numbers tools, the command line and the payslip filler were written in WorkBuddy sessions, with their tests.
+  * **Building the runner and the bot**: the same way.
+  * **Building the dataset**: the synthetic receipts, orders, bank statement, nightly messages and the answer key, with a second independent calculation that had to agree with the first.
+  * **Building the story**: agent identities, the payslip template, the deck outline, the video script and the question and answer sheet.
+  * **Running our agents during development**: before the redesign, the four agents were instruction files that WorkBuddy ran as skills. A skill run of our own script passed on 10 October. That is where the agents' instructions were first shaped.
+* **Evidence pack**: `submission/evidence/`. Each of us adds screenshots of our WorkBuddy sessions, task lists and key exchanges, with one line each on what was being built. Session history is easy to lose, so capture it as you go.
+* **What we say**: only what WorkBuddy really did. Work done or checked by other means is not presented as WorkBuddy's.
 
 ---
 
-## 12. First hour checks
+## 12. Proofs
 
-* **Run before building**: the owner of a check writes its result under the check as soon as it is known. Checks 6 and 7 are done.
-* **Owners, decided 10 October**: Sharon runs checks 1, 2, 3, 4, 9 and 10. Damian runs check 11. Law runs 5 and 8. Reason: these checks test the platform, not our code, and every teammate has WorkBuddy installed.
-* **A person runs these checks, not an agent**: they need a phone, a Telegram chat and a look at the screen. An agent may prepare the test files and write up the result it is given.
-* **How to write a result**: one bullet under the check, in this shape: `**Result, <date> <time>, <name>**: pass, fail or fallback taken. What was done. What happened.` Add one more bullet for anything the build must know, such as a prompt that needed a click.
-* **Time box**: checks 6 and 7 shared 30 minutes. Every other check has 15 minutes. At the limit, write what was seen, take the fallback and move on.
-* **Keep the repository clean**: use a throwaway Telegram bot or chat. A bot token is a secret and never goes into a file here. Delete every test file from `workspace/` afterwards. Commit only the results written in this section.
-* **Dependencies**: do not install any dependency without Law's approval. If WorkBuddy asks to install something to finish a check, stop and write that down.
-* **Check 6 evidence**: record the direct shell run and the temporary diagnostic skill invocation separately. Remove the diagnostic skill afterwards; it is not one of the four product agents.
-* **Check boundaries**: check 6 is a runtime smoke test, including workspace write access and a failing exit code when any probe fails. Schema and empty cell conventions belong to check 7 through the sheet adapter and its tests.
+Each proof answers one question before we build on the answer. The owner writes the result under the proof in this shape: `**Result, <date> <time>, <name>**: pass, fail or fallback taken. What was done. What happened.`
 
-* **Menu names below**: taken from the WorkBuddy guides at `workbuddy.ai/docs`. They may differ slightly in the app. If a menu is missing, write that down as the result.
-* **`<clone>` below**: the full path of your copy of this repository.
-
-1. **Telegram text message starts a task**
-   * **Why**: the trigger in the demo.
-   * **Fallback**: start the task inside WorkBuddy and show the message separately.
-   * **Owner**: Sharon.
-   * **Set up once, for checks 1, 2, 9 and 10**
-     1. In Telegram, open `@BotFather` and send `/newbot`. Give a name and a username ending in `bot`. Copy the token it returns.
-     2. In WorkBuddy, open the Assistant icon in the sidebar, then Assistant Settings, then Channels. Choose Telegram, paste the token and save.
-     3. In Telegram, open the new bot, press Start and send "hello". If the bot shows as unavailable, send `/start`.
-     4. Keep the computer on with WorkBuddy running. In System Settings, turn on Prevent Sleep.
-   * **Steps**: from the phone, send "Create a file named check1.txt containing the word ok in the folder `<clone>/workspace`". Do not touch the computer.
-   * **Pass when**: the file appears in `workspace/` with no click on the computer.
-   * **Also write down**: whether the computer asked for a confirmation, and which folder the task used. The guides suggest a remote task may be tied to its own Assistant folder. The build must know whether a Telegram task can reach `workspace/` at all.
-2. **Telegram voice note works**
-   * **Why**: Law wants the nightly message to work by voice if the platform allows it.
-   * **Fallback**: typed message, or the phone keyboard's dictation.
-   * **Owner**: Sharon. The guides do not mention voice notes for Telegram, so this check finds out.
-   * **Steps**
-     1. Send a voice note saying "Create a file named check2.txt containing the word ok in the same folder".
-     2. If no file appears, write down what the bot replied.
-     3. Then dictate the same sentence with the microphone key of the phone keyboard, so that it arrives as text, and send it.
-   * **Pass when**: the file appears after step 1.
-   * **Also write down**: whether step 3 worked. It is the fallback: spoken by the student, received as text. If WorkBuddy offers to install a transcription skill, stop and ask Law first.
-3. **Scheduled tasks run reliably** (the computer must stay on)
-   * **Why**: the overnight story.
-   * **Fallback**: run manually and present honestly what the schedule does.
-   * **Owner**: Sharon.
-   * **Steps**
-     1. Open Automation in the sidebar and choose New Automation.
-     2. Task: "Append one line with the current date and time to the file `<clone>/workspace/check3.txt`".
-     3. Schedule: One time, a few minutes ahead. If One time has no clock time, use Daily at a time a few minutes ahead. Choose `<clone>` as the workspace directory. Save and activate.
-     4. Run A: leave WorkBuddy open and wait.
-     5. Run B: repeat with the screen locked and Prevent Sleep on.
-   * **Pass when**: the line appears at the set time in both runs with no click.
-   * **Also write down**: the smallest repeat interval offered, whether a permission prompt appeared, and whether a skill can be chosen for the run.
-4. **Receipt reading accuracy on 3 samples**
-   * **Why**: Bookkeeper reliability.
-   * **Fallback**: clean demo images plus one deliberately blurry receipt.
-   * **Owner**: Sharon.
-   * **Steps**
-     1. Copy `order_2026-10-11_zahra.png`, `receipt_pouches.png` and `receipt_thread_blurred.png` from `data/demo/inbox/` into an empty folder outside the repository, so the answer key is out of reach.
-     2. Start a new task with that folder selected, on a model that accepts images.
-     3. Ask: "Read the three images in this folder. For each one give the date, whether it is money in or money out, the amount, the other party, the payment method and the payment reference. If a value cannot be read, say unreadable. Do not guess."
-     4. Compare with rows T0019, T0009 and T0012 of `data/answer_key/ledger_transactions.csv`. For T0019 the document amount is RM5.00; the ledger shows the bank amount.
-   * **Pass when**: every readable value matches, and the blurred amount comes back as unreadable rather than a number.
-   * **Also write down**: the model used.
-5. **A custom skill per agent, and the team run is visible**
-   * **Why**: agent collaboration on camera.
-   * **Fallback**: run agents in sequence and show the `boardroom` folder as evidence.
+1. **The reading model accepts an image through the gateway**
+   * **Why**: receipts arrive as photos. Nothing else matters if this fails.
+   * **Steps**: deploy the model in the gateway dashboard. Send one request with `data/demo/inbox/order_2026-10-11_zahra.png` and ask for the date, the amount, the customer and the payment reference.
+   * **Pass when**: it returns 2026-10-11, RM5.00, Zahra and DEMO-IN-010.
+   * **Fallback**: another model that accepts images, behind the same module.
    * **Owner**: Law.
-   * **Find out**: whether four skills can work inside one task, whether two of them can run in parallel, and what the screen shows while they do. The guides describe an expert team under Experts in the sidebar and say a team run costs several times a single run.
-6. **A skill can run a deterministic script**
-   * **Why**: arithmetic and matching. Also check which runtime and libraries are available.
-   * **Fallback**: spreadsheet formulas inside the ledger.
-   * **Direct shell result, 2026-10-10**: the first run at 13:17 Malaysia time failed before the checks. `tools/numbers.py` shadows the standard library `numbers` module, causing a circular import through `decimal`.
-   * **Direct shell retry**: `C:/Users/User/.workbuddy-ai/binaries/python/versions/3.13.12/python.exe -B -P D:/Projects/Lembur/tools/check_runtime.py`. The executable reports Python 3.13.14 despite its directory name. Seven of nine checks passed; exit code 1. Decimal rounding, ISO week, CSV, temporary write access and workspace write access passed. `openpyxl` is absent, so its import and the `.xlsx` probe failed. Reported script format: CSV. No dependencies installed.
-   * **Workspace cleanup**: the probe wrote and read its own temporary file inside `workspace/`, then removed it. A regression test confirms the directory contents are unchanged.
-   * **Rename, decided and done**: `tools/numbers.py` is now `tools/business_numbers.py`; the remaining test loader and probe instructions are updated. Direct probe execution no longer needs `-P`.
-   * **Skill invocation result, 2026-10-10**: passed. Law ran a temporary diagnostic skill inside WorkBuddy that called `python -B tools/check_runtime.py` from the repository root. It used the managed Python 3.13.14 and gave the same seven of nine checks and CSV mode as the direct run; the two failures are the absent `openpyxl`. Check 6 is conclusive: a skill can run a deterministic script. The diagnostic skill is not one of the four product agents and is removed afterwards.
-   * **Time box**: checks 6 and 7 started at 13:17 Malaysia time; their shared limit is 13:47. If still inconclusive at that point, use the documented fallback.
-7. **`.xlsx` reads and writes reliably**
-   * **Why**: the data model.
-   * **Fallback**: CSV.
-   * **Result, decided by Law at 13:42 on 2026-10-10**: CSV chosen. `openpyxl` is not installed; the eight `.xlsx` tests remain skipped. CSV adapter tests cover file names, headers, string rows and empty cells. The adapter retains `.xlsx` support for later.
-   * **Entry point rule**: pass `fmt="csv"` to every `sheets.load_book` and `sheets.save_book` call, never `auto`: an installed library must not silently switch the data source.
-   * **Files**: `<book>_<sheet>.csv`, as listed in design section 3.1 and validation section 10.
-   * **Full suite result, 2026-10-10**: both managed Python with `-B -m unittest discover -s tools/tests -p "test_*.py" -v` and Law's exact `py -B -m unittest discover -s tools/tests -p "test_*.py"` command passed: 63 tests discovered, 55 passed, 8 skipped, no failures or errors, exit code 0. All skipped tests require `openpyxl`. The independent `test_design_rules.py` was not edited.
-8. **Credits used by one full run**
-   * **Why**: practicality question from judges, and our own budget.
-   * **Fallback**: smaller dataset.
+2. **The reasoning model can run one night as an agent**
+   * **Why**: agents act by asking for tools in a fixed reply format (design section 6.4). A model that drifts from the format cannot run a night.
+   * **Steps**: run the night of 2026-10-05 through the runner with the real model.
+   * **Pass when**: four rows, T0004 marked `duplicate`, and a saved `numbers.json`, with no manual help.
+   * **Fallback**: a stronger model in the same role.
    * **Owner**: Law.
-   * **Steps**: note the credit balance before and after one full run. The balance is under Usage in the profile at `workbuddy.ai`, or under plan and usage in the app settings.
-9. **Morning message goes back to Telegram**
-   * **Why**: the "board meeting is ready" moment.
-   * **Fallback**: screenshot of the WorkBuddy result.
-   * **Owner**: Sharon. Needs the set up from check 1.
-   * **Steps**
-     1. After check 1, look at the Telegram chat: did the result of that task arrive there?
-     2. Create an automation as in check 3 with the task "Reply with exactly: Your board meeting is ready." Turn on the switch that sends the result to the Assistant or the messaging app. Schedule it a few minutes ahead.
-     3. In the Telegram chat, ask "Send me the file `<clone>/workspace/check1.txt`".
-   * **Pass when**: the scheduled message arrives on the phone with no click on the computer.
-   * **Also write down**: whether step 3 delivered a file. The payslip would be sent the same way.
-10. **Telegram photo reaches `workspace/inbox`**
-    * **Why**: receipts are on the student's phone.
-    * **Fallback**: show files dropped into the folder.
-    * **Owner**: Sharon. Needs the set up from check 1.
-    * **Steps**: from the phone, send `receipt_pouches.png` to the bot twice, once as a photo and once as a file. Each time add the text "Save this attachment into `<clone>/workspace/inbox` and tell me the saved file name".
-    * **Pass when**: the file is in `workspace/inbox` and opens.
-    * **Also write down**: the saved file names, whether the photo was renamed or compressed, and where the attachment went if it did not reach `inbox`. File names matter: the Bookkeeper reads the inbox in file name order.
-11. **WorkBuddy turns the HTML payslip into a PDF**
-    * **Why**: the payslip is an HTML template filled by a script (design section 7). The student should receive a PDF.
-    * **Fallback**: the HTML file is the payslip.
-    * **Owner**: Damian.
-    * **Steps**
-      1. Put one self contained HTML file in an empty folder: the payslip template with sample values, or any styled page if the template is not ready.
-      2. Start a new task with that folder selected.
-      3. Ask: "Convert the HTML file in this folder to a PDF with the same name, in the same folder. Keep the layout exactly. Do not install anything. If you would need to install something, stop and tell me what."
-    * **Pass when**: the PDF opens and looks like the page does in a browser, and nothing was installed.
-    * **Also write down**: exactly how WorkBuddy did it, tool or command, and how long it took. The Payroll skill has to repeat it.
-    * **Preparation result, 2026-10-10 17:11, Damian's task**: PDF conversion succeeded without any installation using the installed Chrome 154 and managed Node 22.22.2. A temporary verification script outside the submission files opened the self contained sample HTML in a headless browser and called its `Page.printToPDF` operation with background printing, CSS page size and no browser headers or footers. The last export took 0.562 seconds and produced a structurally valid four page A4 PDF beside the sample HTML. This is export evidence, not a completed check 11 pass.
-    * **Sample visual approval, 2026-10-10 17:23, Damian**: Damian reviewed the sample PDF and confirmed “the sample pdf looks good”. The sample PDF look is approved. Browser inspection also confirmed section order, all four expected transaction review rows, the unknown amount label and the loss marker. Print colours intentionally switch from the dark screen palette to a light page; exact screen colour identity is not claimed.
-    * **Remaining production gate**: Law must confirm a repeatable conversion method for the Payroll skill. The sample has no observed ruling or upheld drafts, so populated real output pagination and final review coverage still need verification. This approval establishes sample appearance and successful export, not a completed end to end run or a guarantee for all future content. HTML remains available as the fallback.
+3. **The bot receives a message and a photo and replies with a file**
+   * **Why**: the chat is the whole interface.
+   * **Steps**: create a bot with `@BotFather`. Put its token in `.env`. Send the bot a text and a photo, then the word `payslip`.
+   * **Pass when**: the photo is in the inbox of that chat's workspace, and the payslip file arrives in the chat.
+   * **Fallback**: run the night from the command line and show the files.
+   * **Owner**: [confirm]
+4. **The whole demo week passes the comparator**
+   * **Why**: this is the pass condition of section 10.
+   * **Steps**: replay the seven nights of `data/demo/messages.md` through the runner with the real models, then run `python -B data/test_harness/compare_outputs.py`.
+   * **Pass when**: it prints PASS with no difference.
+   * **Fallback**: fix the prompt or the runner. A mismatch is a bug, not something to explain away.
+   * **Owner**: Law, checked by Sharon.
+5. **One recorded run of our agents inside WorkBuddy**
+   * **Why**: insurance. The judging slide still names WorkBuddy as the execution platform (section 1).
+   * **Steps**: install the four instruction files from `skills/` as WorkBuddy skills. Run the night of 2026-10-05 with the Bookkeeper skill, then the Payroll skill. Record the screen.
+   * **Pass when**: the same four rows and a saved `numbers.json`.
+   * **Fallback**: none needed. The evidence pack of section 11 stands by itself.
+   * **Owner**: Law.
+
+* **What we already know**, from before the redesign
+  * **Our scripts run from a WorkBuddy skill**: passed on 10 October with its managed Python 3.13.
+  * **The data files are CSV**: decided on 10 October. The `.xlsx` workbooks and the code that read them are removed.
+  * **The agents' instructions work**: one full pass of the demo week that followed only the files in `skills/`, the inbox images and the nightly messages matched the answer key with no difference. That pass was not run in WorkBuddy and used a different model from the one we will run on.
+  * **The payslip can become a PDF**: Damian printed the sample payslip to PDF with an installed browser and no install, and approved the look.
+  * **The payslip template fills**: the payslip command filled Damian's template from the rehearsed week with no placeholder left.
 
 ---
 
 ## 13. Team split
 
-* **A. Builder (Law)**: WorkBuddy workflow, agent skills and instructions, receipt extraction, reconciliation, trigger, payslip and deck output.
-* **B. Data and business (Sharon)**: persona, demo dataset with planted problems, answer key, expected ledger, hand written plan file. Then Day Zero, confirmed owner. Then documentation.
-* **C. Design and story (Damian)**: agent identities, payslip and board meeting look, pitch slides, video script, recording and editing.
-* **Why Role B builds Day Zero**: Day Zero's output is the plan file Role B writes by hand first, so Role B knows its exact shape. Day Zero is mostly skills and instructions, so it can be built without touching the Night Shift.
-* **Order of work**: each step is verified before the next one builds on it.
-  1. **Role A, first hour checks 6, 7, 5 and 4**: they decide script or formulas, and `.xlsx` or CSV. Verified when the results are written in section 12.
-  2. **Everyone, data and rules freeze**: design sections 2 to 4. Verified when all three teammates have read and agreed them.
-  3. **Role B, plan file, dataset, answer key and expected ledger**: verified when a second calculation agrees with the hand calculation.
-  4. **Role A, Bookkeeper and reconciliation**: verified when the ledger matches the expected ledger.
-  5. **Role A, Payroll**: verified when hours, take home and rates match the answer key. It can start as soon as step 3 is done, working from the expected ledger.
-  6. **Role A, Auditor and debate**: verified when the ruling points the expected way.
-  7. **Role C, recording**: needs real run outputs from steps 4 to 6.
-* **What Role C does meanwhile**: look, identities, deck skeleton and script run in parallel from the start. The payslip order in design section 7 is fixed, so Role C and Payroll work to the same list.
-* **Current tasks, as of 10 October 16:30**: do them in the order listed. Anything unclear or not written here: ask Law before acting.
-* **Keep it simple**: Law's rule for the rest of the build. Add no feature, file, field or check that is not written in these docs. If something looks missing, ask before building it.
-* **Where things stand**
-  * **Working**: the reconciliation, hours and numbers tools and the command entry point `tools/lembur.py`, checked by 82 tests. Replayed night by night through the commands, they rebuild Sharon's expected ledger and answer key exactly: every status, every hours line, take home RM39.50, 938 minutes, RM2.53 an hour.
-  * **Decided today**: CSV files (check 7), scripts run from a skill (check 6), intake order, the payslip format (design section 7), who runs each remaining check (section 12), approval by reply and no automatic posting (design section 6.1).
-  * **Agreed as designs, not to be built yet**: the price only raise projection and Day Zero (design section 8). Each waits for Law's word.
-  * **Not built yet**: the four skills and the payslip command. No run by the agents exists, so no real output exists yet.
+* **A. Builder (Law)**: the runner, the model module, the agent prompts, integration.
+* **B. Data and business (Sharon)**: the demo dataset, the answer key, the comparator, checking every run against the key. Then Day Zero, on Law's word.
+* **C. Design and story (Damian)**: agent identities, the payslip template, the wording of the bot's replies, the deck, the video.
+* **Three way split of the remaining build** [confirm]: Law decides. This proposal follows the seams of design section 6.3, so that three people can build at once.
+  * **Law**: `app/runner.py`, `app/model.py`, `prompts/`. Proofs 1, 2, 4 and 5.
+  * **Sharon**: `app/bot.py` and proof 3. The evidence pack. The comparison of each full run.
+  * **Damian**: the fixed sentences the bot says, the morning message, the deck with a slide on how WorkBuddy was used, the video script for the chat story.
+* **Where things stand, 10 October 18:00**
+  * **Working**: the tools and the command line, with their tests. The payslip command and Damian's template. The dataset, the answer key and the comparator.
+  * **Written, not yet built**: the runner, the model module, the bot, the prompts.
+  * **Removed**: the WorkBuddy platform checks, the `.xlsx` support, the runtime probe.
 * **Everyone**
-  1. **Pull `dev` first**: it holds everything above. Work that started from an older `dev` may rest on rules that have since changed.
+  1. **Pull `dev` first.** Work that started from an older `dev` rests on a design that has changed.
   2. **Pull requests go into `dev`**, never into `main`.
-* **Role B, Sharon**
-  1. **Sign off the answer key**: `data/answer_key/answer_key.md` is still marked draft. The tools reproduce every figure in it.
-  2. **Make the CSV files the only copy**: `data/demo/plan_*.csv` and `data/answer_key/ledger_*.csv` are the source of truth. Update the paths in `data/demo/messages.md` and `answer_key.md`. Remove the `.xlsx` workbooks from `data/demo/` and `data/answer_key/`, and either update the helper scripts to read the CSV files or remove them.
-  3. **Apply the intake order**: file name order, so on 6 October Hana is T0006 and Nisa is T0007. The CSV ledger already says so; `answer_key.md` does not yet.
-  4. **Persona**: replace the real university name with a generic one.
-  5. **Test harness in `data/test_harness/`**: it is now in `dev` and reads the CSV files with the standard library. It needs no installed package. What changed from your version is listed in section 10. Please read it through once and tell Law if anything is wrong.
-  6. **Platform checks 1, 2, 3, 4, 9 and 10**: section 12 gives the steps. Write each result under its check. Run check 1 first: the others use its set up, and it answers whether a Telegram task can reach `workspace/`.
-  7. **From 18:00**: compare the first real run with the answer key, using the harness. Waits on Role A.
-  8. **Day Zero**: the design is agreed (design section 8). It is not built until Law says so after the midnight checkpoint. Do not spend time on it before then.
-* **Role C, Damian**
-  1. **`checklist.md`**: move it under `submission/`. Reword it as a task list for the three of us, with no "drafter" or "checker" roles. Keep the judging criterion as "Meaningful use of WorkBuddy". Remove the line about confirming cuts: section 15 is fixed. No dashes in prose.
-  2. **`submission/payslip_template.html`, due 18:00**: built to the format and field names in design section 7. This replaces the layout note as the handoff to Role A.
-  3. **Check 11**: section 12. Law wants the payslip as a PDF, so run it as soon as a first version of the template exists.
-  4. **`board_meeting_layout.md`, `deck_outline.md`, `video_script.md`, `qa_sheet.md`**: all four can start now.
-  5. **Sample figures**: until a real run exists, use the answer key figures and label them as samples. Never invent a figure.
-  6. **Trigger scenes**: the Telegram trigger, the overnight schedule and the morning message are unproven until checks 1, 3 and 9 are recorded. Keep those scenes loose until then.
-* **Role A, Law**
-  1. **Entry point**: `tools/lembur.py`, the commands the skills call. Done; its commands are listed in design section 4. Two fixes remain: output containing text outside the Windows code page, and guards on plan corrections.
-  2. **Payslip command**: fills Damian's template from `numbers.json`.
-  3. **The four skills**: Bookkeeper first, then Payroll, then the Auditor and the Growth coach. Approval by reply is part of their instructions (design section 6.1).
-  4. **Checks 5 and 8**: section 12.
+  3. **Capture evidence as you go** (section 11).
+* **Order of work**: each step is verified before the next one builds on it.
+  1. **Proof 1**: the reading model.
+  2. **Runner with a fake model**: the week replays in tests.
+  3. **Proof 2, then proof 4**: the real model, one night, then the week.
+  4. **Bot and proof 3**: in parallel with step 2, against the seam of design section 6.3.
+  5. **First full run through the chat**: the midnight checkpoint.
+  6. **Recording**: from real run outputs.
 
 ---
 
 ## 14. Timeline (to 9:00am)
 
-* **Confirmed schedule**: checkpoints in bold are fixed; the time blocks below are confirmed as written.
-
-* **12:00 to 13:00**
-  * **A**: first hour checks (section 12).
-  * **B**: persona, start the hand written plan file.
-  * **C**: payslip look, agent identities.
-* **13:00 to 18:00**
-  * **A**: Bookkeeper intake, reconciliation, ledger.
-  * **B**: demo dataset with planted problems, answer key, expected ledger.
-  * **C**: payslip template, deck skeleton.
-* **18:00 to 24:00**
-  * **A**: Payroll, hours, payslip.
-  * **B**: check run output against the answer key.
-  * **C**: story and video script.
-  * **Midnight: first rough end to end run.**
+* **18:00 to 21:00**
+  * **A**: proof 1, the runner with a fake model, the prompts.
+  * **B**: the bot against the seam, proof 3. Start the evidence pack.
+  * **C**: the bot's sentences, the deck for the chat story.
+  * **21:00: the runner passes the comparator with the real model, or the fallback is taken (section 15).**
+* **21:00 to 24:00**
+  * **A**: the runner and the bot joined. Proof 5 recorded.
+  * **B**: every full run compared with the key.
+  * **C**: the video script from real outputs.
+  * **Midnight: first full run through the chat.**
 * **00:00 to 04:00**
-  * **A**: Auditor, boardroom debate, plan versus reality, polish.
-  * **B**: Day Zero, only on Law's word after the midnight checkpoint.
-  * **C**: slides drafted in WorkBuddy.
+  * **A**: fixes, then the optional items in the order of section 15.
+  * **B**: Day Zero, only on Law's word.
+  * **C**: slides.
 * **04:00: feature freeze. Fixes only.**
-* **04:00 to 07:00**
-  * **A**: record several full runs, keep the best.
-  * **B**: documentation in WorkBuddy from real run outputs.
-  * **C**: edit video, time lapse the slow parts.
+* **04:00 to 07:00**: record several full runs and keep the best. Edit the video. Finish the documentation.
 * **08:00: submit.** Do not aim for 8:59.
 * **Never demo live**: agent runs are long. Keep backup recordings.
 * **Nap in shifts**: one person stays sharp for recording and submission.
@@ -357,13 +268,15 @@ Moved to `docs/SYSTEM_DESIGN.md`. Old section numbers map as follows.
 
 ## 15. Cut order if behind schedule
 
+* **If the runner does not pass the comparator by 21:00**: the fallback is the run inside WorkBuddy with the instruction files in `skills/`. The demo shows that run, and the bot becomes the roadmap.
 * **If the midnight checkpoint is missed, cut in this order**
-  1. **Day Zero generation**: show the hand written plan file as "the plan".
-  2. **Telegram trigger**: start the task inside WorkBuddy.
-  3. **Scheduled overnight run**: run manually.
+  1. **Day Zero generation**: show the hand written plan as "the plan".
+  2. **The bot**: start a night from the command line and show the files.
+  3. **The plan written by the model**: use the fixed list of steps.
   4. **Open debate**: reduce to a single Auditor ruling.
-* **Never cut**: ledger, reconciliation flags, payslip with hourly rate, raise plan, Auditor check against the answer key.
-* **Why this order**: the payslip and validation carry the differentiator and the "usable and verifiable results" criterion. Everything above them can be faked honestly or shown as a static file.
+* **Optional, only after the midnight checkpoint, in this order**: the payslip as a PDF, the price only raise projection. WhatsApp and a container file stay future work (section 4).
+* **Never cut**: ledger, reconciliation flags, payslip with hourly rate, raise plan, the check against the answer key.
+* **Why this order**: the payslip and validation carry the differentiator and the "usable and verifiable results" criterion. Everything above them can be shown honestly as a file.
 
 ---
 
@@ -374,19 +287,21 @@ Moved to `docs/SYSTEM_DESIGN.md`. Old section numbers map as follows.
   2. **First helper**: hours logged per person. The payslip answers "is paying a helper worth it?"
   3. **Using accounting or order software**: the ledger moves across once. Our agents then read from those tools and keep producing payslips and decisions.
 * **Answer to have ready**: "What happens when they outgrow you?" They move their books to accounting software and keep using us for time and decisions.
+* **More ways in**: WhatsApp beside Telegram, voice notes, a hosted service. Each is a new channel or a deployment, not a new engine (design section 6.5).
 * **Only build work allowed for growth**: the `person` field and the fixed ledger columns (design section 3).
 
 ---
 
 ## 17. Demo storyline
 
-One character, told across time.
+One character, told across time. The whole story happens in her chat app.
 
-1. **Week 0, Day Zero** (about 30 seconds): idea in, plan and predicted hourly rate out.
+1. **Week 0** (about 30 seconds): the plan. The hand written plan stands in for Day Zero unless it is built.
 2. **Title card**: "Four weeks later…"
-3. **The Night Shift**: message before bed, messy folder, agents at work (time lapse), 7am "Your board meeting is ready."
-4. **Climax**: the payslip reveals the hourly rate, the agent debate, plan versus reality, and the raise plan with drafts.
-5. **Close**: one tap to approve. The student goes to class.
+3. **The Night Shift**: one message before bed with the day's receipts. The agents at work, shown as the plan for the night and the tool calls (time lapse).
+4. **Morning**: "Your board meeting is ready." The payslip arrives as a file.
+5. **Climax**: the hourly rate, the debate, the ruling, plan versus reality, and the drafts.
+6. **Close**: one reply to approve. The student goes to class.
 
 ---
 
@@ -396,20 +311,20 @@ One character, told across time.
   * **Product name**: Lembur.
   * **Payslip day**: Sunday night.
   * **Data model and calculation rules**: as written in the design file.
-  * **Branches**: README is the authority. `main`, `dev`, `dev-law`, `dev-sharon`, `dev-damian`; Role A works on `dev-law`.
+  * **Branches**: README is the authority. Role A works on `dev-law`.
   * **Day Zero owner**: Sharon.
-  * **Schedule and cut order**: sections 14 and 15 confirmed as written.
-  * **Shared figures and audit**: Payroll saves `audit/<week>/numbers.json`; the Auditor compares a read only rerun with that file. The payslip is built once after the ruling.
-  * **Nontransaction review**: `audit/<week>/review_items.md`, combined with transaction review rows on the payslip. No new sheet.
+  * **The product is our own chat bot** (10 October): WorkBuddy is the build platform, not the host.
+  * **Runtime models**: from the model gateway the organisers provided. The tools we build with are not part of the product.
+  * **No agent framework and no third party package**: our own runner, the standard library, plain HTTPS.
+  * **Agents act through tools in a short loop**, and each night starts with a written plan.
+  * **Channel**: Telegram is the one we build. WhatsApp, a web app, hosting and voice notes are future work.
+  * **Data files are CSV.** The demo CSV files are the source of truth.
+  * **Payslip**: an HTML template filled by a command. PDF is optional.
+  * **Approval**: by reply, a file move. The system posts and sends nothing.
+  * **Shared figures and audit**: Payroll saves `audit/<week>/numbers.json`, and the Auditor compares a recomputation with that file. The payslip is built once.
   * **Agent style, decided by Damian**: professional colleagues, using role titles.
-  * **Demo data**: the CSV files in `data/demo/` and `data/answer_key/` are the source of truth. The `.xlsx` workbooks are superseded.
-  * **Payslip format**: an HTML template with named placeholders, filled by a script, then turned into a PDF by WorkBuddy. Details in design section 7; the PDF step is check 11.
-  * **Check owners**: Sharon runs the platform checks 1, 2, 3, 4, 9 and 10. Damian runs check 11. Law keeps 5 and 8. Reason: these checks test the platform rather than our code, and every teammate has it installed.
-  * **Approval**: the student replies "approve N" or "skip N", and the agent moves that draft into `approvals/<week>/approved/`. No command and no click.
-  * **Posting**: the system posts and sends nothing in this version. No connector.
-  * **Voice note and PDF payslip**: both wanted. Checks 2 and 11 decide, and each has a fallback.
-  * **Raise projection**: agreed as a design, price only. Built only on Law's word, after the first full run.
-  * **Day Zero**: agreed as a design. Built only on Law's word, after the midnight checkpoint.
-  * **Keep it simple**: no feature, file, field or check beyond these docs.
+  * **Raise projection and Day Zero**: agreed as designs. Built only on Law's word.
 * **Still open**
-  * **When to build the two agreed designs**: design section 8. Law says when.
+  * **The three way split** (section 13).
+  * **Which model fills each role** (proofs 1 and 2).
+  * **The organisers' exact wording of the rule change** (section 1).

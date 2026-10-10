@@ -1,9 +1,10 @@
-"""Command entry point for docs/SYSTEM_DESIGN.md sections 4 to 6."""
+"""Command entry point for docs/SYSTEM_DESIGN.md sections 4 and 7."""
 
 from __future__ import annotations
 
 import argparse
 from decimal import InvalidOperation
+from html import escape
 import json
 from pathlib import Path
 import re
@@ -37,12 +38,12 @@ def parser():
     commands = root.add_subparsers(dest="command", required=True)
     for name in ("add-transactions", "add-bank-lines", "reconcile", "resolve",
                  "classify", "close-week", "correct-plan", "hours", "numbers",
-                 "numbers-check", "review"):
+                 "numbers-check", "review", "payslip"):
         command = commands.add_parser(name, add_help=False)
         command.add_argument("--workspace", required=True, type=Path)
-        if name in ("close-week", "hours", "numbers", "numbers-check", "review"):
+        if name in ("close-week", "hours", "numbers", "numbers-check", "review", "payslip"):
             command.add_argument("--week", required=True)
-        if name in ("add-transactions", "add-bank-lines", "hours"):
+        if name in ("add-transactions", "add-bank-lines", "hours", "payslip"):
             command.add_argument("--input", required=name != "hours")
         if name in ("resolve", "classify"):
             command.add_argument("--txn-id", required=True)
@@ -56,6 +57,9 @@ def parser():
                 command.add_argument("--" + option, required=True)
         if name == "hours":
             command.add_argument("--payslip-day", action="store_true")
+        if name == "payslip":
+            command.add_argument("--template", type=Path,
+                                 default=Path("submission/payslip_template.html"))
     return root
 
 
@@ -259,6 +263,116 @@ def compute(ledger, plan, week):
         raise
 
 
+PAYSLIP_FIELDS = {
+    "products": ("product_id", "name", "units_sold", "revenue_rm", "unit_costs_rm",
+                 "channel_costs_rm", "profit_rm", "direct_hours", "profit_per_hour_rm", "loses_money"),
+    "review_rows": ("txn_id", "date", "reconciliation_status", "amount_rm", "description", "notes"),
+    "review_items": ("text",),
+    "raise_plan": ("text", "draft_file"),
+}
+PLACEHOLDER = re.compile(r"\{\{\s*([^{}]+?)\s*\}\}")
+BLOCK_MARKER = re.compile(r"<!--\s*(each|end)\s+([^<>]+?)\s*-->")
+
+
+def fill_payslip(template, numbers, sections, blocks):
+    unknown = set()
+
+    def replace_values(fragment, context, allowed=None):
+        def replace(match):
+            name = match.group(1).strip()
+            if allowed is not None and name not in allowed:
+                unknown.add(name)
+                return ""
+            value = context
+            for part in name.split("."):
+                if not isinstance(value, dict) or part not in value:
+                    unknown.add(name)
+                    return ""
+                value = value[part]
+            if isinstance(value, (dict, list)):
+                unknown.add(name)
+                return ""
+            if value is None:
+                return ""
+            if isinstance(value, bool):
+                return "true" if value else "false"
+            return escape(str(value), quote=True)
+        return PLACEHOLDER.sub(replace, fragment)
+
+    context = dict(numbers, **sections)
+    pieces, position, opened = [], 0, None
+    for marker in BLOCK_MARKER.finditer(template):
+        kind, name = marker.group(1), marker.group(2).strip()
+        if name not in PAYSLIP_FIELDS:
+            unknown.add(name)
+        if kind == "each":
+            if opened is not None:
+                raise CommandError("nested repeating blocks are not supported", names=[opened[0], name])
+            pieces.append(replace_values(template[position:marker.start()], context))
+            opened = (name, marker.end())
+        else:
+            if opened is None or opened[0] != name:
+                raise CommandError("repeating block markers do not match", names=[name])
+            body = template[opened[1]:marker.start()]
+            if name in PAYSLIP_FIELDS:
+                # Validate field names even when the list is empty.
+                allowed = PAYSLIP_FIELDS[name]
+                unknown.update(match.group(1).strip() for match in PLACEHOLDER.finditer(body)
+                               if match.group(1).strip() not in allowed)
+                for row in blocks[name]:
+                    pieces.append(replace_values(body, row, allowed))
+            position, opened = marker.end(), None
+    if opened is not None:
+        raise CommandError("repeating block has no end marker", names=[opened[0]])
+    pieces.append(replace_values(template[position:], context))
+    if unknown:
+        raise CommandError("unknown or missing template names", names=sorted(unknown))
+    return "".join(pieces)
+
+
+def payslip(args, ledger):
+    require_open(args.workspace, args.week)
+    numbers_path = args.workspace / "audit" / args.week / "numbers.json"
+    if not numbers_path.is_file():
+        raise CommandError("saved numbers file is missing", path=str(numbers_path))
+    with numbers_path.open(encoding="utf-8") as handle:
+        numbers = json.load(handle)
+    if not isinstance(numbers, dict):
+        raise CommandError("saved numbers must be an object")
+    with open(args.input, encoding="utf-8-sig") as handle:
+        supplied = json.load(handle)
+    if not isinstance(supplied, dict) or set(supplied) != {"debate_summary", "ruling", "raise_plan"}:
+        raise CommandError("payslip input needs debate_summary, ruling and raise_plan")
+    if any(not isinstance(supplied[name], str) for name in ("debate_summary", "ruling")):
+        raise CommandError("debate_summary and ruling must be text")
+    recommendations = supplied["raise_plan"]
+    if not isinstance(recommendations, list) or any(
+            not isinstance(row, dict) or set(row) != {"text", "draft_file"}
+            or any(not isinstance(value, str) for value in row.values())
+            for row in recommendations):
+        raise CommandError("raise_plan must contain rows with text and draft_file strings")
+    products = numbers.get("products")
+    if not isinstance(products, list) or any(not isinstance(row, dict) for row in products):
+        raise CommandError("saved numbers products must be an array of objects")
+    review_path = args.workspace / "audit" / args.week / "review_items.md"
+    items = review_path.read_text(encoding="utf-8").splitlines() if review_path.exists() else []
+    blocks = {
+        "products": products,
+        "review_rows": [row for row in reconciliation.review_list(ledger["transactions"])
+                        if in_week(row["date"], args.week)],
+        "review_items": [{"text": item} for item in items],
+        "raise_plan": recommendations,
+    }
+    sections = {name: supplied[name] for name in ("debate_summary", "ruling")}
+    template = args.template.read_text(encoding="utf-8")
+    rendered = fill_payslip(template, numbers, sections, blocks)
+    output = args.workspace / "payslips" / (args.week + ".html")
+    output.parent.mkdir(parents=True, exist_ok=True)
+    with output.open("x", encoding="utf-8", newline="\n") as handle:
+        handle.write(rendered)
+    return {"payslip": str(output)}
+
+
 def run(args):
     workspace = args.workspace
     if hasattr(args, "week"):
@@ -268,6 +382,8 @@ def run(args):
     if args.command in ("hours", "numbers", "close-week"):
         require_open(workspace, args.week)
     ledger = load_ledger(workspace)
+    if args.command == "payslip":
+        return payslip(args, ledger)
     if args.command == "add-transactions":
         return add_transactions(workspace, ledger, read_input(args.input))
     if args.command == "add-bank-lines":
