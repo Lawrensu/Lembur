@@ -63,7 +63,7 @@
 ## Why trust Day Zero estimates?
 
 - They are predictions based on assumptions, and the plan explicitly admits they tend to be optimistic. Weekly comparisons are intended to expose that optimism.
-- The Day Zero design is agreed (design section 8) but not built. Sharon builds it only on Law's word after the midnight checkpoint. Do not claim generated Day Zero output is ready.
+- The Day Zero design is agreed (design section 8) but not built. Sharon builds it only on Law's word. Do not claim generated Day Zero output is ready.
 - Night Shift can read a hand prepared baseline plan. Law decides under the fixed cut order (PLAN section 15). The hand written plan file is shown as "the plan".
 - Sources: PLAN sections 3, 4 and 15; DESIGN sections 1 and 8.
 
@@ -192,7 +192,7 @@
 ## What remains open before submission?
 
 - Open proofs: 1 to 5 (PLAN section 12).
-- Which model fills each role (proofs 1 and 2), and the three way split of the remaining build, which is a proposal marked [confirm] (PLAN sections 13 and 18).
+- Which model fills each role (proofs 1 and 2), and who takes the agent orchestration and Telegram packages, which is marked [confirm] (PLAN sections 13 and 18).
 - The organisers' exact wording of the rule change (PLAN section 1).
 - Sharon's story and key sign-off and the actual run comparison.
 - Day Zero and the raise projection: agreed designs, not built, on Law's word.

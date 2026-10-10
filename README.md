@@ -41,7 +41,7 @@ Hackerdorm × BuilderX, Track 2 (Agentic Solutions).
 ## Where things stand
 
 * **Built and tested**: the deterministic tools, the command line, the payslip command and template, the demo dataset, the answer key and the comparator.
-* **Designed, not built yet**: the runner, the model module, the bot and the agent prompts (`app/` and `prompts/`).
+* **Designed, not built yet**: the model module, the tool layer, the runner, the bot and the agent prompts (`app/` and `prompts/`).
 * **Current tasks and proofs**: PLAN sections 12 and 13.
 
 ## Read in this order
@@ -58,7 +58,7 @@ Hackerdorm × BuilderX, Track 2 (Agentic Solutions).
 docs/PLAN.md            master plan
 docs/SYSTEM_DESIGN.md   system design
 tools/                  deterministic tools and their tests (design section 4)
-app/                    bot, runner and model module (design section 6.3), not built yet
+app/                    model module, tool layer, runner and bot (design section 6.3), not built yet
 prompts/                one instruction file per agent (design section 6.4), not built yet
 skills/                 the same four agents as WorkBuddy skills: the fallback, and the source of the prompts
 workspace/              one student's files, used by the tests and the demo replay (design section 3.1)
@@ -83,10 +83,14 @@ submission/             payslip template, deck, video script, question and answe
 
 ## Roles
 
-* **A. Builder (Law)**: the runner, the model module, the agent prompts, integration.
+* **A. Builder (Law)**: integration and the final say on the build.
 * **B. Data and business (Sharon)**: the demo dataset, the answer key, the comparator, checking every run against the key.
 * **C. Design and story (Damian)**: agent identities, the payslip template, the wording of the bot's replies, the deck, the video.
-* **Split of the remaining build and order of work**: PLAN sections 13 and 14.
+* **The remaining build is three packages** (PLAN section 13)
+  1. **Backend**, Law, first: `app/model.py` and `app/tools.py`.
+  2. **Agent orchestration**: `app/runner.py` and `prompts/`.
+  3. **Telegram connection**: `app/bot.py`.
+* **Order of work and checkpoints**: PLAN sections 13 and 14.
 
 ## Branches
 

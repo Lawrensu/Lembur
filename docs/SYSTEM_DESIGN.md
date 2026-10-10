@@ -404,15 +404,30 @@ All figures use counted rows and hours lines dated in the week.
 ### 6.3 Runtime
 
 * **Where it runs**: on the team's machine for the demo. It is a service, so the student's device needs nothing. A container file for deployment is future work.
-* **Modules**, all under `app/`
-  * `app/bot.py`: the chat front door (section 6.5).
-  * `app/runner.py`: the plan, the agent loop and the order of steps (sections 6.1 and 6.4).
-  * `app/model.py`: the only code that talks to a language model.
-  * `prompts/<agent>.md`: one instruction file per agent.
-* **Seams between the modules**: fixed here so three people can build at once.
-  * **Bot to runner**: `run_night(workspace, date, message)` returns a summary: the week, whether it was payslip day, the plan with each step's outcome, the headline figures copied from `numbers.json`, the payslip path if one was built, the drafts and the review list. The bot never calls a model, and nothing changes the ledger or the plan except a night started through `run_night`. For `payslip` and `review` the bot only reads: the payslip file, `numbers.json`, and the output of the `review` command.
-  * **Runner to model**: `ask(role, messages, images=None)` returns the model's text. `role` is `reason` or `read`.
-  * **Runner to tools**: the commands of `tools/lembur.py`, with their JSON in and out, exactly as section 4 describes.
+* **Three packages**, one owner each (PLAN section 13)
+  * **Backend**: `app/model.py`, the only code that talks to a language model, and `app/tools.py`, the only code that runs a tool for an agent.
+  * **Agent orchestration**: `app/runner.py`, which holds the plan, the agent loop and the order of steps, and `prompts/<agent>.md`, one instruction file per agent.
+  * **Telegram connection**: `app/bot.py`, the chat front door (section 6.5).
+* **Seams between the packages**: fixed here so that three people can build at once. A seam changes in this file first, then in the code.
+  * **Bot to runner**: `run_night(workspace, date, message, ask=None)` returns the night summary below. The bot never calls a model, and nothing changes the ledger or the plan except a night started through `run_night`. For `payslip` and `review` the bot only reads: the payslip file, `numbers.json`, and the output of the `review` command.
+  * **Runner to tool layer**: `run_tool(workspace, agent, name, args, ask=None)` returns a dict (section 6.4).
+  * **Runner and tool layer to model**: `ask(role, messages, images=None)` returns the model's text. `role` is `reason` or `read`.
+  * **Tool layer to tools**: the commands of `tools/lembur.py`, with their JSON in and out, exactly as section 4 describes. They run from the repository root.
+* **`workspace`**: the path of one student's folder. `date` is the night's date as `YYYY-MM-DD`. `message` is the student's text.
+* **Night summary**: the dict `run_night` returns. Every key is always present.
+  * `week`: the ISO week of the night.
+  * `payslip_day`: `true` or `false`.
+  * `steps`: a list in run order. Each item has `step` (the number in section 6.1), `name`, `agent`, `status` (`done`, `failed` or `skipped`) and `note`.
+  * `figures`: `hourly_rate_rm`, `take_home_rm` and `hours_total`, copied as text from `numbers.json`. Empty text when there is no value.
+  * `payslip`: the workspace path of the payslip, or empty text.
+  * `drafts`: a list. Each item has `number` and `file`, the workspace path of the draft.
+  * `review`: the review list as a list of lines.
+  * `failed`: empty, or a dict with `step` and `reason` in plain words.
+* **`ask`**
+  * `messages` is a list of dicts with `role` (`system`, `user` or `assistant`) and `content` (text).
+  * `images` is a list of file paths. It is used only with the role `read`.
+  * It returns text only. Reading an agent's JSON out of that text belongs to the runner.
+  * It raises `ModelError` when the gateway still fails after its retries.
 * **One workspace per student**: `workspaces/<chat_id>/`, with the layout of section 3.1. Tests and the demo replay use `workspace/`.
 * **Two model roles**
   * **`reason`**: drives the agents. It needs no image input.
@@ -420,7 +435,7 @@ All figures use counted rows and hours lines dated in the week.
   * Both are reached through the model gateway the organisers provided [pending proof 1]. Which model fills which role is configuration, not code.
 * **Calls are written with the standard library**: plain HTTPS, no client package. The whole product has no third party package.
 * **Configuration and secrets**: environment variables, loaded from a `.env` file that git ignores. The names are `LEMBUR_GATEWAY_URL`, `LEMBUR_GATEWAY_KEY`, `LEMBUR_MODEL_REASON`, `LEMBUR_MODEL_READ` and `TELEGRAM_BOT_TOKEN`. `.env.example` lists them with empty values and is added with `app/model.py`. A key never appears in the repository, a prompt, a log or a reply.
-* **Tests use a fake model**: scripted answers stand in for the model, so the whole week replays in seconds without a key. A run with the real model is checked with `data/test_harness/compare_outputs.py`.
+* **Tests use a scripted model**: `run_night` and `run_tool` take an optional `ask`. A test passes a function that returns scripted answers, so the whole week replays in seconds without a key or a network. When `ask` is left out, the real `app/model.py` is used. A run with the real model is checked with `data/test_harness/compare_outputs.py`.
 
 ### 6.4 How an agent acts
 
@@ -428,12 +443,20 @@ All figures use counted rows and hours lines dated in the week.
 * **The agent's reply is one JSON object**, either
   * `{"actions": [{"tool": "<name>", "args": {...}}, ...], "why": "<one sentence>"}`, or
   * `{"finished": true, "report": "<short report in plain words>"}`.
-* **The tools an agent may ask for**
-  * `lembur`: one command of `tools/lembur.py` with its arguments. Returns the command's JSON. This is the only way to add rows, reconcile, build hours, save numbers or build the payslip. When a command takes `--input`, the agent gives the JSON as an argument and the runner writes the file the command reads. An agent never handles a temporary file.
-  * `read_document`: the text of one file in `inbox/` or `receipts/`. An image is read by the `read` model. A text or CSV file is returned as it is.
-  * `list_files`, `read_file`, `write_file`, `move_file`: inside the student's workspace only. `write_file` refuses the ledger and plan CSV files, `numbers.json` and the payslip, so those change only through `lembur`.
-  * `calendar`: the week of a date, and the Sunday that closes a week. Agents never work a date out themselves.
-* **Which agent gets which tools**: only the ones its step needs, and inside `lembur` only the commands its step needs. The Auditor may run only `numbers-check` and `review`, so it has no way to change the ledger or the plan.
+* **The tools an agent may ask for**, with their `args`. Every path is relative to the student's workspace, and a path that leaves it is refused.
+  * `lembur`: `command`, `options` and `input`. `command` is one command of `tools/lembur.py`. `options` is a dict of that command's options without the dashes, for example `{"week": "2026-W41"}` or `{"payslip-day": true}`. `input` is the JSON for a command that takes `--input`. The tool layer adds `--workspace` and writes the file the command reads, so an agent never handles a temporary file. Returns the command's JSON. This is the only way to add rows, reconcile, build hours, save numbers or build the payslip.
+  * `read_document`: `path`, a file in `inbox/` or `receipts/`. Returns `text`. An image is read by the `read` model. A text or CSV file is returned as it is.
+  * `list_files`: `folder`. Returns `files`, in file name order.
+  * `read_file`: `path`. Returns `text`.
+  * `write_file`: `path`, `text` and an optional `append` (`true` adds to the end of the file). It refuses the ledger and plan CSV files, `numbers.json` and the payslip, so those change only through `lembur`.
+  * `move_file`: `from` and `to`.
+  * `calendar`: `date`. Returns `week`, `week_start`, `payslip_day` (the Sunday that closes the week) and `is_payslip_day`. Agents never work a date out themselves.
+* **What `run_tool` returns**: always a dict with `ok`. When `ok` is `true`, the tool's result is beside it. When `ok` is `false`, `error` says why in plain words. A mistake by an agent never raises an exception: it comes back as `ok: false`.
+* **Which agent may use what**: the tool layer checks this on every call. `agent` is `bookkeeper`, `payroll`, `growth_coach` or `auditor`.
+  * **Bookkeeper**: `read_document`, `list_files`, `read_file`, `write_file`, `move_file`, `calendar`, and the commands `add-transactions`, `add-bank-lines`, `reconcile`, `resolve`, `classify`, `close-week` and `review`.
+  * **Payroll**: `list_files`, `read_file`, `write_file`, `calendar`, and the commands `correct-plan`, `hours`, `numbers`, `review` and `payslip`.
+  * **Growth coach**: `list_files`, `read_file`, `write_file`, and the command `review`.
+  * **Auditor**: `list_files`, `read_file`, `write_file`, and the commands `numbers-check` and `review`. It has no way to change the ledger or the plan.
 * **Limits**
   * A turn limit per step, set in the runner.
   * A reply that is not valid JSON, or asks for an unknown tool, gets one reminder. A second failure fails the step.
@@ -497,7 +520,7 @@ All figures use counted rows and hours lines dated in the week.
 
 * **Model gateway** [pending proof 1]: whether the `read` model accepts an image through the gateway, and the exact request format.
 * **Agent loop on the chosen model** [pending proof 2]: whether the `reason` model follows the reply format of section 6.4 for a whole night. Fallback: a stronger model in the same role.
-* **Turn limit and the exact tool arguments**: settled when the runner is built. The builder lists them in section 6.4.
+* **Turn limit**: settled when the runner is built. Its builder writes the number into section 6.4.
 * **PDF**: optional (section 7).
 * **WhatsApp, a container file, voice notes, posting through a connector**: future work. None is built.
 * **`skills/`**: the instruction files that ran the agents inside WorkBuddy. They stay until the runner passes the comparator, as the fallback and as the source of the prompts. Then they are removed.

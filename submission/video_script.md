@@ -71,7 +71,7 @@
 - Story beat: the morning message in the chat, “Your board meeting is ready”, with the payslip file and the drafts waiting for a reply.
 - The morning message arrives when the night finishes (design section 6.1, step 11). There is no scheduled 7am run; any morning time on screen is narrative framing, not proof of delivery at that time.
 - Proposed narration, only when evidenced: “By morning, the result is ready to review.”
-- Evidence gate: the full run through the chat (the midnight checkpoint, PLAN section 14). Fallback if the bot is cut: the payslip file and the files of the night from the command line, labelled honestly.
+- Evidence gate: the full run through the chat (the first full run checkpoint, PLAN section 14). Fallback if the bot is cut: the payslip file and the files of the night from the command line, labelled honestly.
 - Do not portray a run as scheduled or unattended. A night starts when the student sends her message.
 - Sources: PLAN sections 14, 15 and 17; DESIGN sections 6.1 and 6.5.
 
