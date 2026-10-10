@@ -11,4 +11,4 @@ Thumbs.db
 *.key
 
 # Local agent settings
-.claude/
+.workbuddy-ai/
