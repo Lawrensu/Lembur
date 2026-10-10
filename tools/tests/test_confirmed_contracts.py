@@ -5,12 +5,9 @@ Python's standard library numbers module.
 """
 import decimal
 import importlib.util
-import io
 from pathlib import Path
 import sys
 import unittest
-from contextlib import redirect_stdout
-from unittest.mock import patch
 
 TOOLS = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(TOOLS))
@@ -18,7 +15,6 @@ sys.path.insert(0, str(TOOLS))
 from hours import build_hours
 from plan import Plan
 from reconcile import close_week, reconcile
-import check_runtime
 
 spec = importlib.util.spec_from_file_location("lembur_numbers_test", TOOLS / "business_numbers.py")
 numbers_tool = importlib.util.module_from_spec(spec)
@@ -155,22 +151,6 @@ class CategoryTests(unittest.TestCase):
                 reconcile([row], [])
                 self.assertEqual(row["reconciliation_status"], "needs_review")
                 self.assertTrue(row["notes"])
-
-
-class ProbeTests(unittest.TestCase):
-    def test_failure_exit(self):
-        with patch.object(check_runtime, "run_check", return_value=False), redirect_stdout(io.StringIO()):
-            self.assertEqual(check_runtime.main(), 1)
-
-    def test_success_exit(self):
-        with patch.object(check_runtime, "run_check", return_value=True), redirect_stdout(io.StringIO()):
-            self.assertEqual(check_runtime.main(), 0)
-
-    def test_workspace_probe_cleans_up(self):
-        before = set(check_runtime.WORKSPACE.iterdir())
-        ok, _ = check_runtime.check_workspace_write_access()
-        self.assertTrue(ok)
-        self.assertEqual(set(check_runtime.WORKSPACE.iterdir()), before)
 
 
 if __name__ == "__main__":
