@@ -107,25 +107,25 @@ Moved to `docs/SYSTEM_DESIGN.md`. Old section numbers map as follows.
   * **One product per order**: so per order fees, shipping and packing time belong to one product.
   * **Payment methods**: `cash` and `bank_transfer` only.
   * **Bank statement**: CSV or a text PDF, never a photo. Every line has a unique reference.
-  * **Duplicate receipt**: not cash, and identical to the original on date, amount, counterparty and reference.
+  * **Duplicate receipt**: not cash, and identical to the original on date, type, amount, counterparty and reference. The planted duplicate must not copy the mismatched receipt: a later copy of that receipt is a known reconciliation limit.
   * **Mismatched amount**: the receipt and its bank line share the same reference.
   * **Missing receipt**: an expense whose bank description names the supplier, so the category is clear.
-  * **Bank transfer sales**: two with the same amount within a day of each other will come out ambiguous unless each carries a reference found on the statement. The answer key states which bank line each belongs to.
+  * **Bank transfer sales**: every sale needs a distinct counterparty or a reference. Two sales with the same date and amount and empty counterparty and reference make the second row `duplicate`, not ambiguous. When the duplicate keys differ, equal amounts within one day may still be ambiguous without bank references. The answer key states which bank line each belongs to.
   * **Materials purchases**: restock size, so one receipt does not swamp the week's take home.
-  * **Stated hours**: for events only.
+  * **Stated hours**: for events only, written as clock times or plain numeric hours. Unsupported duration wording goes to review.
 * **The answer key must state**
   * Expected ledger totals by category.
   * The expected status and review list entry for each planted problem.
-  * Expected minutes for each hours line, and the total.
+  * Expected minutes for each hours line, and the total. Match hours lines by date, activity, product and assumption reference, never by `entry_id`: only open week IDs may be renumbered.
   * Expected take home and hourly rate.
   * Expected profit and profit per hour for each product.
   * The expected direction of the Auditor's ruling.
-* **Expected ledger file**: Role B also provides the expected ledger with the same sheets and columns as `ledger.xlsx`. Payroll can then be built and checked before the Bookkeeper is finished.
+* **Expected ledger files**: Role B provides `ledger_transactions.csv`, `ledger_bank_lines.csv` and `ledger_hours.csv` with the same columns as the workspace ledger CSV files. Payroll can then be built and checked before the Bookkeeper is finished.
 * **Where the files live**: demo inputs stay outside `workspace/`, so the workspace can be wiped and refilled before each recorded run.
-  * `data/demo/plan.xlsx`: the hand written plan file, copied to `workspace/plan/` before a run.
+  * `data/demo/plan_products.csv`, `data/demo/plan_channels.csv`, `data/demo/plan_assumptions.csv`, `data/demo/plan_change_log.csv`: the hand written plan, copied to `workspace/plan/` before a run.
   * `data/demo/inbox/`: the documents the student drops, copied to `workspace/inbox/` before a run.
   * `data/demo/messages.md`: each nightly message and the correction reply, with its date.
-  * `data/answer_key/expected_ledger.xlsx`: the expected ledger.
+  * `data/answer_key/ledger_transactions.csv`, `data/answer_key/ledger_bank_lines.csv`, `data/answer_key/ledger_hours.csv`: the expected ledger.
   * `data/answer_key/answer_key.md`: every other expected figure and flag.
 * **Checking the key itself**: the hand calculation is confirmed by a second, independent calculation before anyone builds against it.
 * **Pass condition**: the run's outputs match the answer key exactly (statuses, minutes, and money to the sen). A mismatch is a bug to fix, not something to explain away in the demo.
@@ -147,7 +147,11 @@ Moved to `docs/SYSTEM_DESIGN.md`. Old section numbers map as follows.
 
 ## 12. First hour checks
 
-Run before building. Role A writes each result under its check as soon as it is known.
+* **Run before building**: Role A writes each result under its check as soon as it is known. Start with checks 6, 7, 5 and 4.
+* **Time box**: checks 6 and 7 share 30 minutes in total. If either remains inconclusive at the limit, take its fallback below and move on.
+* **Dependencies**: do not install any dependency without Law's approval.
+* **Check 6 evidence**: record the direct shell run and the temporary diagnostic skill invocation separately. Remove the diagnostic skill afterwards; it is not one of the four product agents.
+* **Check boundaries**: check 6 is a runtime smoke test, including workspace write access and a failing exit code when any probe fails. Schema and empty cell conventions belong to check 7 through the sheet adapter and its tests.
 
 1. **Telegram text message starts a task**
    * **Why**: the trigger in the demo.
@@ -167,24 +171,38 @@ Run before building. Role A writes each result under its check as soon as it is 
 6. **A skill can run a deterministic script**
    * **Why**: arithmetic and matching. Also check which runtime and libraries are available.
    * **Fallback**: spreadsheet formulas inside the ledger.
+   * **Direct shell result, 2026-10-10**: the first run at 13:17 Malaysia time failed before the checks. `tools/numbers.py` shadows the standard library `numbers` module, causing a circular import through `decimal`.
+   * **Direct shell retry**: `C:/Users/User/.workbuddy-ai/binaries/python/versions/3.13.12/python.exe -B -P D:/Projects/Lembur/tools/check_runtime.py`. The executable reports Python 3.13.14 despite its directory name. Seven of nine checks passed; exit code 1. Decimal rounding, ISO week, CSV, temporary write access and workspace write access passed. `openpyxl` is absent, so its import and the `.xlsx` probe failed. Reported script format: CSV. No dependencies installed.
+   * **Workspace cleanup**: the probe wrote and read its own temporary file inside `workspace/`, then removed it. A regression test confirms the directory contents are unchanged.
+   * **Rename, decided and done**: `tools/numbers.py` is now `tools/business_numbers.py`; the remaining test loader and probe instructions are updated. Direct probe execution no longer needs `-P`.
+   * **Skill invocation result, 2026-10-10**: passed. Law ran a temporary diagnostic skill inside WorkBuddy that called `python -B tools/check_runtime.py` from the repository root. It used the managed Python 3.13.14 and gave the same seven of nine checks and CSV mode as the direct run; the two failures are the absent `openpyxl`. Check 6 is conclusive: a skill can run a deterministic script. The diagnostic skill is not one of the four product agents and is removed afterwards.
+   * **Time box**: checks 6 and 7 started at 13:17 Malaysia time; their shared limit is 13:47. If still inconclusive at that point, use the documented fallback.
+   * **Regression verification**: 12 focused tests passed, including exit codes, event conversion, open week IDs, category blocking and the worked example. This is not the full module test suite.
 7. **`.xlsx` reads and writes reliably**
    * **Why**: the data model.
    * **Fallback**: CSV.
+   * **Result, decided by Law at 13:42 on 2026-10-10**: CSV chosen. `openpyxl` is not installed; the eight `.xlsx` tests remain skipped. CSV adapter tests cover file names, headers, string rows and empty cells. The adapter retains `.xlsx` support for later.
+   * **Entry point rule**: pass `fmt="csv"` to every `sheets.load_book` and `sheets.save_book` call, never `auto`: an installed library must not silently switch the data source.
+   * **Files**: `<book>_<sheet>.csv`, as listed in design section 3.1 and validation section 10.
+   * **Full suite result, 2026-10-10**: both managed Python with `-B -m unittest discover -s tools/tests -p "test_*.py" -v` and Law's exact `py -B -m unittest discover -s tools/tests -p "test_*.py"` command passed: 63 tests discovered, 55 passed, 8 skipped, no failures or errors, exit code 0. All skipped tests require `openpyxl`. The independent `test_design_rules.py` was not edited.
 8. **Credits used by one full run**
    * **Why**: practicality question from judges, and our own budget.
    * **Fallback**: smaller dataset.
 9. **Morning message goes back to Telegram**
    * **Why**: the "board meeting is ready" moment.
    * **Fallback**: screenshot of the WorkBuddy result.
+10. **Telegram photo reaches `workspace/inbox`**
+    * **Why**: receipts are on the student's phone.
+    * **Fallback**: show files dropped into the folder.
 
 ---
 
 ## 13. Team split
 
 * **A. Builder (Law)**: WorkBuddy workflow, agent skills and instructions, receipt extraction, reconciliation, trigger, payslip and deck output.
-* **B. Data and business (Sharon)**: persona, demo dataset with planted problems, answer key, expected ledger, hand written plan file. Then Day Zero [confirm owner]. Then documentation.
+* **B. Data and business (Sharon)**: persona, demo dataset with planted problems, answer key, expected ledger, hand written plan file. Then Day Zero, confirmed owner. Then documentation.
 * **C. Design and story (Damian)**: agent identities, payslip and board meeting look, pitch slides, video script, recording and editing.
-* **Why Role B builds Day Zero** [confirm]: Day Zero's output is the plan file Role B writes by hand first, so Role B knows its exact shape. Day Zero is mostly skills and instructions, so it can be built without touching the Night Shift.
+* **Why Role B builds Day Zero**: Day Zero's output is the plan file Role B writes by hand first, so Role B knows its exact shape. Day Zero is mostly skills and instructions, so it can be built without touching the Night Shift.
 * **Order of work**: each step is verified before the next one builds on it.
   1. **Role A, first hour checks 6, 7, 5 and 4**: they decide script or formulas, and `.xlsx` or CSV. Verified when the results are written in section 12.
   2. **Everyone, data and rules freeze**: design sections 2 to 4. Verified when all three teammates have read and agreed them.
@@ -199,24 +217,24 @@ Run before building. Role A writes each result under its check as soon as it is 
 
 ## 14. Timeline (to 9:00am)
 
-Checkpoints in bold are fixed. Time blocks marked [confirm] are proposals.
+* **Confirmed schedule**: checkpoints in bold are fixed; the time blocks below are confirmed as written.
 
 * **12:00 to 13:00**
   * **A**: first hour checks (section 12).
   * **B**: persona, start the hand written plan file.
   * **C**: payslip look, agent identities.
-* **13:00 to 18:00** [confirm]
+* **13:00 to 18:00**
   * **A**: Bookkeeper intake, reconciliation, ledger.
   * **B**: demo dataset with planted problems, answer key, expected ledger.
   * **C**: payslip template, deck skeleton.
-* **18:00 to 24:00** [confirm]
+* **18:00 to 24:00**
   * **A**: Payroll, hours, payslip.
   * **B**: check run output against the answer key.
   * **C**: story and video script.
   * **Midnight: first rough end to end run.**
 * **00:00 to 04:00**
   * **A**: Auditor, boardroom debate, plan versus reality, polish.
-  * **B**: Day Zero [confirm].
+  * **B**: Day Zero, subject to Law's decision on the parked formulas after the midnight checkpoint.
   * **C**: slides drafted in WorkBuddy.
 * **04:00: feature freeze. Fixes only.**
 * **04:00 to 07:00**
@@ -229,7 +247,7 @@ Checkpoints in bold are fixed. Time blocks marked [confirm] are proposals.
 
 ---
 
-## 15. Cut order if behind schedule [confirm]
+## 15. Cut order if behind schedule
 
 * **If the midnight checkpoint is missed, cut in this order**
   1. **Day Zero generation**: show the hand written plan file as "the plan".
@@ -270,7 +288,11 @@ One character, told across time.
   * **Product name**: Lembur.
   * **Payslip day**: Sunday night.
   * **Data model and calculation rules**: as written in the design file.
+  * **Branches**: README is the authority. `main`, `dev`, `dev-law`, `dev-sharon`, `dev-damian`; Role A works on `dev-law`.
+  * **Day Zero owner**: Sharon.
+  * **Schedule and cut order**: sections 14 and 15 confirmed as written.
+  * **Shared figures and audit**: Payroll saves `audit/<week>/numbers.json`; the Auditor compares a read only rerun with that file. The payslip is built once after the ruling.
+  * **Nontransaction review**: `audit/<week>/review_items.md`, combined with transaction review rows on the payslip. No new sheet.
 * **Still open**
   * **Agent style**: professional colleagues or distinct personalities. Role C's call. It does not affect the build.
-  * **Every [confirm] in this file**: Day Zero owner (13), time blocks (14), cut order (15).
-  * **Open items in the design file**: design section 8.
+  * **Open items in the design file**: design section 8. Both calculation proposals stay parked until Law decides after the midnight checkpoint.

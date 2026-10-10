@@ -52,6 +52,9 @@ submission/             final slides, video and documentation
 
 * **`skills/`**: [confirm] where WorkBuddy stores skills and whether they can be exported here, so the team shares one copy.
 * **`workspace/`**: starts empty. Runs fill it with the ledger, payslips, boardroom files and drafts.
+* **Plan files, CSV**: `workspace/plan/plan_products.csv`, `workspace/plan/plan_channels.csv`, `workspace/plan/plan_assumptions.csv`, `workspace/plan/plan_change_log.csv`.
+* **Ledger files, CSV**: `workspace/ledger_transactions.csv`, `workspace/ledger_bank_lines.csv`, `workspace/ledger_hours.csv`.
+* **Demo and answer key**: Sharon delivers the same plan file names in `data/demo/` and ledger file names in `data/answer_key/`. CSV is decided; the adapter retains `.xlsx` support for later.
 
 ## Team
 
@@ -62,7 +65,7 @@ submission/             final slides, video and documentation
 ## Roles
 
 * **A. Builder (Law)**: WorkBuddy workflow, agent skills and instructions, receipt extraction, reconciliation, trigger, payslip and deck output.
-* **B. Data and business (Sharon)**: persona, demo dataset, answer key, expected ledger, hand written plan file, Day Zero [confirm], documentation.
+* **B. Data and business (Sharon)**: persona, demo dataset, answer key, expected ledger, hand written plan file, Day Zero (confirmed owner), documentation.
 * **C. Design and story (Damian)**: agent identities, payslip and board meeting look, pitch slides, video script, recording and editing.
 * **Order of work and checkpoints**: PLAN sections 13 and 14.
 

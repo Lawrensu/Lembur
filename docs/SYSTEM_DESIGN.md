@@ -20,7 +20,7 @@ How the system works: conventions, data, tools, agents, workflows and outputs.
 * **Two modes, one engine**
   * Day Zero plans a new business. The Night Shift runs an existing one.
   * Both use the same four agents and the same plan file.
-  * Day Zero writes `plan/plan.xlsx`. The Night Shift reads it and compares every payslip against it.
+  * Day Zero writes the four plan CSV files in `plan/` (section 3.2). The Night Shift reads them and compares every payslip against the plan.
 * **Build dependency**: the Night Shift needs the plan file, not Day Zero. It is built first against a hand written plan file.
 * **Stop rule**: if Day Zero needs its own agents or its own data shapes, stop and redesign. That would be two products.
 * **Agents read and argue, tools count**
@@ -63,20 +63,28 @@ How the system works: conventions, data, tools, agents, workflows and outputs.
 ```
 workspace/
   inbox/                    student drops files here
-  plan/plan.xlsx            baseline: Day Zero output or hand written
-  ledger.xlsx               transactions, bank lines and hours
+  plan/plan_products.csv    baseline products
+  plan/plan_channels.csv    baseline channels
+  plan/plan_assumptions.csv baseline assumptions
+  plan/plan_change_log.csv  corrections
+  ledger_transactions.csv  transactions
+  ledger_bank_lines.csv    bank statement lines
+  ledger_hours.csv         hours
   receipts/<year_month>/    filed source documents and saved nightly messages
   boardroom/<week>/         payroll.md, growth.md, ruling.md
-  audit/<week>/             audit_report.md, intake_log.md
+  audit/<week>/             numbers.json, audit_report.md, intake_log.md, review_items.md
   payslips/<week>.pdf       weekly payslip
   approvals/<week>/         drafted posts and messages, one file per draft
 ```
 
 * **Why this layout**: the Auditor traces numbers to receipts, judges open a ledger row and see the receipt behind it, and the folder is the handoff package if the student moves to accounting software.
-* **File format**: `.xlsx` [pending check 7]. Fallback: one CSV per sheet with the same columns.
-* **Sheets**: row 1 holds the column names exactly as written below, in the order listed.
+* **File format**: CSV, decided by Law at 13:42 on 10 October. One file per sheet, named `<book>_<sheet>.csv`, with the same columns. `openpyxl` is not installed; the adapter retains `.xlsx` support for later.
+* **Pinned format**: every entry point passes `fmt="csv"` to `sheets.load_book` and `sheets.save_book`, never `auto`: installing a library must not silently change which files are read.
+* **Sheets**: each CSV represents one logical sheet; row 1 holds the column names exactly as written below, in the order listed.
 
-### 3.2 `plan/plan.xlsx`
+### 3.2 Plan CSV files
+
+* **Files in `plan/`**: `plan_products.csv`, `plan_channels.csv`, `plan_assumptions.csv`, `plan_change_log.csv`.
 
 * **`products`**: one row per product.
   * `product_id`
@@ -104,7 +112,9 @@ workspace/
   * `source`: message reference
 * **Value in force on a date**: the `old_value` of the earliest `change_log` row for that field with `changed_at` later than the date. If there is none, the value now in the plan sheet.
 
-### 3.3 `ledger.xlsx`
+### 3.3 Ledger CSV files
+
+* **Files**: `ledger_transactions.csv`, `ledger_bank_lines.csv`, `ledger_hours.csv`.
 
 * **`transactions`**: one row per sale or expense.
   * `txn_id`
@@ -149,7 +159,7 @@ workspace/
 
 ## 4. Deterministic tools
 
-* **Mechanism**: a script run by a skill [pending check 6]. Fallback: spreadsheet formulas inside the ledger. The rules below hold either way.
+* **Mechanism**: a Python script in `tools/`, run by a skill. Confirmed by check 6 on 10 October, so the spreadsheet formula fallback is not used.
 * **Boundary**: agents pass in what they have read (rows, event durations, corrections). They never calculate.
 * **Counted row**: a transaction row counts towards totals and hours unless its status is `duplicate` or its `amount_rm` is empty.
 
@@ -164,7 +174,7 @@ workspace/
   * `cash_declared`: a cash row; no bank evidence is expected
 * **A bank line is used**: when any transaction row carries its `bank_reference`.
 * **Steps, in order**. Each row takes the first status that applies.
-  1. **Flagged at intake**: a row already `needs_review` is left untouched.
+  1. **Intake and defensive validation**: a row already `needs_review` is left untouched. Before matching an eligible row, the tool sets `needs_review` with a reason if a required field is missing, the category is unknown, category and type disagree, or the payment method is unknown. The Bookkeeper still checks at intake: a mechanical check must not depend on a model.
   2. **Cash**: `payment_method` is `cash` → `cash_declared`.
   3. **Duplicate**: the row equals an earlier row (lower `txn_id`) on `date`, `type`, `amount_rm`, `counterparty` and `reference` → `duplicate`. `notes` names the original row.
   4. **Reference match**: `reference` equals the `bank_reference` of an unused bank line of the same `type`.
@@ -179,10 +189,12 @@ workspace/
   7. **Leftover bank lines**, on payslip day only: each unused bank line becomes a new transaction row.
      * Copied from the bank line: `date`, `type`, `amount_rm`, `description`, `bank_reference`.
      * `payment_method` is `bank_transfer`, `source_file` is empty, status is `unmatched`, `notes` says no document was found.
-     * The Bookkeeper sets `category` from the description. An unclear expense becomes `other_expenses`. Income becomes `sales` with `product_id` empty.
-* **Review list**: every row with status `unmatched`, `duplicate` or `needs_review`.
+     * Income becomes `sales` with `product_id` empty. An expense is created with an empty `category`; the Bookkeeper must classify it from the description before running the numbers tool. An unclear expense becomes `other_expenses` with a note explaining the uncertainty. No silent expense category default.
+* **Review list**: every row with status `unmatched`, `duplicate` or `needs_review`, plus every line of `audit/<week>/review_items.md`. Payroll appends one line per nontransaction item, containing its date, what is unclear and the message reference. No new sheet.
 * **Running again**: each run tests rows that are not cash and have an empty status, or are `unmatched` with an empty `bank_reference`. Settled rows are never changed.
-* **Known limit**: a document that arrives after step 7 turned its bank line into a row is not paired automatically. It shows as `unmatched` for the student to resolve.
+* **Known limits**
+  * A document that arrives after step 7 turned its bank line into a row is not paired automatically. It shows as `unmatched` for the student to resolve.
+  * A copy of a mismatched receipt arriving on a later run is not caught as a duplicate: the original row's amount was replaced by the bank amount, so the duplicate key no longer agrees. The later copy is `unmatched` and counted. A copy in the same run is caught.
 
 ### 4.2 Hours tool
 
@@ -198,7 +210,7 @@ workspace/
     * `assumption_ref` is `channels.<channel>.fulfilment_minutes_per_order`.
     * No line is written when the minutes are zero.
   * **Event**: one line per event stated in a nightly message.
-    * `minutes` is the stated duration. "Bazaar 4 to 9" is 300.
+    * The agent passes the date, plus either start and end as 24 hour times or the stated hours as written. The hours tool computes whole minutes. For "Bazaar 4 to 9", the agent passes `16:00` and `21:00`; the tool returns 300. Choosing am or pm is reading and remains with the agent.
     * `source` is `stated`. `assumption_ref` is the message reference.
   * **Admin**: one line per week, dated that week's Sunday, written on payslip day.
     * `minutes` = `admin_hours_per_week` in force on that date × 60.
@@ -206,14 +218,17 @@ workspace/
 * **`source` on production, fulfilment and admin lines**: `corrected` when the value in force comes from a `change_log` row, otherwise `estimate`.
 * **Sales rows without `product_id` or `quantity`**: produce no lines.
 * **Why production counts units sold, not units made**: it mirrors how accounting attaches cost to goods when they sell. A big production weekend does not distort one week's rate.
-* **Events**: Payroll reads the message and passes the date and the duration in minutes. If the duration is unclear, no line is written and the item goes on the review list.
-* **Stated hours for anything other than events**: not applied, and listed for review. Stated production time describes units made while estimates count units sold, so applying it would double count.
+* **Events**: Payroll passes what it read, never a calculated duration. A missing or unreadable event date returns one review warning and writes no line, without raising an exception. An end time not after the start, or a duration that cannot be read, also produces no hours line and a warning. Payroll appends the available date, what is unclear and the message reference to `audit/<week>/review_items.md`.
+* **Event input limits**: durations use clock times or plain numeric hours. Text such as "2h30", "half an hour" or "2 jam" goes to review.
+* **Event rerun limits**: an event reread with a different duration on a rerun adds a second line. Two separate events with the same date, message reference and duration become one line.
+* **Stated hours for anything other than events**: not applied. Payroll appends the item to `audit/<week>/review_items.md`. Stated production time describes units made while estimates count units sold, so applying it would double count.
 * **Corrections**
   * The student replies with a correction, for example "keychains take me 15 minutes".
   * Payroll updates the plan cell and adds a `change_log` row.
   * The new value applies to lines dated on or after `changed_at`. Earlier lines keep the old value.
   * Only three values can be corrected: `minutes_per_unit`, `fulfilment_minutes_per_order`, `admin_hours_per_week`.
-* **Running again**: production, fulfilment and admin lines of the open week are rebuilt from the ledger on every run. An event line is written once per stated event.
+* **Running again**: production, fulfilment and admin lines of the open week are rebuilt from the ledger on every run. An event line is written once per stated event. Only open week lines are renumbered; lines of every other week retain their IDs. An ID is stable once its week's payslip is issued.
+* **Answer key comparison**: match hours lines by date, activity, product and assumption reference, never by `entry_id`.
 * **Worked example** (illustration only; real numbers come from the answer key)
   * Keychains sold: 30 × 20 minutes = 600
   * Bracelets sold: 6 × 35 minutes = 210
@@ -227,6 +242,9 @@ workspace/
 
 All figures use counted rows and hours lines dated in the week.
 
+* **Classification gate**: `business_numbers.compute` raises `ValueError` while any counted row has an empty category, an unknown category, or a category that disagrees with its type. `sales` requires `income`; the five expense categories require `expense`. The Bookkeeper must finish classification first. Rows that are not counted, including duplicates and rows with an empty amount, never block this gate.
+* **Entry point warnings**: append every warning returned by the hours tool and the numbers tool to `audit/<week>/review_items.md`, including warnings about missing products or channels. Do not change the figures to hide a warning.
+* **Saved numbers**: Payroll writes exactly the numbers tool return value to `audit/<week>/numbers.json`. Payroll, the Growth coach and the Auditor copy figures only from this file. The Auditor reruns the tool without writing and records the comparison with the saved file in `audit_report.md`.
 * **Category totals**: the sum of `amount_rm` for each category.
 * **Take home**: sales total minus the totals of the five expense categories.
 * **Hourly rate**: take home ÷ week minutes × 60. Not shown when the week has no minutes.
@@ -254,7 +272,7 @@ All figures use counted rows and hours lines dated in the week.
 ### 5.1 Rules for every agent
 
 * **No invented numbers**: every figure traces to a ledger row, an hours line or a plan value.
-* **No arithmetic**: figures come from the tools in section 4 and are copied, never recalculated.
+* **No arithmetic**: figures come from the tools in section 4 and are copied, never recalculated. Payroll, the Growth coach and the Auditor copy figures only from `audit/<week>/numbers.json`.
 * **Nothing leaves the building**: drafts go to `approvals`. Nothing is posted or sent without the student's approval.
 * **Uncertain means flag, not guess**: anything unclear goes on the review list.
 * **Why only four agents**: an agent exists only where it needs different tools, different context or a conflicting objective. Timekeeping is part of Payroll. Reconciliation is a tool.
@@ -280,15 +298,17 @@ All figures use counted rows and hours lines dated in the week.
 * **Does**
   * Reads event durations and corrections from the message.
   * Applies corrections to the plan file.
-  * Runs the hours tool, then the numbers tool.
-  * On payslip day, writes its recommendation, then builds the payslip after the ruling.
-* **Writes**: `hours` lines, plan corrections, `boardroom/<week>/payroll.md`, `payslips/<week>.pdf`.
+  * Runs the hours tool, then the numbers tool, saving exactly its return value to `audit/<week>/numbers.json`.
+  * Appends every hours tool and numbers tool warning, plus stated hours that are not events, to `audit/<week>/review_items.md`.
+  * On payslip day, writes its recommendation, then builds the payslip once after the ruling. There is no draft payslip.
+  * Includes both transaction review rows and every line of `review_items.md` in the payslip review list.
+* **Writes**: `hours` lines, plan corrections, `audit/<week>/numbers.json`, `audit/<week>/review_items.md`, `boardroom/<week>/payroll.md`, `payslips/<week>.pdf`.
 * **Objective**: maximise the student's hourly rate.
 
 ### 5.4 Growth coach
 
 * **Purpose**: raise plan and drafted actions.
-* **Reads**: ledger, numbers tool output, plan file.
+* **Reads**: ledger, `audit/<week>/numbers.json`, plan file.
 * **Does**
   * Proposes changes to pricing, product mix, channels and schedule.
   * Writes its recommendation.
@@ -300,10 +320,11 @@ All figures use counted rows and hours lines dated in the week.
 ### 5.5 Auditor
 
 * **Purpose**: check everyone's work and rule on disagreements.
-* **Reads**: ledger, draft payslip, both recommendations.
+* **Reads**: ledger, saved numbers file at `audit/<week>/numbers.json`, both recommendations, and `audit/<week>/review_items.md`.
 * **Does**
-  * Runs the numbers tool again and compares the result with the draft payslip.
-  * Confirms every row with status `unmatched`, `duplicate` or `needs_review` is on the review list.
+  * Runs the numbers tool again without writing and compares the result with the saved numbers file. Reports the comparison in `audit_report.md`.
+  * Confirms every row with status `unmatched`, `duplicate` or `needs_review`, plus every line of `review_items.md`, is on the final review list.
+  * After the payslip is built at step 8, confirms both review sources reached it. No draft payslip is created.
   * Confirms every hours line traces to its source:
     * `estimate`: the plan value named by `assumption_ref`
     * `corrected`: the latest `change_log` row for that field with `changed_at` on or before the line date
@@ -325,11 +346,11 @@ All figures use counted rows and hours lines dated in the week.
   2. **Reconcile**, reconciliation tool then Bookkeeper: a status on every row.
   3. **Ledger update**, Bookkeeper: ledger rows with source links.
   4. **Hours**, Payroll: hours lines.
-  5. **Numbers**, Payroll: take home, hourly rate, profit per hour by product.
+  5. **Numbers**, Payroll: take home, hourly rate, profit per hour by product. Save exactly the tool return value to `audit/<week>/numbers.json`.
 * **Payslip day adds**
   6. **Recommendations**, Payroll and Growth coach in parallel: `payroll.md`, `growth.md`.
-  7. **Audit and ruling**, Auditor: `audit_report.md`, `ruling.md`.
-  8. **Payslip**, Payroll: `payslips/<week>.pdf`.
+  7. **Audit and ruling**, Auditor: rerun the numbers tool without writing, compare with the saved numbers file, and write `audit_report.md` and `ruling.md`.
+  8. **Payslip**, Payroll: build `payslips/<week>.pdf` once, after the ruling, using the saved numbers file. The Auditor then confirms both review sources reached the payslip.
   9. **Drafts**, Growth coach: posts and supplier messages in `approvals`.
   10. **Morning message**, WorkBuddy messaging: "Your board meeting is ready" plus the approval list.
 * **Approval**: the student approves each draft individually. Only then is it sent or posted.
@@ -342,7 +363,7 @@ All figures use counted rows and hours lines dated in the week.
   2. **Pricing and launch**, Growth coach: prices, launch post drafts, supplier research.
   3. **Time and predicted rate**, Payroll: minutes per unit labelled as assumptions, break even point, predicted hourly rate.
   4. **Check**, Auditor: arithmetic checked, every assumption labelled.
-  5. **Plan file**, Payroll: `plan/plan.xlsx` in the format of section 3.2.
+  5. **Plan files**, Payroll: `plan/plan_products.csv`, `plan/plan_channels.csv`, `plan/plan_assumptions.csv` and `plan/plan_change_log.csv` in the format of section 3.2.
 * **Output to the student**: a plan summary with the predicted hourly rate, plus the plan file.
 
 ---
@@ -360,8 +381,8 @@ All figures use counted rows and hours lines dated in the week.
   8. Debate summary and the Auditor's ruling
   9. Raise plan: the recommendations the ruling upheld, each pointing to its draft in `approvals`
   10. Needs your review list
-* **Payslip rules**: wording and look belong to Role C. Every number is copied from the numbers tool.
-* **`payroll.md` and `growth.md`**: each recommendation states the change and cites the figures it rests on, taken from the numbers tool or the plan file.
+* **Payslip rules**: wording and look belong to Role C. Every number is copied from `audit/<week>/numbers.json`. The review list includes transaction rows with status `unmatched`, `duplicate` or `needs_review` and every line of `audit/<week>/review_items.md`.
+* **`payroll.md` and `growth.md`**: each recommendation states the change and cites the figures it rests on, copied only from `audit/<week>/numbers.json`.
 * **`ruling.md`**: for each disagreement, which side is upheld and why, citing figures.
 * **`audit_report.md`**: each check in section 5.5 with pass or fail and the rows concerned.
 * **`intake_log.md`**: each file read, where it was filed and the rows it produced.
@@ -370,8 +391,11 @@ All figures use counted rows and hours lines dated in the week.
 
 ## 8. Open items
 
-* **Tool mechanism and location in the repository**: decided by check 6.
-* **File format**: decided by check 7.
+* **Parked until after the midnight checkpoint**: the Day Zero planned week and raise plan replay proposals below remain unconfirmed. Do not build either proposal before Law decides.
+
+* **Tool mechanism and location in the repository, decided**: Python scripts in `tools/`, run by a skill with the managed Python 3.13. Check 6 passed.
+* **Runtime module naming, decided and done**: renamed `tools/numbers.py` to `tools/business_numbers.py` and updated the remaining loader reference. The probe no longer needs `-P`: the local module no longer shadows Python's standard library `numbers` module.
+* **File format, decided**: CSV, check 7. Every entry point explicitly passes `fmt="csv"`; the adapter retains `.xlsx` support for later.
 * **Day Zero formulas** [confirm]: break even point and predicted hourly rate need an expected sales volume, and the plan file has no column for one. Do not build Day Zero until this is agreed.
   * **Proposal, a planned week**: a new `planned_sales` sheet in the plan file (`product_id`, `channel`, `units_per_week`) holds the student's own expected volume, one unit per order.
   * **Predicted figures**: the hours tool and the product profit rules of section 4.3 run over that planned week. Planned take home is the total of the product profits. Predicted hourly rate and `planned_margin_percent` come out of the same tools.
