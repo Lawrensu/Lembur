@@ -69,12 +69,15 @@
 * **In scope**
   1. **Night Shift**: the nightly workflow for a running business. Build first.
   2. **Day Zero**: the planning workflow for a new business. Build second. It writes the plan file the Night Shift reads.
+* **Wanted if the platform allows it**, decided by Law on 10 October
+  * **Voice note trigger**: the nightly message can be spoken. Waits on check 2. Fallback: a typed message.
+  * **Payslip as a PDF**: waits on check 11. Fallback: the HTML payslip.
 * **Out of scope**
   * **All in one platform**: pulls build time into dashboards and logins, and weakens WorkBuddy's role.
   * **Late and due payment tracking**: does not fit prepaid chat sellers.
   * **Dress rehearsal simulation**: parked. It would be a third workflow.
   * **Exam mode**: parked.
-  * **Voice note trigger**: stretch goal, depends on the first hour checks.
+  * **Automatic posting of approved drafts**: the system never posts or sends a draft. The student sends an approved draft herself. Posting through a connector is a roadmap line only.
   * **Multi person or helper features**: the `person` data field only, no features.
   * **Integrations with accounting or order tools**: roadmap slide only (section 16).
 
@@ -141,7 +144,7 @@ Moved to `docs/SYSTEM_DESIGN.md`. Old section numbers map as follows.
 * **The Auditor**: task breakdown with verification, shown as its own agent.
 * **Payslip, books, board meeting deck**: native document, spreadsheet and presentation generation.
 * **Every night, automatically**: automation (scheduled tasks).
-* **Approval, then action**: human approval before anything is sent, connectors where needed.
+* **Approval**: the student approves each draft with a short reply. Nothing is sent by the system in this version.
 * **Slides and documentation**: generated in WorkBuddy from the real demo run's outputs.
 
 ---
@@ -174,11 +177,15 @@ Moved to `docs/SYSTEM_DESIGN.md`. Old section numbers map as follows.
    * **Pass when**: the file appears in `workspace/` with no click on the computer.
    * **Also write down**: whether the computer asked for a confirmation, and which folder the task used. The guides suggest a remote task may be tied to its own Assistant folder. The build must know whether a Telegram task can reach `workspace/` at all.
 2. **Telegram voice note works**
-   * **Why**: stretch goal only.
+   * **Why**: Law wants the nightly message to work by voice if the platform allows it.
    * **Fallback**: typed message, or the phone keyboard's dictation.
-   * **Owner**: Sharon. Five minutes at most: the guides do not mention voice notes for Telegram.
-   * **Steps**: send a voice note saying "Create a file named check2.txt containing the word ok in the same folder".
-   * **Pass when**: the file appears.
+   * **Owner**: Sharon. The guides do not mention voice notes for Telegram, so this check finds out.
+   * **Steps**
+     1. Send a voice note saying "Create a file named check2.txt containing the word ok in the same folder".
+     2. If no file appears, write down what the bot replied.
+     3. Then dictate the same sentence with the microphone key of the phone keyboard, so that it arrives as text, and send it.
+   * **Pass when**: the file appears after step 1.
+   * **Also write down**: whether step 3 worked. It is the fallback: spoken by the student, received as text. If WorkBuddy offers to install a transcription skill, stop and ask Law first.
 3. **Scheduled tasks run reliably** (the computer must stay on)
    * **Why**: the overnight story.
    * **Fallback**: run manually and present honestly what the schedule does.
@@ -273,30 +280,36 @@ Moved to `docs/SYSTEM_DESIGN.md`. Old section numbers map as follows.
   6. **Role A, Auditor and debate**: verified when the ruling points the expected way.
   7. **Role C, recording**: needs real run outputs from steps 4 to 6.
 * **What Role C does meanwhile**: look, identities, deck skeleton and script run in parallel from the start. The payslip order in design section 7 is fixed, so Role C and Payroll work to the same list.
-* **Current tasks, as of 10 October 15:30**: do them in the order listed. Anything unclear or not written here: ask Law before acting.
+* **Current tasks, as of 10 October 16:30**: do them in the order listed. Anything unclear or not written here: ask Law before acting.
+* **Keep it simple**: Law's rule for the rest of the build. Add no feature, file, field or check that is not written in these docs. If something looks missing, ask before building it.
 * **Where things stand**
   * **Working**: the reconciliation, hours and numbers tools and the command entry point `tools/lembur.py`, checked by 82 tests. Replayed night by night through the commands, they rebuild Sharon's expected ledger and answer key exactly: every status, every hours line, take home RM39.50, 938 minutes, RM2.53 an hour.
-  * **Decided today**: CSV files (check 7), scripts run from a skill (check 6), intake order, the payslip format (design section 7), and who runs each remaining check (section 12).
+  * **Decided today**: CSV files (check 7), scripts run from a skill (check 6), intake order, the payslip format (design section 7), who runs each remaining check (section 12), approval by reply and no automatic posting (design section 6.1).
+  * **Agreed as designs, not to be built yet**: the price only raise projection and Day Zero (design section 8). Each waits for Law's word.
   * **Not built yet**: the four skills and the payslip command. No run by the agents exists, so no real output exists yet.
+* **Everyone**
+  1. **Pull `dev` first**: it holds everything above. Work that started from an older `dev` may rest on rules that have since changed.
+  2. **Pull requests go into `dev`**, never into `main`.
 * **Role B, Sharon**
   1. **Sign off the answer key**: `data/answer_key/answer_key.md` is still marked draft. The tools reproduce every figure in it.
   2. **Make the CSV files the only copy**: `data/demo/plan_*.csv` and `data/answer_key/ledger_*.csv` are the source of truth. Update the paths in `data/demo/messages.md` and `answer_key.md`. Remove the `.xlsx` workbooks from `data/demo/` and `data/answer_key/`, and either update the helper scripts to read the CSV files or remove them.
   3. **Apply the intake order**: file name order, so on 6 October Hana is T0006 and Nisa is T0007. The CSV ledger already says so; `answer_key.md` does not yet.
   4. **Persona**: replace the real university name with a generic one.
-  5. **Platform checks 1, 2, 3, 4, 9 and 10**: section 12 gives the steps. Write each result under its check.
-  6. **From 18:00**: compare the first real run with the answer key. Waits on Role A.
-  7. **Day Zero**: waits on Law's decision about the two parked proposals in design section 8. Do not start it before then.
+  5. **Test harness in `data/test_harness/`**: it was written for `.xlsx` files and needs a package we do not install. Change it to read the CSV files with the standard library: `workspace/ledger_*.csv`, `workspace/plan/plan_*.csv`, `data/demo/plan_*.csv` and `data/answer_key/ledger_*.csv`. The reset script copies the CSV plan files and the inbox files. Add `workspace/*.csv` and `workspace/plan/*.csv` to `.gitignore`. Then open its pull request into `dev`.
+  6. **Platform checks 1, 2, 3, 4, 9 and 10**: section 12 gives the steps. Write each result under its check. Run check 1 first: the others use its set up, and it answers whether a Telegram task can reach `workspace/`.
+  7. **From 18:00**: compare the first real run with the answer key, using the harness. Waits on Role A.
+  8. **Day Zero**: the design is agreed (design section 8). It is not built until Law says so after the midnight checkpoint. Do not spend time on it before then.
 * **Role C, Damian**
   1. **`checklist.md`**: move it under `submission/`. Reword it as a task list for the three of us, with no "drafter" or "checker" roles. Keep the judging criterion as "Meaningful use of WorkBuddy". Remove the line about confirming cuts: section 15 is fixed. No dashes in prose.
   2. **`submission/payslip_template.html`, due 18:00**: built to the format and field names in design section 7. This replaces the layout note as the handoff to Role A.
-  3. **Check 11**: section 12.
+  3. **Check 11**: section 12. Law wants the payslip as a PDF, so run it as soon as a first version of the template exists.
   4. **`board_meeting_layout.md`, `deck_outline.md`, `video_script.md`, `qa_sheet.md`**: all four can start now.
   5. **Sample figures**: until a real run exists, use the answer key figures and label them as samples. Never invent a figure.
   6. **Trigger scenes**: the Telegram trigger, the overnight schedule and the morning message are unproven until checks 1, 3 and 9 are recorded. Keep those scenes loose until then.
 * **Role A, Law**
-  1. **Entry point**: `tools/lembur.py`, the commands the skills call. Done; its commands are listed in design section 4.
-  2. **The four skills**: Bookkeeper first, then Payroll, then the Auditor and the Growth coach.
-  3. **Payslip command**: fills Damian's template from `numbers.json`.
+  1. **Entry point**: `tools/lembur.py`, the commands the skills call. Done; its commands are listed in design section 4. Two fixes remain: output containing text outside the Windows code page, and guards on plan corrections.
+  2. **Payslip command**: fills Damian's template from `numbers.json`.
+  3. **The four skills**: Bookkeeper first, then Payroll, then the Auditor and the Growth coach. Approval by reply is part of their instructions (design section 6.1).
   4. **Checks 5 and 8**: section 12.
 
 ---
@@ -320,7 +333,7 @@ Moved to `docs/SYSTEM_DESIGN.md`. Old section numbers map as follows.
   * **Midnight: first rough end to end run.**
 * **00:00 to 04:00**
   * **A**: Auditor, boardroom debate, plan versus reality, polish.
-  * **B**: Day Zero, subject to Law's decision on the parked formulas after the midnight checkpoint.
+  * **B**: Day Zero, only on Law's word after the midnight checkpoint.
   * **C**: slides drafted in WorkBuddy.
 * **04:00: feature freeze. Fixes only.**
 * **04:00 to 07:00**
@@ -383,5 +396,11 @@ One character, told across time.
   * **Demo data**: the CSV files in `data/demo/` and `data/answer_key/` are the source of truth. The `.xlsx` workbooks are superseded.
   * **Payslip format**: an HTML template with named placeholders, filled by a script, then turned into a PDF by WorkBuddy. Details in design section 7; the PDF step is check 11.
   * **Check owners**: Sharon runs the platform checks 1, 2, 3, 4, 9 and 10. Damian runs check 11. Law keeps 5 and 8. Reason: these checks test the platform rather than our code, and every teammate has it installed.
+  * **Approval**: the student replies "approve N" or "skip N", and the agent moves that draft into `approvals/<week>/approved/`. No command and no click.
+  * **Posting**: the system posts and sends nothing in this version. No connector.
+  * **Voice note and PDF payslip**: both wanted. Checks 2 and 11 decide, and each has a fallback.
+  * **Raise projection**: agreed as a design, price only. Built only on Law's word, after the first full run.
+  * **Day Zero**: agreed as a design. Built only on Law's word, after the midnight checkpoint.
+  * **Keep it simple**: no feature, file, field or check beyond these docs.
 * **Still open**
-  * **Open items in the design file**: design section 8. Both calculation proposals stay parked until Law decides after the midnight checkpoint.
+  * **When to build the two agreed designs**: design section 8. Law says when.
