@@ -88,9 +88,9 @@ Paths are relative to the workspace and never start with `workspace/`.
 1. Send `lembur` `reconcile`. It settles every row it can and lists the `ambiguous` rows with their candidate bank lines.
 2. A bank transfer row reads `unmatched` until a statement covering it is added. That is expected. Do not report those as problems before payslip day.
 3. When a document and its bank line share a reference but not an amount, the command keeps the bank amount, sets `needs_review` and writes both amounts in `notes`. That is the rule, not an error.
-4. For each ambiguous row, compare its `counterparty` and `description` with the `description` of each candidate bank line.
+4. The reconcile result does not show the row itself. Before you resolve anything, send `read_file` for `ledger_transactions.csv` and find the `counterparty` of each ambiguous `txn_id`. Then compare that `counterparty` with the `description` of each candidate bank line. A candidate whose description names the same person or supplier is the clear fit.
    * One candidate clearly fits: send `resolve` with `txn-id`, that `bank-reference`, and the reason in `reason`.
-   * You cannot decide: send `resolve` with `"bank-reference": ""` and say why in `reason`. The row goes to review.
+   * Only when no candidate names the row's counterparty: send `resolve` with `"bank-reference": ""` and say why in `reason`. The row goes to review.
    * Example: {"tool": "lembur", "args": {"command": "resolve", "options": {"txn-id": "<txn_id>", "bank-reference": "<ref>", "reason": "<why>"}}}
 5. When every ambiguous row is resolved, finish. Report how many were resolved and how many were sent to review.
 

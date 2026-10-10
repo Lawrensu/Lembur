@@ -181,12 +181,14 @@ Each proof answers one question before we build on the answer. The owner writes 
    * **Pass when**: it returns 2026-10-11, RM5.00, Zahra and DEMO-IN-010.
    * **Fallback**: another model that accepts images, behind the same module.
    * **Owner**: Sharon. Law gives her the gateway address and a key privately.
+   * **Result, 11 October 07:14, Law**: pass. The image was sent to the reading model as an image part of the message. It answered 2026-10-11, RM5.00, Zahra and DEMO-IN-010. The reply arrives as text in `message`.
 2. **The reasoning model can run one night as an agent**
    * **Why**: agents act by asking for tools in a fixed reply format (design section 6.4). A model that drifts from the format cannot run a night.
    * **Steps**: run the night of 2026-10-05 through the runner with the real model.
    * **Pass when**: four rows, T0004 marked `duplicate`, and a saved `numbers.json`, with no manual help.
    * **Fallback**: a stronger model in the same role.
    * **Owner**: Law.
+   * **Result, 11 October 07:20, Law**: pass. The night of 2026-10-05 ran through the runner with the real models in about 20 seconds: four rows, T0004 marked `duplicate`, `numbers.json` saved, no manual help.
 3. **The bot receives a message and a photo and replies with a file**
    * **Why**: the chat is the whole interface.
    * **Steps**: create a bot with `@BotFather`. Put its token in `.env`. Send the bot a text and a photo, then the word `payslip`.
@@ -200,6 +202,8 @@ Each proof answers one question before we build on the answer. The owner writes 
    * **Pass when**: it prints PASS with no difference.
    * **Fallback**: fix the prompt or the runner. A mismatch is a bug, not something to explain away.
    * **Owner**: Law. Sharon reads the comparator's report.
+   * **Result, 11 October 07:45, Law**: pass. The seven nights were replayed through the runner with the real models, started from a script and not from the chat. The run took about five minutes and the comparator printed PASS with no difference: 20 transactions, 14 bank lines, 20 hours lines, take home RM39.50, 15.6 hours, RM2.53 an hour.
+   * **What to know**: the models do not answer the same way every time. Four earlier replays that morning differed from the key in one step each (a document not filed, the statement not added, a bazaar sale without its channel, two transfers left unresolved). Each cause was closed with a check in the runner or a clearer line in a prompt. One passing run is not a guarantee for every run: compare each recorded run again.
 5. **One recorded run of our agents inside WorkBuddy**
    * **Why**: insurance, and the fallback demo (section 15). The judging slide still names WorkBuddy as the execution platform (section 1).
    * **Steps**: install the four instruction files from `skills/` as WorkBuddy skills. Run the night of 2026-10-05 with the Bookkeeper skill, then the Payroll skill. Record the screen.
@@ -254,10 +258,11 @@ Each proof answers one question before we build on the answer. The owner writes 
   * **Law**: proof 5, the recorded run inside WorkBuddy. It is also the fallback demo (section 15).
   * **Sharon**: sign off the answer key. Read the comparator's report for every full run.
   * **Damian**: the deck, the video script, the question and answer sheet.
-* **Where things stand, 10 October 23:45**
-  * **Working, merged into `dev`**: the tools and the command line with their tests, the payslip command and Damian's template, the dataset, the answer key, the comparator, and the redesigned docs.
-  * **Not built**: everything in `app/` and `prompts/`.
-  * **Not run**: any proof of section 12.
+* **Where things stand, 11 October 07:50**
+  * **Built and tested**: all three packages. The tool layer and the bot, the model module, the runner and the four prompts. 238 tests pass with no key and no network.
+  * **Proved with the real models**: proofs 1, 2 and 4 (section 12).
+  * **Not run yet**: the full round trip through the chat with the real runner, which is the rest of proof 3, and proof 5. The bot saves a photo into the inbox in a live chat, as Damian reported.
+  * **Who built what**: Sharon the tool layer, Damian the bot. The model module, the runner and the prompts were finished in Law's package in the last two hours.
 
 ---
 

@@ -432,7 +432,7 @@ All figures use counted rows and hours lines dated in the week.
 * **Two model roles**
   * **`reason`**: drives the agents. It needs no image input.
   * **`read`**: turns one image into text. It is used only by the `read_document` tool.
-  * Both are reached through the model gateway the organisers provided [pending proof 1]. Which model fills which role is configuration, not code.
+  * Both are reached through the model gateway the organisers provided. Which model fills which role is configuration, not code.
 * **Calls are written with the standard library**: plain HTTPS, no client package. The whole product has no third party package.
 * **Configuration and secrets**: environment variables, loaded from a `.env` file that git ignores. The names are `LEMBUR_GATEWAY_URL`, `LEMBUR_GATEWAY_KEY`, `LEMBUR_MODEL_REASON`, `LEMBUR_MODEL_READ` and `TELEGRAM_BOT_TOKEN`. `.env.example` lists them with empty values and is added with `app/model.py`. A key never appears in the repository, a prompt, a log or a reply.
 * **Tests use a scripted model**: `run_night` and `run_tool` take an optional `ask`. A test passes a function that returns scripted answers, so the whole week replays in seconds without a key or a network. When `ask` is left out, the real `app/model.py` is used. A run with the real model is checked with `data/test_harness/compare_outputs.py`.
@@ -465,6 +465,15 @@ All figures use counted rows and hours lines dated in the week.
   * A tool error is returned to the agent as data. The agent is expected to read it and adapt: for example, classify the rows the numbers tool refused, then run it again.
 * **Figures in what an agent writes**: after the recommendations and the ruling are written, the runner checks that every money and hours figure in them appears in `numbers.json`. A text with a figure that does not is sent back once to the agent that wrote it. A second failure fails the step (section 6.1). [confirm] whether a plan value, such as a current price, may be cited as well: `numbers.json` holds no price.
 * **The prompts**: `prompts/bookkeeper.md`, `payroll.md`, `growth_coach.md`, `auditor.md`. Each holds the agent's identity, its rules and its steps. They are derived from the instruction files in `skills/`, which were rehearsed against the answer key on 10 October.
+* **As built on 11 October**, where the runner differs from the lines above
+  * **Turn limit**: 16 turns for one step.
+  * **Reminders**: a reply that is not the agreed JSON gets up to two reminders. One bare action is read as a list of one, and a command named as the tool is read as the `lembur` tool.
+  * **A step is checked, not trusted**: when an agent answers finished, the runner checks that the step's command really passed and its file exists. If not, the step is sent back, up to twice, with what is missing. Then the step fails.
+  * **Filing**: when the Bookkeeper leaves a document in `inbox/` after its rows are in the ledger, the runner moves it to the `source_file` path itself. Filing is mechanical and does not depend on a model.
+  * **Figure check**: a figure may come from `numbers.json` or from the plan CSV files. A text that still holds an untraced figure after one send back is put on the review list. It does not stop the night.
+  * **Trace**: every reply of an agent and every tool result is kept in `audit/<week>/trace_<date>.jsonl`.
+  * **Date at the start of a message**: read by the runner, for the demo replay.
+  * **The gateway**: one HTTPS address. The key goes in the `x-user-id` header and the model name in the `x-model` header. The reply is JSON with the text in `message`. An image is sent as an image part of the last user message.
 
 ### 6.5 Chat
 
@@ -523,8 +532,8 @@ All figures use counted rows and hours lines dated in the week.
 
 ## 8. Open items
 
-* **Model gateway** [pending proof 1]: whether the `read` model accepts an image through the gateway, and the exact request format.
-* **Agent loop on the chosen model** [pending proof 2]: whether the `reason` model follows the reply format of section 6.4 for a whole night. Fallback: a stronger model in the same role.
+* **Model gateway**: proved on 11 October (PLAN section 12, proof 1). The request format is in section 6.4.
+* **Agent loop on the chosen model**: proved for one night and for the whole week (PLAN section 12, proofs 2 and 4). The model's answers vary from run to run, so every recorded run is compared with the key again.
 * **Turn limit**: settled when the runner is built. Its builder writes the number into section 6.4.
 * **PDF**: optional (section 7).
 * **WhatsApp, a container file, voice notes, posting through a connector**: future work. None is built.
