@@ -50,6 +50,7 @@ tools/                  deterministic scripts and their tests (design section 4)
 workspace/              the folder WorkBuddy reads and writes (design section 3.1)
 data/demo/              demo inputs: plan file, inbox files, nightly messages (Role B)
 data/answer_key/        answer key and expected ledger (Role B)
+data/test_harness/      compares a finished run with the answer key, and resets the workspace (Role B)
 submission/             final slides, video and documentation
 ```
 

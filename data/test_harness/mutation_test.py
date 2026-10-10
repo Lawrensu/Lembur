@@ -1,7 +1,8 @@
 """mutation_test.py -- Prove the comparator catches every kind of error.
 
 Each mutation:
-  1. Start from the golden ledger (expected_ledger.xlsx copied to workspace).
+  1. Start from the golden ledger (data/answer_key/ledger_*.csv copied into a
+     temporary workspace; the real workspace/ is never touched).
   2. Apply one known error (status, amount, minutes, missing row, etc.).
   3. Run compare_outputs.py.
   4. Verify the comparator reports FAIL with the expected field(s).
@@ -24,44 +25,68 @@ import tempfile
 from pathlib import Path
 from copy import deepcopy
 
-import openpyxl
+import csv
 
 ROOT = Path(__file__).resolve().parents[2]
 HARNESS = Path(__file__).parent
-WORKSPACE = ROOT / "workspace"
-EXPECTED_LEDGER = ROOT / "data" / "answer_key" / "expected_ledger.xlsx"
-BASELINE_PLAN = ROOT / "data" / "demo" / "plan.xlsx"
+ANSWER_KEY = ROOT / "data" / "answer_key"
+DEMO = ROOT / "data" / "demo"
+# A temporary workspace: the real workspace/ may hold a run and is never touched.
+TEMP = Path(tempfile.mkdtemp(prefix="lembur_mutation_"))
+WORKSPACE = TEMP / "workspace"
 PYTHON = sys.executable
+LEDGER_SHEETS = ("transactions", "bank_lines", "hours")
+PLAN_SHEETS = ("products", "channels", "assumptions", "change_log")
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
 
+def read_csv(path):
+    with open(path, encoding="utf-8-sig", newline="") as handle:
+        return [row for row in csv.reader(handle)]
+
+
+def write_csv(path, rows):
+    with open(path, "w", encoding="utf-8", newline="") as handle:
+        csv.writer(handle).writerows(rows)
+
+
+def copy_baseline_plan():
+    for sheet in PLAN_SHEETS:
+        shutil.copy2(DEMO / f"plan_{sheet}.csv", WORKSPACE / "plan" / f"plan_{sheet}.csv")
+
+
 def setup_golden():
-    """Copy the golden ledger + corrected plan into the workspace."""
-    WORKSPACE.mkdir(parents=True, exist_ok=True)
+    """Copy the golden ledger + corrected plan into the temporary workspace."""
     (WORKSPACE / "plan").mkdir(parents=True, exist_ok=True)
-    shutil.copy2(EXPECTED_LEDGER, WORKSPACE / "ledger.xlsx")
-    shutil.copy2(BASELINE_PLAN, WORKSPACE / "plan" / "plan.xlsx")
+    for sheet in LEDGER_SHEETS:
+        shutil.copy2(ANSWER_KEY / f"ledger_{sheet}.csv", WORKSPACE / f"ledger_{sheet}.csv")
+    copy_baseline_plan()
     # Apply the correction (P01=15, one change_log row)
-    wb = openpyxl.load_workbook(WORKSPACE / "plan" / "plan.xlsx")
-    ws = wb["products"]
-    for row in ws.iter_rows(min_row=2):
-        if row[0].value == "P01":
-            row[5].value = 15
-    ws = wb["change_log"]
-    ws.append(["2026-10-07", "products.P01.minutes_per_unit", 20, 15,
-               "I timed myself today, keychains take 15 minutes not 20",
-               "message.2026-10-07"])
-    wb.save(WORKSPACE / "plan" / "plan.xlsx")
+    path = WORKSPACE / "plan" / "plan_products.csv"
+    rows = read_csv(path)
+    column = rows[0].index("minutes_per_unit")
+    for row in rows[1:]:
+        if row[0] == "P01":
+            row[column] = "15"
+    write_csv(path, rows)
+    path = WORKSPACE / "plan" / "plan_change_log.csv"
+    rows = read_csv(path)
+    rows.append(["2026-10-07", "products.P01.minutes_per_unit", "20", "15",
+                 "I timed myself today, keychains take 15 minutes not 20",
+                 "message.2026-10-07"])
+    write_csv(path, rows)
 
 
 def run_comparator():
-    """Run compare_outputs.py and return the report dict."""
+    """Run compare_outputs.py on the temporary workspace and return the report dict."""
+    report_path = TEMP / "latest_report.json"
+    report_path.unlink(missing_ok=True)  # never read the report of an earlier run
     result = subprocess.run(
-        [PYTHON, str(HARNESS / "compare_outputs.py")],
+        [PYTHON, str(HARNESS / "compare_outputs.py"), "--workspace", str(WORKSPACE),
+         "--output-dir", str(TEMP)],
         capture_output=True, text=True, cwd=str(ROOT))
-    report_path = HARNESS / "latest_report.json"
     if report_path.exists():
         report = json.loads(report_path.read_text(encoding="utf-8"))
     else:
@@ -71,21 +96,20 @@ def run_comparator():
 
 def mutate_ledger(mutations):
     """Apply a list of (sheet, row_id, column, new_value) mutations to the workspace ledger."""
-    wb = openpyxl.load_workbook(WORKSPACE / "ledger.xlsx")
     for sheet_name, row_id, column, new_value in mutations:
-        ws = wb[sheet_name]
-        headers = [c.value for c in ws[1]]
-        col_idx = headers.index(column)
-        for row in ws.iter_rows(min_row=2):
-            if row[0].value == row_id:
-                row[col_idx].value = new_value
+        path = WORKSPACE / f"ledger_{sheet_name}.csv"
+        rows = read_csv(path)
+        col_idx = rows[0].index(column)
+        for row in rows[1:]:
+            if row[0] == row_id:
+                row[col_idx] = str(new_value)
                 break
-    wb.save(WORKSPACE / "ledger.xlsx")
+        write_csv(path, rows)
 
 
 def mutate_plan_remove_changelog():
     """Remove the change_log row (revert to baseline plan)."""
-    shutil.copy2(BASELINE_PLAN, WORKSPACE / "plan" / "plan.xlsx")
+    copy_baseline_plan()
 
 
 def restore_golden():
@@ -156,11 +180,11 @@ MUTATIONS = [
     },
     {
         "name": "product_id_change",
-        "description": "T0007 product_id: P02 -> P01",
+        "description": "T0006 product_id: P02 -> P01",
         "apply": lambda: mutate_ledger([
-            ("transactions", "T0007", "product_id", "P01"),
+            ("transactions", "T0006", "product_id", "P01"),
         ]),
-        "expected_fields": ["T0007", "product_id", "P01", "P02"],
+        "expected_fields": ["T0006", "product_id", "P01", "P02"],
     },
     {
         "name": "plan_no_correction",
@@ -184,22 +208,17 @@ MUTATIONS = [
 
 
 def _add_extra_hours_line():
-    wb = openpyxl.load_workbook(WORKSPACE / "ledger.xlsx")
-    ws = wb["hours"]
-    headers = [c.value for c in ws[1]]
-    ws.append(["H0021", "2026-10-11", "person_1", "admin", None, None, 60,
-               "estimate", "assumptions.admin_hours_per_week"])
-    wb.save(WORKSPACE / "ledger.xlsx")
+    path = WORKSPACE / "ledger_hours.csv"
+    rows = read_csv(path)
+    rows.append(["H0021", "2026-10-11", "person_1", "admin", "", "", "60",
+                 "estimate", "assumptions.admin_hours_per_week"])
+    write_csv(path, rows)
 
 
 def _delete_row(sheet_name, row_id):
-    wb = openpyxl.load_workbook(WORKSPACE / "ledger.xlsx")
-    ws = wb[sheet_name]
-    for i, row in enumerate(ws.iter_rows(min_row=2), start=2):
-        if row[0].value == row_id:
-            ws.delete_rows(i, 1)
-            break
-    wb.save(WORKSPACE / "ledger.xlsx")
+    path = WORKSPACE / f"ledger_{sheet_name}.csv"
+    rows = read_csv(path)
+    write_csv(path, [rows[0]] + [row for row in rows[1:] if row[0] != row_id])
 
 
 # ---------------------------------------------------------------------------
@@ -252,8 +271,8 @@ def main():
             all_passed = False
         print()
 
-    # --- Restore golden state ---
-    restore_golden()
+    # --- Remove the temporary workspace ---
+    shutil.rmtree(TEMP, ignore_errors=True)
 
     # --- Summary ---
     print("=" * 70)

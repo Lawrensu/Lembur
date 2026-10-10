@@ -14,8 +14,8 @@ Thumbs.db
 .workbuddy-ai/
 
 # Workspace runtime outputs (keep .gitkeep stubs, ignore everything else)
-workspace/*.xlsx
-workspace/plan/*.xlsx
+workspace/*.csv
+workspace/plan/*.csv
 workspace/payslips/*
 workspace/receipts/*
 workspace/boardroom/*/

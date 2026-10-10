@@ -133,6 +133,12 @@ Moved to `docs/SYSTEM_DESIGN.md`. Old section numbers map as follows.
 * **Checking the key itself**: the hand calculation is confirmed by a second, independent calculation before anyone builds against it.
 * **Intake order**: the Bookkeeper reads inbox files in file name order, then adds rows that come only from the message. Transaction IDs follow that order.
 * **Pass condition**: the run's outputs match the answer key exactly (statuses, minutes, and money to the sen). A mismatch is a bug to fix, not something to explain away in the demo.
+* **How to check it**: the test harness in `data/test_harness/`, written by Sharon. Run each script from the repository root.
+  * `python -B data/test_harness/compare_outputs.py`: compares `workspace/` with the answer key and prints PASS or FAIL. It checks every ledger row, recalculates the figures on its own, and checks that the plan correction was applied.
+  * `python -B data/test_harness/reset_workspace.py --clean-only`: empties `workspace/` before a run. `--full` also copies the plan and every inbox file. `--day <date>` copies one day's files, but it empties the workspace first, so it cannot be used between the nights of one run.
+  * `python -B data/test_harness/mutation_test.py`: proves the comparator catches eleven kinds of error. It works in a temporary folder and never touches `workspace/`.
+  * **Not compared**: the `notes` and `description` columns of transactions, because an agent words them itself. Hours lines are matched by date, activity, product and assumption reference.
+  * **Changed on 10 October to fit the CSV decision**: the harness read `.xlsx` workbooks before. It also keyed hours lines by `entry_id`, compared the free text columns, and ran its mutation test inside `workspace/`.
 
 ---
 
@@ -295,7 +301,7 @@ Moved to `docs/SYSTEM_DESIGN.md`. Old section numbers map as follows.
   2. **Make the CSV files the only copy**: `data/demo/plan_*.csv` and `data/answer_key/ledger_*.csv` are the source of truth. Update the paths in `data/demo/messages.md` and `answer_key.md`. Remove the `.xlsx` workbooks from `data/demo/` and `data/answer_key/`, and either update the helper scripts to read the CSV files or remove them.
   3. **Apply the intake order**: file name order, so on 6 October Hana is T0006 and Nisa is T0007. The CSV ledger already says so; `answer_key.md` does not yet.
   4. **Persona**: replace the real university name with a generic one.
-  5. **Test harness in `data/test_harness/`**: it was written for `.xlsx` files and needs a package we do not install. Change it to read the CSV files with the standard library: `workspace/ledger_*.csv`, `workspace/plan/plan_*.csv`, `data/demo/plan_*.csv` and `data/answer_key/ledger_*.csv`. The reset script copies the CSV plan files and the inbox files. Add `workspace/*.csv` and `workspace/plan/*.csv` to `.gitignore`. Then open its pull request into `dev`.
+  5. **Test harness in `data/test_harness/`**: it is now in `dev` and reads the CSV files with the standard library. It needs no installed package. What changed from your version is listed in section 10. Please read it through once and tell Law if anything is wrong.
   6. **Platform checks 1, 2, 3, 4, 9 and 10**: section 12 gives the steps. Write each result under its check. Run check 1 first: the others use its set up, and it answers whether a Telegram task can reach `workspace/`.
   7. **From 18:00**: compare the first real run with the answer key, using the harness. Waits on Role A.
   8. **Day Zero**: the design is agreed (design section 8). It is not built until Law says so after the midnight checkpoint. Do not spend time on it before then.
