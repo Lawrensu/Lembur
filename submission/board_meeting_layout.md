@@ -5,7 +5,7 @@
 - Format-neutral presentation notes based on the provisionally approved wireframe, not a final presentation template or evidence of a completed debate.
 - Warm, student-first presentation with professional-colleague role titles.
 - All recommendations, figures, source references and ruling text remain named placeholders.
-- Exact styling, page or slide breaks and supported approval interaction await Damian's review and Law's implementation confirmation.
+- Approval is by reply, "approve N" or "skip N" (design section 6.1). Style and page breaks await Damian's review.
 
 ## Approved structure
 
@@ -23,7 +23,7 @@
 - Topic: `{disagreement_topic}`.
 - Present one actual disagreement at a time; do not manufacture conflict for the story.
 
-## Payroll — hourly earnings
+## Payroll: hourly earnings
 
 - Role heading: “Payroll”.
 - Objective label: “What pays you better per hour?”
@@ -33,7 +33,7 @@
 - Use the actual `boardroom/{week}/payroll.md` recommendation. Every proposed change must cite the figures it rests on.
 - Keep the student's hourly earnings as the objective; do not promise an improvement that has not been calculated under approved rules.
 
-## Growth coach — revenue and sales
+## Growth coach: revenue and sales
 
 - Role heading: “Growth coach”.
 - Objective label: “What grows revenue and sales?”
@@ -44,7 +44,7 @@
 - The objective differs from Payroll's; popularity alone is not evidence that expanding a product is worthwhile.
 - Do not invent forecasts, demand claims or projected gains.
 
-## Auditor — evidence, decision and reason
+## Auditor: evidence, decision and reason
 
 - Role heading: “Auditor”.
 - Evidence checked: `{verified_figures_and_sources}`.
@@ -63,14 +63,14 @@
 - After the actual ruling, repeat one group per upheld recommendation:
   - Upheld action: `{upheld_recommendation}`.
   - Draft: `{draft_reference}` in `approvals/{week}/`.
-  - State: “Waiting for individual approval”.
-- Draft posts and supplier messages remain unsent until the student approves each draft individually.
+  - State: waiting for your reply, "approve N" or "skip N".
+- Lembur posts and sends nothing. The student sends an approved draft herself. Posting through a connector is roadmap only.
 - No blanket approval, auto-send or unsupported interaction controls in the layout.
-- Quantified raise projections remain excluded while design section 8 is unconfirmed; cite current evidence only.
+- The raise projection is an agreed design, not built (design section 8). Quantified raise projections stay excluded; cite current evidence only.
 
 ## Relationship to the payslip
 
-- The expanded meeting provides the evidence behind the short debate-and-ruling summary in payslip section 8.
+- The expanded meeting provides the evidence behind the short debate and ruling summary in payslip section 8, which uses `{{debate_summary}}` and `{{ruling}}`.
 - Upheld actions must match payslip section 9 and point to the same drafts.
 - Review items must remain consistent with the Auditor's final list in payslip section 10; do not hide uncertainty in a separate presentation.
 - Source notes are for traceability, not authoring attribution.
@@ -91,6 +91,6 @@
 - Financial bases and time sources: `docs/SYSTEM_DESIGN.md`, sections 4.2 and 4.3.
 - Conflicting objectives and Auditor duties: `docs/SYSTEM_DESIGN.md`, sections 5.3 to 5.5.
 - Recommendations, ruling, drafts and individual approval: `docs/SYSTEM_DESIGN.md`, sections 6.1 and 7.
-- Unconfirmed projections: `docs/SYSTEM_DESIGN.md`, section 8.
+- Raise projections, an agreed design not built: `docs/SYSTEM_DESIGN.md`, section 8.
 - Unknown expense and fixture-only validation: `data/answer_key/answer_key.md`, “Validation and limitations”. The draft key does not supply an observed ruling.
 - Visual structure: Damian's provisional approval of equal arguments above a separate Auditor ruling.

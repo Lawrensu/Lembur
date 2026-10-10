@@ -14,7 +14,7 @@
 - Rule checker covers every planted problem and every dataset rule. See .expected_ledger.ref/rule_check.md for results and visual-inspection limitations.
 - This validates the fixture, not Law's extraction workflow, model OCR accuracy, trigger reliability, or an observed end-to-end run. Those remain to be tested against this key.
 - The blurry expense has an unknown amount, not a zero expense. Take home and hourly rate are provisional known-amount results; true earnings may be lower once the receipt is readable.
-- No projected raise or Day Zero formula is used. Both design-section-8 proposals remain unapproved.
+- No projected raise or Day Zero formula is used. Both designs are agreed in design section 8 but not built.
 
 ## Ledger totals by category
 
@@ -43,9 +43,9 @@
 
 ## Correction and plan state
 
-- The input data/demo/plan.xlsx is the baseline: P01=20 and change_log has headers only.
-- The run's workspace/plan/plan.xlsx ends with P01=15 and exactly one change_log row: changed_at=2026-10-07; field=products.P01.minutes_per_unit; old_value=20; new_value=15; reason=I timed myself today, keychains take 15 minutes not 20; source=message.2026-10-07.
-- Sharon-approved clarification of design wording: pre-correction P01 lines use 20 and source=estimate; on/after October 7 use 15 and source=corrected. Historical baseline values are not retroactively labelled corrected. Shared source-of-truth docs have not been edited.
+- The input, the plan CSV files data/demo/plan_*.csv, is the baseline: P01=20 and change_log has headers only.
+- The run's workspace/plan/plan_*.csv ends with P01=15 and exactly one change_log row: changed_at=2026-10-07; field=products.P01.minutes_per_unit; old_value=20; new_value=15; reason=I timed myself today, keychains take 15 minutes not 20; source=message.2026-10-07.
+- Sharon-approved clarification of design wording: pre-correction P01 lines use 20 and source=estimate; on/after October 7 use 15 and source=corrected. Historical baseline values are not retroactively labelled corrected. Design section 4.2 states this rule.
 - Other production, fulfilment and admin lines remain estimate. Only the bazaar event is stated. No extra stated production hours are added.
 
 ## Every expected hours line
@@ -103,14 +103,15 @@
 
 ## Bank matching and every transaction status
 
+- Transaction IDs follow intake order: inbox files in file name order, then rows that come only from the message.
 - Dana and Mira have same-amount nearby bank candidates and no printed references. Resolve by the fictional customer name in the bank description. Both are ambiguous_resolved; reference-bearing transfers match directly.
 - T0001: 2026-10-05; ambiguous_resolved; RM5.00; bank_reference=DEMO-IN-001; source_file=receipts/2026-10/order_2026-10-05_dana.png.
 - T0002: 2026-10-05; ambiguous_resolved; RM5.00; bank_reference=DEMO-IN-002; source_file=receipts/2026-10/order_2026-10-05_mira.png.
 - T0003: 2026-10-05; matched; RM18.00; bank_reference=DEMO-OUT-001; source_file=receipts/2026-10/receipt_beads.png.
 - T0004: 2026-10-05; duplicate; RM18.00; bank_reference=empty; source_file=receipts/2026-10/receipt_beads_copy.png.
 - T0005: 2026-10-06; matched; RM5.00; bank_reference=DEMO-IN-003; source_file=receipts/2026-10/order_2026-10-06_farah.png.
-- T0006: 2026-10-06; matched; RM5.00; bank_reference=DEMO-IN-004; source_file=receipts/2026-10/order_2026-10-06_nisa.png.
-- T0007: 2026-10-06; matched; RM18.00; bank_reference=DEMO-IN-005; source_file=receipts/2026-10/order_2026-10-06_hana.png.
+- T0006: 2026-10-06; matched; RM18.00; bank_reference=DEMO-IN-005; source_file=receipts/2026-10/order_2026-10-06_hana.png.
+- T0007: 2026-10-06; matched; RM5.00; bank_reference=DEMO-IN-004; source_file=receipts/2026-10/order_2026-10-06_nisa.png.
 - T0008: 2026-10-07; matched; RM5.00; bank_reference=DEMO-IN-006; source_file=receipts/2026-10/order_2026-10-07_iman.png.
 - T0009: 2026-10-07; matched; RM6.00; bank_reference=DEMO-OUT-002; source_file=receipts/2026-10/receipt_pouches.png.
 - T0010: 2026-10-08; matched; RM5.00; bank_reference=DEMO-IN-007; source_file=receipts/2026-10/order_2026-10-08_lina.png.
@@ -127,6 +128,7 @@
 
 ## Reproduction and handoff
 
+- The CSV files data/demo/plan_*.csv and data/answer_key/ledger_*.csv are the source of truth, and data/test_harness/compare_outputs.py checks a run against them with no installed package. The scripts listed below built the first .xlsx version and still need openpyxl and Pillow.
 - Run the scripts using a Python environment with openpyxl and Pillow installed; paths below are relative to the repository root. No runtime app or skills are installed by this fixture.
 - Baseline workbook: data/demo/.plan.ref/build.py.
 - Expected ledger and primary numbers: data/answer_key/.expected_ledger.ref/build.py.

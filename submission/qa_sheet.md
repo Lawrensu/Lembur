@@ -46,14 +46,14 @@
 - Only `minutes_per_unit`, `fulfilment_minutes_per_order` and `admin_hours_per_week` are permitted time corrections.
 - Each correction updates the plan and appends a dated change-log row. It applies from the correction date onward; earlier lines retain their earlier assumption.
 - This does not support arbitrary retrospective time entries or automatically recover failed-batch hours.
-- The draft key records a source-label clarification not yet incorporated into the source docs. Confirm its treatment with the team before treating it as a new specification.
+- `corrected` applies only from the correction date (design section 4.2). Earlier lines stay `estimate`.
 - Source: DESIGN section 4.2; draft answer key “Correction and plan state”.
 
 ## Why trust Day Zero estimates?
 
 - They are predictions based on assumptions, and the plan explicitly admits they tend to be optimistic. Weekly comparisons are intended to expose that optimism.
-- Expected-volume inputs and prediction/break-even formulas are unconfirmed. Do not claim generated Day Zero output is ready until those rules and the workflow are agreed and tested.
-- Night Shift can read a hand-prepared baseline plan. Showing that fallback in the submission requires Damian's confirmed presentation decision.
+- The Day Zero design is agreed (design section 8) but not built. Sharon builds it only on Law's word after the midnight checkpoint. Do not claim generated Day Zero output is ready.
+- Night Shift can read a hand prepared baseline plan. Law decides under the fixed cut order (PLAN section 15). The hand written plan file is shown as "the plan".
 - Sources: PLAN sections 3, 4 and 15; DESIGN sections 1 and 8.
 
 ## How do you handle missing or conflicting evidence?
@@ -107,15 +107,15 @@
 
 ## Can you promise the raise plan will earn more?
 
-- No guaranteed improvement. Quantified projections require an agreed deterministic calculation, and that rule remains unconfirmed.
+- No guaranteed improvement. The design is agreed, price change only, and not built. It is built on Law's word after the first full run.
 - Until approved, recommendations cite current tool outputs or plan values only. Do not invent future demand or a precise hourly raise.
 - Source: DESIGN section 8.
 
 ## Does it send posts or supplier messages automatically?
 
-- Drafts wait for the student's individual approval. Approval of one draft does not approve every draft.
-- Nothing is posted or sent before that draft is approved. Whether final delivery is implemented must be established by Law's actual execution evidence.
-- Evidence: `{verified_individual_approval_and_delivery}`. Do not infer approval controls or completed sending from draft files alone.
+- No. The student replies "approve N" or "skip N". An approved draft moves to `approvals/<week>/approved/` and she sends it herself. Lembur posts and sends nothing in this version. Posting through a connector is roadmap only.
+- Approval of one draft does not approve every draft.
+- Evidence: `{verified_individual_approval_evidence}`.
 - Sources: DESIGN sections 5.1 and 6.1.
 
 ## How is WorkBuddy doing meaningful work?
@@ -135,8 +135,8 @@
 
 ## What does a run cost, and how reliable is it?
 
-- The source docs do not record results for first-hour runtime, scheduling, extraction, file-format, trigger or credit-use checks.
-- Use `{recorded_first_hour_check_results}`, `{measured_run_duration}` and `{measured_run_credit_usage}` from Law; do not invent them.
+- Recorded: check 6 (scripts run from a skill) and check 7 (CSV). Open: checks 1, 2, 3, 4, 5, 8, 9, 10 and 11.
+- Use `{recorded_first_hour_check_results}` from the owner of each check (PLAN section 12), and `{measured_run_duration}` and `{measured_run_credit_usage}` from Law; do not invent them.
 - If a fallback is used, disclose it. Do not present manual execution as scheduled overnight operation.
 - Pricing, monetisation and security guarantees are not specified; ask the team rather than invent a business model or assurance.
 - Sources: PLAN sections 0, 12 and 15; DESIGN section 0.
@@ -150,10 +150,10 @@
 
 ## What remains open before submission?
 
-- Law's fillable template format and recorded first-hour results.
-- Sharon's story/key sign-off and actual-run comparison.
-- Day Zero formulas, owner and any approved presentation fallback.
-- Raise projections, which remain excluded.
+- Open checks: 1, 2, 3, 4, 5, 8, 9, 10 and 11 (PLAN section 12).
+- Sharon's story and key sign-off and the actual run comparison.
+- Day Zero and the raise projection: agreed designs, not built, on Law's word.
+- Payslip template and PDF (check 11).
 - Damian's total video duration and final look. WorkBuddy naming and the exact judging criterion are approved.
 - Review items and unknown-expense caveats must stay visible even after the run passes its expected checks.
 - Sources: PLAN sections 12, 13, 15 and 18; DESIGN section 8; current draft answer key.
