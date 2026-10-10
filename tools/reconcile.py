@@ -73,7 +73,7 @@ def reconcile(transactions: list, bank_lines: list) -> list:
         testable = status == "" or (
             status == "unmatched" and is_empty(row.get("bank_reference"))
         )
-        if status == "":
+        if testable:
             problem = _intake_problem(row)
             if problem:
                 row["reconciliation_status"] = "needs_review"
@@ -177,7 +177,7 @@ def close_week(transactions: list, bank_lines: list) -> list:
             "txn_id": "T%04d" % number,
             "date": to_date(line["date"]).isoformat(),
             "type": text(line["type"]),
-            "category": "sales" if income else "other_expenses",
+            "category": "sales" if income else "",
             "description": text(line["description"]),
             "amount_rm": rm(to_sen(line["amount_rm"])),
             "payment_method": "bank_transfer",
