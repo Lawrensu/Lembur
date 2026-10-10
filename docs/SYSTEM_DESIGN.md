@@ -76,6 +76,7 @@ workspace/
   payslips/<week>.html      weekly payslip, filled from the template (section 7)
   payslips/<week>.pdf       the same payslip as a PDF [pending check 11]
   approvals/<week>/         drafted posts and messages, one file per draft
+  approvals/<week>/approved/  drafts the student has approved
 ```
 
 * **Why this layout**: the Auditor traces numbers to receipts, judges open a ledger row and see the receipt behind it, and the folder is the handoff package if the student moves to accounting software.
@@ -286,7 +287,7 @@ All figures use counted rows and hours lines dated in the week.
 
 * **No invented numbers**: every figure traces to a ledger row, an hours line or a plan value.
 * **No arithmetic**: figures come from the tools in section 4 and are copied, never recalculated. Payroll, the Growth coach and the Auditor copy figures only from `audit/<week>/numbers.json`.
-* **Nothing leaves the building**: drafts go to `approvals`. Nothing is posted or sent without the student's approval.
+* **Nothing leaves the building**: drafts go to `approvals`. The system never posts or sends a draft. The student sends an approved draft herself.
 * **Uncertain means flag, not guess**: anything unclear goes on the review list.
 * **Why only four agents**: an agent exists only where it needs different tools, different context or a conflicting objective. Timekeeping is part of Payroll. Reconciliation is a tool.
 
@@ -326,7 +327,7 @@ All figures use counted rows and hours lines dated in the week.
 * **Does**
   * Proposes changes to pricing, product mix, channels and schedule.
   * Writes its recommendation.
-  * After the ruling, drafts posts and supplier messages.
+  * After the ruling, drafts posts and supplier messages. Each draft is one file whose name starts with its number, for example `01_instagram_post.md`.
 * **Writes**: `boardroom/<week>/growth.md`, drafts in `approvals/<week>/`.
 * **Objective**: grow revenue and sales.
 * **Why a separate agent**: its objective conflicts with Payroll's. That conflict is the debate.
@@ -354,7 +355,7 @@ All figures use counted rows and hours lines dated in the week.
 
 ### 6.1 Night Shift
 
-* **Trigger**: the student sends one Telegram text message and drops files into `inbox`. Voice notes are a stretch goal.
+* **Trigger**: the student sends one Telegram text message and drops files into `inbox`. A voice note is wanted as well [pending check 2]; the fallback is a typed message.
 * **Every night**
   1. **Intake**, Bookkeeper: transactions extracted, documents filed.
   2. **Reconcile**, reconciliation tool then Bookkeeper: a status on every row.
@@ -367,7 +368,11 @@ All figures use counted rows and hours lines dated in the week.
   8. **Payslip**, Payroll: fill the template to build `payslips/<week>.html` once, after the ruling, using the saved numbers file. PDF is a later step. The Auditor then confirms both review sources reached the payslip.
   9. **Drafts**, Growth coach: posts and supplier messages in `approvals`.
   10. **Morning message**, WorkBuddy messaging: "Your board meeting is ready" plus the approval list.
-* **Approval**: the student approves each draft individually. Only then is it sent or posted.
+* **Approval**: the student approves each draft individually, by reply.
+  * "approve 2" moves draft 2 from `approvals/<week>/` into `approvals/<week>/approved/`. "skip 2" leaves it where it is. The agent confirms either way.
+  * The reply works the same from Telegram or typed inside WorkBuddy.
+  * It is a file move written into the skill instructions. There is no approval command.
+  * Nothing is posted or sent by the system in this version. Posting through a connector is future work.
 
 ### 6.2 Day Zero
 
@@ -399,7 +404,7 @@ All figures use counted rows and hours lines dated in the week.
 * **Payslip format**, decided by Law on 10 October
   * **Template**: `submission/payslip_template.html`, owned by Role C. One self contained HTML file: styles inside the file, no scripts, no fonts or images loaded from the internet. Reason: it must look the same offline and when turned into a PDF.
   * **Filling**: a script fills the template and writes `payslips/<week>.html`. No model types a figure into the payslip.
-  * **PDF**: WorkBuddy turns that file into `payslips/<week>.pdf` [pending check 11]. Fallback: the HTML file is the payslip.
+  * **PDF**: wanted. WorkBuddy turns that file into `payslips/<week>.pdf` [pending check 11]. Fallback: the HTML file is the payslip.
   * **Single values**: `{{name}}`, where the name is a key of `audit/<week>/numbers.json`, with a dot for a nested key. Examples: `{{week}}`, `{{date_from}}`, `{{hourly_rate_rm}}`, `{{take_home_rm}}`, `{{category_totals_rm.sales}}`, `{{hours.production}}`, `{{hours.total}}`, `{{shared_hours}}`, `{{plan_versus_reality.margin_percent}}`.
   * **Repeating rows**: everything between `<!-- each products -->` and `<!-- end products -->` is repeated once per item, and inside it `{{name}}` is a field of that item. The blocks are:
     * `products`: `product_id`, `name`, `units_sold`, `revenue_rm`, `unit_costs_rm`, `channel_costs_rm`, `profit_rm`, `direct_hours`, `profit_per_hour_rm`, `loses_money` (filled as `true` or `false`, so it can drive a style class).
@@ -418,17 +423,17 @@ All figures use counted rows and hours lines dated in the week.
 
 ## 8. Open items
 
-* **Parked until after the midnight checkpoint**: the Day Zero planned week and raise plan replay proposals below remain unconfirmed. Do not build either proposal before Law decides.
+* **Agreed as designs, not built**: Law agreed the two designs below on 10 October. Neither is built until Law says so: the raise projection after the first full run, Day Zero after the midnight checkpoint. Until then recommendations cite current figures only, and the hand written plan stands in for Day Zero (PLAN section 15).
 
 * **Tool mechanism and location in the repository, decided**: Python scripts in `tools/`, run by a skill with the managed Python 3.13. Check 6 passed.
 * **Runtime module naming, decided and done**: renamed `tools/numbers.py` to `tools/business_numbers.py` and updated the remaining loader reference. The probe no longer needs `-P`: the local module no longer shadows Python's standard library `numbers` module.
 * **File format, decided**: CSV, check 7. Every entry point explicitly passes `fmt="csv"`; the adapter retains `.xlsx` support for later.
 * **Payslip format, decided**: an HTML template filled by a script (section 7). The PDF step waits on check 11.
-* **Day Zero formulas** [confirm]: break even point and predicted hourly rate need an expected sales volume, and the plan file has no column for one. Do not build Day Zero until this is agreed.
-  * **Proposal, a planned week**: a new `planned_sales` sheet in the plan file (`product_id`, `channel`, `units_per_week`) holds the student's own expected volume, one unit per order.
+* **Day Zero formulas**, design agreed: break even point and predicted hourly rate need an expected sales volume, and the plan file has no column for one.
+  * **A planned week**: a new `planned_sales` sheet in the plan file (`product_id`, `channel`, `units_per_week`) holds the student's own expected volume, one unit per order.
   * **Predicted figures**: the hours tool and the product profit rules of section 4.3 run over that planned week. Planned take home is the total of the product profits. Predicted hourly rate and `planned_margin_percent` come out of the same tools.
-  * **Break even**: the model has no fixed costs, so the classic break even point does not exist. It becomes the multiple of planned sales at which the hourly rate reaches `target_hourly_rate_rm`, or "not reachable at these prices".
-* **Raise plan projections** [confirm]: a claim such as "this would earn you RM2 more an hour" needs a deterministic calculation. Until this is agreed, recommendations cite current figures only.
-  * **Proposal, replay the week**: the numbers tool runs again on the same week with one change, either a new price or a new number of units for one product.
-  * **Projected figures**: take home plus the change in product profit, over week minutes plus the change in direct minutes.
+  * **Break even**, optional: the model has no fixed costs, so the classic break even point does not exist. It becomes the multiple of planned sales at which the hourly rate reaches `target_hourly_rate_rm`, or "not reachable at these prices".
+* **Raise plan projections**, design agreed: a claim such as "this would earn you RM2 more an hour" needs a deterministic calculation. Until it is built, recommendations cite current figures only.
+  * **Replay the week**: the numbers tool runs again on the same week with one change: a new price for one product, with the same units sold. A change in units is not part of the design.
+  * **Projected figures**: take home plus the change in that product's profit, over the same week minutes. A price change does not change minutes.
   * **Label**: every projection states the assumption it replays, for example "same units sold at RM18". The Auditor rejects any projection that is not tool output.
