@@ -274,6 +274,9 @@ Moved to `docs/SYSTEM_DESIGN.md`. Old section numbers map as follows.
       3. Ask: "Convert the HTML file in this folder to a PDF with the same name, in the same folder. Keep the layout exactly. Do not install anything. If you would need to install something, stop and tell me what."
     * **Pass when**: the PDF opens and looks like the page does in a browser, and nothing was installed.
     * **Also write down**: exactly how WorkBuddy did it, tool or command, and how long it took. The Payroll skill has to repeat it.
+    * **Preparation result, 2026-10-10 17:11, Damian's task**: PDF conversion succeeded without any installation using the installed Chrome 154 and managed Node 22.22.2. A temporary verification script outside the submission files opened the self contained sample HTML in a headless browser and called its `Page.printToPDF` operation with background printing, CSS page size and no browser headers or footers. The last export took 0.562 seconds and produced a structurally valid four page A4 PDF beside the sample HTML. This is export evidence, not a completed check 11 pass.
+    * **Sample visual approval, 2026-10-10 17:23, Damian**: Damian reviewed the sample PDF and confirmed “the sample pdf looks good”. The sample PDF look is approved. Browser inspection also confirmed section order, all four expected transaction review rows, the unknown amount label and the loss marker. Print colours intentionally switch from the dark screen palette to a light page; exact screen colour identity is not claimed.
+    * **Remaining production gate**: Law must confirm a repeatable conversion method for the Payroll skill. The sample has no observed ruling or upheld drafts, so populated real output pagination and final review coverage still need verification. This approval establishes sample appearance and successful export, not a completed end to end run or a guarantee for all future content. HTML remains available as the fallback.
 
 ---
 
