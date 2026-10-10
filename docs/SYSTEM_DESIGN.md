@@ -211,11 +211,12 @@ workspace/
     * No line is written when the minutes are zero.
   * **Event**: one line per event stated in a nightly message.
     * The agent passes the date, plus either start and end as 24 hour times or the stated hours as written. The hours tool computes whole minutes. For "Bazaar 4 to 9", the agent passes `16:00` and `21:00`; the tool returns 300. Choosing am or pm is reading and remains with the agent.
+    * When a message gives both clock times and a total, the agent passes the clock times only. The hours tool rejects an event carrying both forms.
     * `source` is `stated`. `assumption_ref` is the message reference.
   * **Admin**: one line per week, dated that week's Sunday, written on payslip day.
     * `minutes` = `admin_hours_per_week` in force on that date × 60.
     * `assumption_ref` is `assumptions.admin_hours_per_week`.
-* **`source` on production, fulfilment and admin lines**: `corrected` when the value in force comes from a `change_log` row, otherwise `estimate`.
+* **`source` on production, fulfilment and admin lines**: `corrected` only when a `change_log` row for the line's field has `changed_at` on or before the line date. Earlier lines stay `estimate`, even when their value in force is recovered from a later correction's `old_value`.
 * **Sales rows without `product_id` or `quantity`**: produce no lines.
 * **Why production counts units sold, not units made**: it mirrors how accounting attaches cost to goods when they sell. A big production weekend does not distort one week's rate.
 * **Events**: Payroll passes what it read, never a calculated duration. A missing or unreadable event date returns one review warning and writes no line, without raising an exception. An end time not after the start, or a duration that cannot be read, also produces no hours line and a warning. Payroll appends the available date, what is unclear and the message reference to `audit/<week>/review_items.md`.
@@ -283,7 +284,8 @@ All figures use counted rows and hours lines dated in the week.
 * **Reads**: files in `inbox`, the nightly message.
 * **Does**
   * Saves the nightly message to `receipts/<year_month>/message_<date>.txt`.
-  * Extracts transactions from the inbox files and from the message (for example cash sales the student reports).
+  * Reads inbox files in file name order, then adds rows that come only from the message. Transaction IDs follow that order.
+  * Makes a transaction row from the message only when the message states an amount and no document in the same batch covers it.
   * Extracts bank statement lines into `bank_lines`.
   * Files each document into `receipts/<year_month>/`, using the month of the document date, or of the intake date when the date cannot be read. `inbox` ends empty.
   * Sets `needs_review` on any row with a required field missing. An unreadable receipt still gets a row holding whatever could be read.

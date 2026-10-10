@@ -128,6 +128,7 @@ Moved to `docs/SYSTEM_DESIGN.md`. Old section numbers map as follows.
   * `data/answer_key/ledger_transactions.csv`, `data/answer_key/ledger_bank_lines.csv`, `data/answer_key/ledger_hours.csv`: the expected ledger.
   * `data/answer_key/answer_key.md`: every other expected figure and flag.
 * **Checking the key itself**: the hand calculation is confirmed by a second, independent calculation before anyone builds against it.
+* **Intake order**: the Bookkeeper reads inbox files in file name order, then adds rows that come only from the message. Transaction IDs follow that order.
 * **Pass condition**: the run's outputs match the answer key exactly (statuses, minutes, and money to the sen). A mismatch is a bug to fix, not something to explain away in the demo.
 
 ---
@@ -177,7 +178,6 @@ Moved to `docs/SYSTEM_DESIGN.md`. Old section numbers map as follows.
    * **Rename, decided and done**: `tools/numbers.py` is now `tools/business_numbers.py`; the remaining test loader and probe instructions are updated. Direct probe execution no longer needs `-P`.
    * **Skill invocation result, 2026-10-10**: passed. Law ran a temporary diagnostic skill inside WorkBuddy that called `python -B tools/check_runtime.py` from the repository root. It used the managed Python 3.13.14 and gave the same seven of nine checks and CSV mode as the direct run; the two failures are the absent `openpyxl`. Check 6 is conclusive: a skill can run a deterministic script. The diagnostic skill is not one of the four product agents and is removed afterwards.
    * **Time box**: checks 6 and 7 started at 13:17 Malaysia time; their shared limit is 13:47. If still inconclusive at that point, use the documented fallback.
-   * **Regression verification**: 12 focused tests passed, including exit codes, event conversion, open week IDs, category blocking and the worked example. This is not the full module test suite.
 7. **`.xlsx` reads and writes reliably**
    * **Why**: the data model.
    * **Fallback**: CSV.
@@ -293,6 +293,6 @@ One character, told across time.
   * **Schedule and cut order**: sections 14 and 15 confirmed as written.
   * **Shared figures and audit**: Payroll saves `audit/<week>/numbers.json`; the Auditor compares a read only rerun with that file. The payslip is built once after the ruling.
   * **Nontransaction review**: `audit/<week>/review_items.md`, combined with transaction review rows on the payslip. No new sheet.
+  * **Agent style, decided by Damian**: professional colleagues, using role titles.
 * **Still open**
-  * **Agent style**: professional colleagues or distinct personalities. Role C's call. It does not affect the build.
   * **Open items in the design file**: design section 8. Both calculation proposals stay parked until Law decides after the midnight checkpoint.
