@@ -122,8 +122,9 @@ def _lembur(root: Path, args: dict) -> dict:
     rows = None
     if has_input:
         rows = args["input"]
-        if not isinstance(rows, list):
-            raise Refused("input must be an array of objects")
+        # payslip reads one object; every other command reads an array of rows
+        if not isinstance(rows, (list, dict)):
+            raise Refused("input must be a JSON array or object")
     elif has_input_file:
         source = inside(root, args["input_file"])
         if not source.is_file():
@@ -135,7 +136,11 @@ def _lembur(root: Path, args: dict) -> dict:
     for key, value in options.items():
         if value is None or value is False:
             continue
-        flag = "--" + str(key).lstrip("-")
+        name = str(key).lstrip("-")
+        # the tool layer alone decides the workspace and the input file
+        if name in ("workspace", "input"):
+            raise Refused("options may not set " + name)
+        flag = "--" + name
         if value is True:
             argv.append(flag)
         else:
