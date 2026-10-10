@@ -473,6 +473,9 @@ All figures use counted rows and hours lines dated in the week.
   * `review`: sends the review list.
   * `approve N` and `skip N`: section 6.1, approval.
   * Anything else: it is tonight's message. The bot calls `run_night` and reports back.
+* **A new student**: the first message from a chat creates `workspaces/<chat_id>/` with the layout of section 3.1. Day Zero is not built, so the bot copies the hand written plan, `data/demo/plan_*.csv`, into its `plan/` folder.
+* **The night's date**: today's date in Malaysia time. [confirm] For the demo replay only, a message that starts with a date written `YYYY-MM-DD` runs as the night of that date, so the recorded week can be replayed in one sitting.
+* **Approve and skip**: they act on the latest week that has drafts. The number is the one at the start of the draft's file name.
 * **Fixed words only**: the four words above are matched by the code. The bot does not use a model to guess what the student meant.
 * **What the bot says**: figures are copied from `numbers.json`. The bot calculates nothing and words nothing beyond fixed sentences. The wording of those sentences belongs to Role C.
 * **One night at a time**: while a night is running for a student, a second message from her waits.
