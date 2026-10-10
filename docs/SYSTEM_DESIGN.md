@@ -73,8 +73,8 @@ workspace/
   receipts/<year_month>/    filed source documents and saved nightly messages
   boardroom/<week>/         payroll.md, growth.md, ruling.md
   audit/<week>/             numbers.json, audit_report.md, intake_log.md, review_items.md
-  payslips/<week>.html      weekly payslip filled from a template
-  payslips/<week>.pdf       optional later PDF
+  payslips/<week>.html      weekly payslip, filled from the template (section 7)
+  payslips/<week>.pdf       the same payslip as a PDF [pending check 11]
   approvals/<week>/         drafted posts and messages, one file per draft
 ```
 
@@ -396,6 +396,19 @@ All figures use counted rows and hours lines dated in the week.
   9. Raise plan: the recommendations the ruling upheld, each pointing to its draft in `approvals`
   10. Needs your review list
 * **Payslip rules**: wording and look belong to Role C. Every number is copied from `audit/<week>/numbers.json`. The review list includes transaction rows with status `unmatched`, `duplicate` or `needs_review` and every line of `audit/<week>/review_items.md`.
+* **Payslip format**, decided by Law on 10 October
+  * **Template**: `submission/payslip_template.html`, owned by Role C. One self contained HTML file: styles inside the file, no scripts, no fonts or images loaded from the internet. Reason: it must look the same offline and when turned into a PDF.
+  * **Filling**: a script fills the template and writes `payslips/<week>.html`. No model types a figure into the payslip.
+  * **PDF**: WorkBuddy turns that file into `payslips/<week>.pdf` [pending check 11]. Fallback: the HTML file is the payslip.
+  * **Single values**: `{{name}}`, where the name is a key of `audit/<week>/numbers.json`, with a dot for a nested key. Examples: `{{week}}`, `{{date_from}}`, `{{hourly_rate_rm}}`, `{{take_home_rm}}`, `{{category_totals_rm.sales}}`, `{{hours.production}}`, `{{hours.total}}`, `{{shared_hours}}`, `{{plan_versus_reality.margin_percent}}`.
+  * **Repeating rows**: everything between `<!-- each products -->` and `<!-- end products -->` is repeated once per item, and inside it `{{name}}` is a field of that item. The blocks are:
+    * `products`: `product_id`, `name`, `units_sold`, `revenue_rm`, `unit_costs_rm`, `channel_costs_rm`, `profit_rm`, `direct_hours`, `profit_per_hour_rm`, `loses_money` (filled as `true` or `false`, so it can drive a style class).
+    * `review_rows`: `txn_id`, `date`, `reconciliation_status`, `amount_rm`, `description`, `notes`, one per transaction row on the review list.
+    * `review_items`: `text`, one per line of `audit/<week>/review_items.md`.
+    * `raise_plan`: `text` and `draft_file`, one per recommendation the ruling upheld.
+  * **Text sections**: `{{debate_summary}}` and `{{ruling}}`, copied from `boardroom/<week>/ruling.md`.
+  * **A figure that is not shown**: its placeholder is filled with nothing. The wording around it belongs to Role C.
+  * **All field names**: the keys of `numbers.json` are the return value of the numbers tool (section 4.3). No field outside this list may be added to the template without asking.
 * **`payroll.md` and `growth.md`**: each recommendation states the change and cites the figures it rests on, copied only from `audit/<week>/numbers.json`.
 * **`ruling.md`**: for each disagreement, which side is upheld and why, citing figures.
 * **`audit_report.md`**: each check in section 5.5 with pass or fail and the rows concerned.
@@ -410,6 +423,7 @@ All figures use counted rows and hours lines dated in the week.
 * **Tool mechanism and location in the repository, decided**: Python scripts in `tools/`, run by a skill with the managed Python 3.13. Check 6 passed.
 * **Runtime module naming, decided and done**: renamed `tools/numbers.py` to `tools/business_numbers.py` and updated the remaining loader reference. The probe no longer needs `-P`: the local module no longer shadows Python's standard library `numbers` module.
 * **File format, decided**: CSV, check 7. Every entry point explicitly passes `fmt="csv"`; the adapter retains `.xlsx` support for later.
+* **Payslip format, decided**: an HTML template filled by a script (section 7). The PDF step waits on check 11.
 * **Day Zero formulas** [confirm]: break even point and predicted hourly rate need an expected sales volume, and the plan file has no column for one. Do not build Day Zero until this is agreed.
   * **Proposal, a planned week**: a new `planned_sales` sheet in the plan file (`product_id`, `channel`, `units_per_week`) holds the student's own expected volume, one unit per order.
   * **Predicted figures**: the hours tool and the product profit rules of section 4.3 run over that planned week. Planned take home is the total of the product profits. Predicted hourly rate and `planned_margin_percent` come out of the same tools.
