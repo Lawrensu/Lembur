@@ -89,6 +89,15 @@ For `payslip` and `review` the bot only reads: the payslip file, `numbers.json`,
 - `app/tests/test_bot.py`: offline contract tests with a fake Telegram and an injected runner stand in.
 - `app/tests/test_bot_transport.py`: offline transport tests for the HTTPS calls, token loading, error sanitising and polling.
 
+## Status at 02:55 on 11 October
+
+- Committed as `4d13715` on `dev-damian`, then merged `dev` into the branch as `c8dca0d`.
+- The merge brought in **Sharon's tool layer**: `app/tools.py` and `app/tests/test_tool_layer.py`, plus a small SYSTEM_DESIGN clarification about `input_file` and what `run_tool` returns for `lembur`. **The bot to runner seam did not change**: `run_night(workspace, date, message, ask=None)` and the night summary are as written above.
+- The package 3 tests were rerun after the merge: 70 run, 60 passed, 10 skipped, no failures. The merge did not break this package.
+- The local `.env` now exists and the token is configured. It was checked live against Telegram: the token authenticates and the API is reachable, and the bot is `lembur_damian_bot`. No token value was printed, logged or committed.
+- `app/runner.py` still does not exist, so **proof 3 cannot pass yet**. Its photo half can be checked live; its payslip half needs a night to have produced a payslip.
+- **Proof 3 partial result, recorded under the proof in PLAN section 12.** The bot was run against Telegram and a photo sent from the phone arrived correctly: `workspaces/998236319/` was created, the four baseline plan files were copied into its `plan/`, the other six folders were made, and the upload was saved to `inbox/` as `photo_20261011_064620_3.jpg`, a valid 252,087 byte JPEG. The photo half of the pass condition is met. The payslip half is not, because no night has run. The proof is recorded as partial, not a pass.
+
 ## What is verified and what is not
 
 - **Verified offline**: `python -B -m unittest discover -s app/tests -p "test_bot*.py"` ran 70 tests on 11 October 2026: 60 passed, 10 skipped, no failures or errors. The skips are symlink and junction cases: this Windows filesystem does not expose real symbolic links without extra privilege. They are skipped with a clear reason, not silently ignored. The passing tests cover routing, upload naming and collisions, approval moves, summary formatting, chat isolation, queueing, the HTTPS transport calls, token loading and error sanitising.
@@ -98,9 +107,9 @@ For `payslip` and `review` the bot only reads: the payslip file, `numbers.json`,
 
 ## Blockers before proof 3
 
-1. **No `.env`.** The token is not configured locally. Someone must create the bot with `@BotFather` and save the token as `TELEGRAM_BOT_TOKEN` in `D:\Github\Lembur\.env`. Never paste the token into chat, a file, a screenshot or a commit.
-2. **No `app/runner.py`.** The bot needs the real `run_night` for a full night. Fixed commands and uploads work without it.
-3. **Backend not in `dev`.** `app/tools.py` and `app/model.py` are another package's work.
+1. **No `app/runner.py`.** The bot needs the real `run_night` for a full night, and proof 3 needs a payslip to exist before it can arrive in the chat. Fixed commands and uploads work without it.
+2. **The photo half needs a person at the phone.** Someone must send the bot a text and a photo, then the word `payslip`. An agent cannot send Telegram messages as the student.
+3. **The token is now configured.** This blocker is cleared; the live token check passed.
 
 ## Proof 3, as written in PLAN section 12
 
