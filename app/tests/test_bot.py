@@ -246,8 +246,14 @@ class BotTests(unittest.TestCase):
         self.assertTrue(self.replies(101))
         self.assertTrue(self.replies(-202))
 
-    def test_noncommands_are_passed_to_runner_without_date_prefix_or_start_special_cases(self):
-        texts = ["/start", "2026-10-05 Sold two keychains.", "Payslip", "REVIEW",
+    def test_a_greeting_gets_the_welcome_and_starts_no_night(self):
+        for text in ["/start", "hello", "Hi!", "help", "/help"]:
+            with self.subTest(text=text):
+                self.bot.handle_message(message(text))
+        self.assertEqual(self.runs, [])
+
+    def test_noncommands_are_passed_to_runner_without_date_prefix_special_cases(self):
+        texts = ["2026-10-05 Sold two keychains.", "Payslip", "REVIEW",
                  "Approve 2", "approve two", "payslip please", "review today"]
         for text in texts:
             with self.subTest(text=text):

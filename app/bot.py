@@ -24,6 +24,16 @@ PLAN_FILES = ("plan_products.csv", "plan_channels.csv", "plan_assumptions.csv",
               "plan_change_log.csv")
 WEEK = re.compile(r"\d{4}-W\d{2}\Z")
 DRAFT = re.compile(r"(\d+)_.*\.md\Z")
+WELCOME = (
+    "Hi, I am Lembur, your back office team. You sleep, we do the overtime.",
+    "Before bed, send me today's receipts, order screenshots or your bank statement as files. "
+    "Then send one message about your day, for example what you sold and any hours you worked at an event.",
+    "I record everything, work out what you earned per hour, and on Sunday I send your payslip "
+    "with drafts of changes that could earn you more.",
+    "Words I understand: payslip, review, approve N, skip N, help. Anything else I treat as tonight's message.",
+)
+GREETINGS = {"/start", "/help", "help", "hi", "hello", "hey", "start"}
+STARTING = "Got it. The night shift is starting. This usually takes under a minute, and longer on payslip day."
 FAILURE = "I could not finish that request. Nothing was guessed. Please try again or ask the team to check the run."
 
 
@@ -384,13 +394,16 @@ class Bot:
                 if not isinstance(text, str) or not text.strip():
                     return
                 command = text.strip()
-                if command == "payslip":
+                if command.lower().rstrip("!. ") in GREETINGS:
+                    self.telegram.send_message(chat_id, "\n\n".join(WELCOME))
+                elif command == "payslip":
                     self._payslip(chat_id, workspace)
                 elif command == "review":
                     self._review(chat_id, workspace)
                 elif match := re.fullmatch(r"(approve|skip) ([0-9]+)", command):
                     self._approval(chat_id, workspace, match[1], int(match[2]))
                 else:
+                    self.telegram.send_message(chat_id, STARTING)
                     summary = self.run_night(workspace, self.today(), text)
                     self._report_night(chat_id, workspace, summary)
             except Exception:
