@@ -37,6 +37,8 @@ Hackerdorm × BuilderX, Track 2 (Agentic Solutions, Tencent WorkBuddy).
 
 * **Both files are the source of truth**: every skill, tool and template traces back to them.
 * **Not in either file**: ask the team, do not assume.
+* **Your next tasks**: PLAN section 13 lists the current tasks for each role, what each one waits on, and who to ask.
+* **Platform checks**: PLAN section 12 says who runs each check, how to run it and where to write the result.
 
 ## Repository layout
 
@@ -44,6 +46,7 @@ Hackerdorm × BuilderX, Track 2 (Agentic Solutions, Tencent WorkBuddy).
 docs/PLAN.md            master plan
 docs/SYSTEM_DESIGN.md   system design
 skills/                 one folder per agent: bookkeeper, payroll, growth_coach, auditor
+tools/                  deterministic scripts and their tests (design section 4)
 workspace/              the folder WorkBuddy reads and writes (design section 3.1)
 data/demo/              demo inputs: plan file, inbox files, nightly messages (Role B)
 data/answer_key/        answer key and expected ledger (Role B)
@@ -52,6 +55,10 @@ submission/             final slides, video and documentation
 
 * **`skills/`**: [confirm] where WorkBuddy stores skills and whether they can be exported here, so the team shares one copy.
 * **`workspace/`**: starts empty. Runs fill it with the ledger, payslips, boardroom files and drafts.
+* **Plan files, CSV**: `workspace/plan/plan_products.csv`, `workspace/plan/plan_channels.csv`, `workspace/plan/plan_assumptions.csv`, `workspace/plan/plan_change_log.csv`.
+* **Ledger files, CSV**: `workspace/ledger_transactions.csv`, `workspace/ledger_bank_lines.csv`, `workspace/ledger_hours.csv`.
+* **Demo and answer key**: the same plan file names live in `data/demo/` and the same ledger file names in `data/answer_key/`. These CSV files are the source of truth for the demo data. The earlier `.xlsx` workbooks are superseded.
+* **Check the tools**: `python -B -m unittest discover -s tools/tests -p "test_*.py"` from the repository root. It needs no installed package.
 
 ## Team
 
@@ -62,7 +69,7 @@ submission/             final slides, video and documentation
 ## Roles
 
 * **A. Builder (Law)**: WorkBuddy workflow, agent skills and instructions, receipt extraction, reconciliation, trigger, payslip and deck output.
-* **B. Data and business (Sharon)**: persona, demo dataset, answer key, expected ledger, hand written plan file, Day Zero [confirm], documentation.
+* **B. Data and business (Sharon)**: persona, demo dataset, answer key, expected ledger, hand written plan file, Day Zero (confirmed owner), documentation.
 * **C. Design and story (Damian)**: agent identities, payslip and board meeting look, pitch slides, video script, recording and editing.
 * **Order of work and checkpoints**: PLAN sections 13 and 14.
 
@@ -86,3 +93,8 @@ git checkout dev-<your name>
 * **Demo data only**: no real receipts, bank statements or personal details go in this repository.
 * **No secrets**: API keys and account tokens stay out of the repository.
 * **Small commits, frequent pulls**: pull `dev` into your branch before opening a pull request, so conflicts surface early.
+* **Pull requests go into `dev`**: never into `main`. `main` only receives `dev` after an end to end run.
+* **Authors**: the three team members are the only contributors named in commits, files and pull requests. No attribution lines.
+* **The platform is named**: WorkBuddy is the platform being judged, so the docs, slides and video name it wherever the product uses it.
+* **Docs style**: point form, no tables, no dashes in prose.
+* **No installs without asking**: a new package or tool needs Law's approval first.

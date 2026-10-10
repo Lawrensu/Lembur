@@ -1,0 +1,15 @@
+date,description,type,amount_rm,bank_reference
+2026-10-05,Transfer from Dana - accessories,income,5.00,DEMO-IN-001
+2026-10-05,Transfer from Mira - accessories,income,5.00,DEMO-IN-002
+2026-10-05,Demo Bead Nook - bead materials restock,expense,18.00,DEMO-OUT-001
+2026-10-06,Transfer from Farah - accessories,income,5.00,DEMO-IN-003
+2026-10-06,Transfer from Nisa - accessories,income,5.00,DEMO-IN-004
+2026-10-06,Transfer from Hana - accessories,income,18.00,DEMO-IN-005
+2026-10-07,Transfer from Iman - accessories,income,5.00,DEMO-IN-006
+2026-10-07,Demo Pouch Corner - packaging pouches,expense,6.00,DEMO-OUT-002
+2026-10-08,Transfer from Lina - accessories,income,5.00,DEMO-IN-007
+2026-10-08,Transfer from Rina - accessories,income,18.00,DEMO-IN-008
+2026-10-09,Transfer from Suri - accessories,income,5.00,DEMO-IN-009
+2026-10-09,Demo Parcel Desk - nine weekly parcels,expense,36.00,DEMO-OUT-003
+2026-10-11,Transfer from Zahra - accessories,income,4.50,DEMO-IN-010
+2026-10-11,Demo Bead Nook - bead materials top-up,expense,9.00,DEMO-OUT-004
