@@ -2,11 +2,11 @@
 
 ## Status and handoff
 
-- Format-neutral content and hierarchy notes, based on the provisionally approved wireframe.
-- Not a final fillable template or a populated payslip.
-- Final template format, required fields, sizing, page breaks and exact styling await Law's confirmation and Damian's review.
-- Priority handoff: before 18:00, after Law confirms the format. These notes can be reviewed now; do not mark the final template as delivered.
-- All business values and run-dependent text remain named placeholders. Placeholder names below are display slots, not new ledger columns or an agreed output schema.
+* Reference notes for the approved continuous hierarchy. The fillable handoff is now `submission/payslip_template.html`, using Law's contract in SYSTEM_DESIGN section 7.
+* The template uses inline styles, no scripts or external assets, documented `{{field}}` values and the four repeating blocks. Numerical values come from `audit/<week>/numbers.json`; review and ruling text come from their documented files.
+* Priority handoff remains before 18:00. Damian's visual review and Law's acceptance are separate from file creation.
+* The narrative slots below explain the hierarchy, not extra fields supported by the renderer. Use the documented template keys rather than these single brace display labels.
+* Screen treatment uses a dark olive reading surface, warm sand emphasis and system fonts; print uses a light surface with dark text. Final visual approval remains with Damian.
 
 ## Approved visual hierarchy
 
@@ -107,9 +107,9 @@
   - `{upheld_recommendation}`.
   - Draft to review: `{draft_reference}` in `approvals/{week}/`.
   - State: “Waiting for individual approval”.
-- No projected hourly raise or guaranteed improvement while the projection rules remain unconfirmed.
-- Do not insert a generic approval button or imply approval handling is implemented. The supported interaction must be confirmed by Law.
-- Nothing is sent or posted before the student approves that draft individually.
+* The price only projection design is agreed but not built; no projected hourly raise appears until Law authorises and verifies its implementation.
+* Do not add an approval button. The agreed interaction is “approve N” or “skip N” by reply for each numbered draft; implementation evidence remains separate.
+* Approved drafts move to `approvals/<week>/approved/`. The system never posts or sends a draft; the student sends an approved draft herself.
 
 ### 10. Needs-your-review list
 
@@ -120,7 +120,7 @@
   - `{review_reason}`.
   - `{source_reference}`.
   - `{requested_clarification}`.
-- Include every row with `unmatched`, `duplicate` or `needs_review` status, plus applicable hours-review items; use the Auditor's final review list.
+* Include every row with `unmatched`, `duplicate` or `needs_review` status and every line of `audit/<week>/review_items.md`, including hours and numbers warnings; use the Auditor's final review list.
 - For an unreadable expense, ask for a clearer source and keep the amount unknown. For a bank-only row, do not invent a receipt link.
 - Do not suppress a review item because a known amount is already counted in totals.
 
@@ -142,4 +142,18 @@
 - Agent authority, individual approval and fixed output order: `docs/SYSTEM_DESIGN.md`, sections 5, 6.1 and 7.
 - Unconfirmed projections: `docs/SYSTEM_DESIGN.md`, section 8.
 - Current fixture status and unknown-expense limitation: `data/answer_key/answer_key.md`, “Validation and limitations”; fixture evidence does not replace the source-of-truth docs.
-- Visual hierarchy: Damian's provisional approval of the format-neutral wireframe.
+* Visual hierarchy: Damian's provisional approval of the format neutral wireframe.
+
+## Template integration notes
+
+* Fill every numerical scalar from the saved `audit/<week>/numbers.json`, without recalculation. Copy the actual ruling and debate summary only after the ruling exists.
+* HTML escape substituted text and attribute values. Serialize `loses_money` as lowercase `true` or `false`. Remove the repeating block comments after expansion.
+* Supply absent scalar values as empty strings, with no whitespace, `null` or zero substitution. The template uses CSS `:empty` and `:has()` for missing rates, unknown review amounts and empty lists; the verified browser supports both selectors.
+* Supply `draft_file` as a workspace relative path such as `approvals/<week>/01_instagram_post.md`. The template prepends `../` because the filled document lives in `workspace/payslips/`. A filename alone or a `workspace/` prefix will point to the wrong place.
+* Keep the document and approvals folder together for draft links to resolve. An approved file moves to the approved folder; the original pending draft link can then be stale. Approval state handling remains part of Law's skill implementation, not this static template.
+* Populate every `review_rows` record and every `review_items` line. The template does not add receipt links, source fields or conditional fields absent from the contract.
+* The caveat uses conditional wording on every payslip: an unknown expense is excluded and can reduce confirmed earnings. It does not claim an expense is always missing; review rows identify actual unknowns.
+* PDF export uses the light print stylesheet and A4 page size. Screen output uses the dark reading palette. Colours intentionally differ; ordering, content and hierarchy are preserved.
+* Sample previews contain fixture figures only and an explicit sample notice. They are not an issued payslip or proof of a completed agent run.
+* Damian approved the sample PDF look at 17:23 on 10 October: “the sample pdf looks good”. This approval covers the displayed sample, not unseen populated outputs or the absence of real agent evidence.
+* Law must still confirm renderer integration, repeatable PDF conversion and receipt of the handoff. Final run figures, ruling text, drafts and pagination need their own verification.
