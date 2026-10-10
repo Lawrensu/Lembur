@@ -1,13 +1,17 @@
 # Lembur skills
 
-One folder per agent. Each holds a `SKILL.md` with that agent's instructions. The design behind them is `docs/SYSTEM_DESIGN.md`, sections 5 and 6.
+One folder per agent. Each holds a `SKILL.md` with that agent's instructions, written so that WorkBuddy can run the agent as a skill. The design behind them is `docs/SYSTEM_DESIGN.md`, sections 5 and 6.
+
+* **What this folder is now**: the product runs the agents from `prompts/` through its own runner (design section 6.4). These skill files are where those instructions were first shaped and rehearsed.
+* **Why it stays**: it is the fallback if the runner is not ready (PLAN section 15), and it is what the recorded WorkBuddy run uses (PLAN section 12, proof 5).
+* **When it goes**: after the runner passes the comparator (design section 8).
 
 * `bookkeeper/`: reads the message and the inbox, files documents, adds and reconciles rows.
 * `payroll/`: applies corrections, builds hours and numbers, writes its recommendation, builds the payslip.
-* `growth_coach/`: writes the growth recommendation, drafts posts and messages, handles "approve N".
+* `growth_coach/`: writes the growth recommendation, drafts posts and messages, handles "approve N". In the product the bot handles "approve N".
 * `auditor/`: rechecks the numbers, traces the hours, rules, confirms the payslip.
 
-## Order of a Night Shift run
+## Order of a Night Shift run in WorkBuddy
 
 Every command is run from the repository root. `workspace/` is the only folder the agents write to, apart from input files in the system temporary folder. The roles run one after another in the same task, and the files in `workspace/` are the handover between them.
 
@@ -31,4 +35,4 @@ Every command is run from the repository root. `workspace/` is the only folder t
 
 ## Installing the skills in WorkBuddy
 
-[pending check 5] On the machine where check 6 passed, WorkBuddy reads skills from the user folder `.workbuddy-ai/skills/<name>/SKILL.md`. Copy each of the four folders there, named after the `name` at the top of its `SKILL.md`. Whether WorkBuddy can read them straight from this folder is not known yet.
+On Law's machine WorkBuddy reads skills from the user folder `.workbuddy-ai/skills/<name>/SKILL.md`. Copy each of the four folders there, named after the `name` at the top of its `SKILL.md`. A skill run of one of our scripts passed there on 10 October. The four agent skills have not been run inside WorkBuddy yet: that is proof 5 in PLAN section 12.
