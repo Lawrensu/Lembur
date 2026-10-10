@@ -5,7 +5,7 @@
 - Point-form rehearsal answers for the hackathon submission, not a claim that the project has passed an end-to-end run.
 - Use source-based answers below; replace evidence placeholders only after the relevant approvals and actual-run checks.
 - The merged answer key is independently verified but still awaits Sharon's business sign-off. Its calculations validate the fixture, not Law's extraction or workflow execution.
-- The runner, the model module, the bot and the prompts are written as designs and are not built yet (PLAN section 13). Answers about them describe the design until their proofs in PLAN section 12 are recorded.
+- Built and merged into `dev`: the deterministic tools, the command line, the payslip command and template, the dataset, the answer key, the comparator, the tool layer (`app/tools.py`) and the Telegram bot (`app/bot.py`), each with its tests. Not built yet: the model module, the runner and the prompts (PLAN section 13). Answers about the unbuilt parts describe the design until their proofs in PLAN section 12 are recorded.
 - Final wording and delivery belong to Damian. Do not invent user research, pricing, costs, guarantees or traction absent from the source docs.
 
 ## What problem are you solving?

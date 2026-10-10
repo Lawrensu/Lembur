@@ -9,7 +9,7 @@
 - All scene durations below are placeholders. PLAN section 17 suggests about thirty seconds for Week 0; this is guidance, not the confirmed submission time limit.
 - Aisyah is the fictional student in the merged dataset, subject to Sharon's story sign-off. Use `{approved_persona_name}` in narration until then.
 - There is no scheduled run. A night starts when the student sends her message, and the morning message arrives when the night finishes.
-- The runner, the model module, the bot and the prompts are written as designs and are not built yet (PLAN section 13). Their scenes use real outputs only after the proofs in PLAN section 12 are recorded.
+- The tool layer and the Telegram bot are built and merged; the model module, the runner and the prompts are not built yet (PLAN section 13). Scenes use real outputs only after the proofs in PLAN section 12 are recorded.
 - Every business figure, recommendation, ruling and runtime claim stays a named placeholder until supported by verified outputs.
 - Narration that describes successful execution is usable only after its scene's evidence gate passes. A scripted claim is not execution evidence.
 - Demo data only. Keep the expected ledger and answer key out of the production agents' inputs.
