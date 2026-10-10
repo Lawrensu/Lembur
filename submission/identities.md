@@ -14,7 +14,7 @@
 ## Shared boundaries
 
 * Agents interpret and recommend; deterministic tools calculate. Copy figures from tool outputs, never calculate or invent them in dialogue.
-* Until verified run outputs or Sharon's independently checked answer key supply the figures, use named placeholders such as `{hourly_rate}`. Every figure must trace to a ledger row, an hours line or a plan value.
+* Retain named placeholders such as `{hourly_rate}` until verified run outputs or Sharon's approved, independently checked answer key supply traceable figures. Answer-key figures are expected results, not evidence of observed execution; actual dialogue and rulings require the real output files. Every figure must trace to a ledger row, an hours line or a plan value.
 * Payroll and Growth coach retain their different objectives. The Auditor's ruling is evidence-led, not a personality contest.
 * Unclear evidence is flagged for review, not filled in with a guess.
 * Drafts wait for the student's individual approval before anything is sent or posted.
