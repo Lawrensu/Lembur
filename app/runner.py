@@ -22,6 +22,9 @@ from app import tools as tool_layer  # noqa: E402
 PROMPTS = ROOT / "prompts"
 TURN_LIMIT = 16
 REMINDERS = 2
+COMMANDS = ("add-transactions", "add-bank-lines", "reconcile", "resolve", "classify", "close-week",
+            "correct-plan", "hours", "numbers", "numbers-check", "review", "payslip")
+SEND_BACKS = 2
 
 # (number in design section 6.1, name, agent, payslip day only, what it is for)
 STEPS = (
@@ -83,28 +86,38 @@ def _trace(workspace, facts, agent, entry):
 
 
 def _run_agent(workspace, agent, facts, ask):
-    """One agent, one step. Returns (status, note)."""
+    """One agent, one step. Returns (status, note, the commands that passed)."""
     prompt = (PROMPTS / (agent + ".md")).read_text(encoding="utf-8")
-    task = ("Do only the step named \"%s\" now. Follow the section \"Step: %s\" of your instructions "
-            "from its first line to its last, then reply finished. Do not do any other step. Facts: %s"
-            % (facts["step"], facts["step"], json.dumps(facts, ensure_ascii=True)))
+    if facts.get("unfinished"):
+        task = ("You are in the step named \"%s\". You answered finished, but this is still missing: %s. "
+                "Do not start the step again. Do only what is missing, check each result, then reply finished. "
+                "Facts: %s" % (facts["step"], facts["unfinished"], json.dumps(facts, ensure_ascii=True)))
+    else:
+        task = ("Do only the step named \"%s\" now. Follow the section \"Step: %s\" of your instructions "
+                "from its first line to its last, then reply finished. Do not do any other step. Facts: %s"
+                % (facts["step"], facts["step"], json.dumps(facts, ensure_ascii=True)))
     messages = [{"role": "system", "content": prompt}, {"role": "user", "content": task}]
     reminded = 0
+    ran = set()
     for _ in range(TURN_LIMIT):
         try:
             text = ask("reason", messages)
         except Exception as error:  # a model failure stops the step, never the program
-            return "failed", "the model could not answer: %s" % (str(error) or type(error).__name__)
+            if "empty answer" in str(error) and reminded < REMINDERS:
+                reminded += 1
+                messages.append({"role": "user", "content": "Your last reply was empty. " + REMINDER})
+                continue
+            return "failed", "the model could not answer: %s" % (str(error) or type(error).__name__), ran
         reply = _read_json(text)
         if reply and "tool" in reply and "actions" not in reply:
             reply = {"actions": [reply]}  # one bare action is read as a list of one
         actions = reply.get("actions") if reply else None
         _trace(workspace, facts, agent, {"reply": reply if reply else text})
         if reply and reply.get("finished") in (True, "true"):
-            return "done", str(reply.get("report", "")).strip()
+            return "done", str(reply.get("report", "")).strip(), ran
         if not isinstance(actions, list) or not actions:
             if reminded >= REMINDERS:
-                return "failed", "the agent did not answer in the agreed format"
+                return "failed", "the agent did not answer in the agreed format", ran
             reminded += 1
             messages += [{"role": "assistant", "content": text},
                          {"role": "user", "content": REMINDER}]
@@ -115,11 +128,21 @@ def _run_agent(workspace, agent, facts, ask):
                 results.append({"ok": False, "error": "an action must be an object"})
                 continue
             args = action.get("args") if isinstance(action.get("args"), dict) else {}
-            results.append(tool_layer.run_tool(workspace, agent, action.get("tool"), args, ask=ask))
+            tool = action.get("tool")
+            if tool in COMMANDS:  # a command named as the tool is read as the lembur tool
+                args = dict(args, command=tool)
+                if "options" not in args:
+                    args["options"] = {key: args.pop(key) for key in list(args)
+                                       if key not in ("command", "input", "input_file")}
+                tool = "lembur"
+            result = tool_layer.run_tool(workspace, agent, tool, args, ask=ask)
+            if tool == "lembur" and result.get("ok"):
+                ran.add(str(args.get("command")))
+            results.append(result)
         _trace(workspace, facts, agent, {"results": results})
         messages += [{"role": "assistant", "content": text},
                      {"role": "user", "content": json.dumps({"results": results}, ensure_ascii=True)}]
-    return "failed", "the agent did not finish within %d turns" % TURN_LIMIT
+    return "failed", "the agent did not finish within %d turns" % TURN_LIMIT, ran
 
 
 def _plan(steps, facts, ask):
@@ -217,8 +240,20 @@ def _left_in_inbox(workspace):
                   if item.is_file() and not item.name.startswith("."))
 
 
-def _missing(workspace, facts, name, agent):
-    """What a finished step should have left behind and did not. Empty text when all is there."""
+MUST_RUN = {"reconcile": "reconcile", "close_week": "close-week", "hours": "hours",
+            "numbers": "numbers", "audit": "numbers-check", "payslip": "payslip"}
+
+
+def _without_status(workspace):
+    path = workspace / "ledger_transactions.csv"
+    if not path.is_file():
+        return []
+    with open(path, encoding="utf-8-sig", newline="") as handle:
+        return [row["txn_id"] for row in csv.DictReader(handle) if not row.get("reconciliation_status")]
+
+
+def _missing(workspace, facts, name, agent, ran):
+    """What a finished step should have done and did not. Empty text when all is there."""
     week, date = facts["week"], facts["date"]
     expected = {
         ("intake", "bookkeeper"): ["receipts/%s/message_%s.txt" % (facts["year_month"], date)],
@@ -229,13 +264,51 @@ def _missing(workspace, facts, name, agent):
         ("payslip", "payroll"): ["payslips/%s.html" % week],
     }.get((name, agent), [])
     gaps = ["%s does not exist yet" % path for path in expected if not (workspace / path).is_file()]
+    command = MUST_RUN.get(name)
+    if command and command not in ran:
+        gaps.append("the lembur command %s has not passed in this step. Run it now with the lembur tool "
+                    "and read its result before you answer finished" % command)
+    if name == "drafts":
+        folder = workspace / "approvals" / week
+        if not any(re.match(r"\d+", item.name) for item in folder.iterdir() if item.is_file()):
+            gaps.append("no draft was written. Write one file per upheld recommendation into approvals/%s/, "
+                        "each name starting with a two digit number, such as 01_instagram_post.md" % week)
+    if name == "reconcile":
+        open_rows = _without_status(workspace)
+        if open_rows:
+            gaps.append("these rows still have no status: %s. Resolve each ambiguous row with the resolve command"
+                        % ", ".join(open_rows))
     if name == "intake":
         left = _left_in_inbox(workspace)
-        if left:
-            gaps.append("these files are still in inbox and must be moved to receipts/%s/ with move_file: %s. "
-                        "If add-transactions says their rows are already in the ledger, do not add rows again, "
-                        "only move the files" % (facts["year_month"], ", ".join(left)))
+        statements = [item for item in left if item.lower().endswith(".csv") and "bank_reference" in
+                      (workspace / "inbox" / item).read_text(encoding="utf-8-sig", errors="replace")[:200]]
+        if statements and "add-bank-lines" not in ran:
+            gaps.append("the bank statement has not been added. Send the lembur tool with command add-bank-lines "
+                        "and input_file inbox/%s, and check that the result is ok" % statements[0])
+        if left and not ({"add-transactions", "add-bank-lines"} & ran):
+            gaps.append("no rows were added for the files in inbox (%s). Read each one with read_document "
+                        "and add its rows with the lembur tool" % ", ".join(left))
     return "; ".join(gaps)
+
+
+def _file_leftovers(workspace, facts):
+    """Filing is mechanical, so it does not depend on a model: move what intake left in inbox."""
+    targets = {}
+    ledger = workspace / "ledger_transactions.csv"
+    if ledger.is_file():
+        with open(ledger, encoding="utf-8-sig", newline="") as handle:
+            for row in csv.DictReader(handle):
+                source = (row.get("source_file") or "").replace("\\", "/")
+                if source.startswith("receipts/") and ".." not in source:
+                    targets[source.rsplit("/", 1)[-1]] = source
+    moved = []
+    for name in _left_in_inbox(workspace):
+        target = workspace / targets.get(name, "receipts/%s/%s" % (facts["year_month"], name))
+        target.parent.mkdir(parents=True, exist_ok=True)
+        if not target.exists():
+            (workspace / "inbox" / name).replace(target)
+            moved.append(name)
+    return moved
 
 
 def _append_review(workspace, week, line):
@@ -323,20 +396,29 @@ def run_night(workspace, date, message, ask=None):
             row["status"] = "skipped"
             continue
         step_facts = dict(facts, step=row["name"])
-        status, note = _run_agent(workspace, row["agent"], step_facts, ask)
-        gap = _missing(workspace, step_facts, row["name"], row["agent"]) if status == "done" else ""
-        if gap:  # the step said finished but its work is not there: sent back once
-            status, note = _run_agent(workspace, row["agent"], dict(step_facts, unfinished=gap), ask)
-            gap = _missing(workspace, step_facts, row["name"], row["agent"]) if status == "done" else ""
-            if gap:
-                status, note = "failed", "the step ended without its result: " + gap
+        status, note, ran = _run_agent(workspace, row["agent"], step_facts, ask)
+        gap = _missing(workspace, step_facts, row["name"], row["agent"], ran) if status == "done" else ""
+        for _ in range(SEND_BACKS):  # the step said finished but its work is not there
+            if not gap:
+                break
+            status, note, again = _run_agent(workspace, row["agent"], dict(step_facts, unfinished=gap), ask)
+            ran |= again
+            gap = _missing(workspace, step_facts, row["name"], row["agent"], ran) if status == "done" else ""
+        if gap and row["name"] == "drafts":
+            note = (note + " No draft was written.").strip()
+        elif gap:
+            status, note = "failed", "the step ended without its result: " + gap
+        if status == "done" and row["name"] == "intake":
+            moved = _file_leftovers(workspace, step_facts)
+            if moved:
+                note = (note + " The runner filed: " + ", ".join(moved) + ".").strip()
         if status == "done" and row["name"] in ("recommendation", "audit"):
             files = {"payroll": ["boardroom/%s/payroll.md" % week],
                      "growth_coach": ["boardroom/%s/growth.md" % week],
                      "auditor": ["boardroom/%s/ruling.md" % week]}[row["agent"]]
             wrong = _untraced(workspace, week, files)
             if wrong:  # sent back once to the agent that wrote it
-                status, note = _run_agent(workspace, row["agent"], dict(
+                status, note, _ = _run_agent(workspace, row["agent"], dict(
                     facts, step=row["name"], fix_figures=wrong,
                     instruction="These figures are not in numbers.json or the plan. Rewrite the file "
                                 "using only figures copied from audit/%s/numbers.json or the plan files." % week), ask)

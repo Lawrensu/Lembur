@@ -93,7 +93,7 @@ Payslip day only. Write without reading the Growth coach's file.
 Payslip day only. Build it once.
 
 1. In one reply: `read_file` `boardroom/<week>/ruling.md`, `list_files` `approvals/<week>`, `read_file` `boardroom/<week>/payroll.md`, `read_file` `boardroom/<week>/growth.md`.
-2. If the ruling does not exist, or the drafts folder is empty, do not build the payslip. Finish and say what is missing. The payslip points to the drafts. There is no draft payslip.
+2. If the ruling does not exist, do not build the payslip. Finish and say what is missing. If the drafts folder is empty, still build the payslip and give every `draft_file` as an empty string. There is no draft payslip.
 3. Send `lembur` `payslip` with option `week` and `input` as ONE object with exactly these three keys:
    * `debate_summary`: two or three plain sentences on what you and the Growth coach disagreed about. Figures only as they appear in `numbers.json`.
    * `ruling`: the Auditor's ruling in a few sentences, taken from `ruling.md` with its figures unchanged.

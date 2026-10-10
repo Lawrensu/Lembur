@@ -59,8 +59,17 @@ class RunnerTests(unittest.TestCase):
         return {"actions": [{"tool": "write_file", "args": {
             "path": "receipts/%s/message_%s.txt" % (date[:7], date), "text": "Nothing sold today."}}], "why": "save"}
 
-    def numbers(self, week):
-        return {"actions": [{"tool": "lembur", "args": {"command": "numbers", "options": {"week": week}}}], "why": "numbers"}
+    def command(self, name, **options):
+        return {"actions": [{"tool": "lembur", "args": {"command": name, "options": options}}], "why": name}
+
+    def script(self, date, **extra):
+        """A night in which every step runs its own command and nothing else."""
+        steps = {"intake": [self.save_message(date)],
+                 "reconcile": [self.command("reconcile")],
+                 "hours": [self.command("hours", week="2026-W41")],
+                 "numbers": [self.command("numbers", week="2026-W41")]}
+        steps.update(extra)
+        return steps
 
     def test_summary_always_has_every_key(self):
         summary = self.night("2026-10-05", {})
@@ -73,11 +82,10 @@ class RunnerTests(unittest.TestCase):
         self.assertEqual(summary["failed"]["step"], 1)
         self.assertEqual([s["status"] for s in summary["steps"]],
                          ["failed", "skipped", "skipped", "skipped", "skipped"])
-        self.assertEqual(sum(1 for step, turn in ask.seen if step == "intake" and turn == 0), 2)
+        self.assertEqual(sum(1 for step, turn in ask.seen if step == "intake" and turn == 0), 1 + runner.SEND_BACKS)
 
     def test_an_ordinary_night_runs_steps_one_to_five_and_writes_the_plan(self):
-        summary = self.night("2026-10-05", {"intake": [self.save_message("2026-10-05")],
-                                            "numbers": [self.numbers("2026-W41")]})
+        summary = self.night("2026-10-05", self.script("2026-10-05"))
         self.assertEqual(summary["failed"], "")
         self.assertEqual([(s["step"], s["name"]) for s in summary["steps"]],
                          [(1, "intake"), (2, "reconcile"), (3, "corrections"), (4, "hours"), (5, "numbers")])
@@ -97,20 +105,23 @@ class RunnerTests(unittest.TestCase):
 
     def test_one_bare_action_is_accepted_and_text_that_is_not_json_gets_a_reminder(self):
         bare = self.save_message("2026-10-05")["actions"][0]
-        summary = self.night("2026-10-05", {"intake": ["I will start now.", bare],
-                                            "numbers": [self.numbers("2026-W41")]})
+        summary = self.night("2026-10-05", self.script("2026-10-05", intake=["I will start now.", bare]))
         self.assertEqual(summary["failed"], "")
 
     def test_a_message_that_starts_with_a_date_runs_as_that_night(self):
-        ask = scripted({"intake": [self.save_message("2026-10-06")], "numbers": [self.numbers("2026-W41")]})
+        ask = scripted(self.script("2026-10-06"))
         summary = runner.run_night(self.workspace, "2026-12-25", "2026-10-06: Nothing sold today.", ask=ask)
         self.assertEqual(summary["week"], "2026-W41")
         self.assertTrue((self.workspace / "audit" / "2026-W41" / "plan_2026-10-06.md").is_file())
 
+    def test_a_step_that_skips_its_command_is_sent_back_and_then_fails(self):
+        summary = self.night("2026-10-05", self.script("2026-10-05", reconcile=[]))
+        self.assertEqual(summary["failed"]["step"], 2)
+        self.assertIn("reconcile", summary["failed"]["reason"])
+
     def test_an_agent_cannot_reach_a_tool_that_is_not_its_own(self):
         forbidden = {"actions": [{"tool": "lembur", "args": {"command": "add-transactions", "input": []}}], "why": "try"}
-        self.night("2026-10-05", {"intake": [self.save_message("2026-10-05")],
-                                  "corrections": [forbidden], "numbers": [self.numbers("2026-W41")]})
+        self.night("2026-10-05", self.script("2026-10-05", corrections=[forbidden]))
         trace = (self.workspace / "audit" / "2026-W41" / "trace_2026-10-05.jsonl").read_text(encoding="utf-8")
         refused = [json.loads(line) for line in trace.splitlines() if '"corrections"' in line and '"results"' in line]
         self.assertIs(refused[0]["results"][0]["ok"], False)

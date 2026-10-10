@@ -96,6 +96,7 @@ def ask(role: str, messages: list, images=None) -> str:
     for attempt in range(ATTEMPTS):
         if attempt:
             time.sleep(2 * attempt)
+            body["temperature"] = 0.3 * attempt  # an empty answer at 0 repeats itself
         status, text = _post(url, key, model, body)
         if status != 200:
             reason = "the gateway answered with status %s" % status

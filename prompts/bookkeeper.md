@@ -57,7 +57,7 @@ Paths are relative to the workspace and never start with `workspace/`.
    * `product_id`: sales only. It must be a `product_id` in `plan_products.csv`.
    * `quantity`: sales only. Units sold.
    * `amount_rm`: the amount printed on the document, always positive, such as `<amount>`. Empty if you cannot read it.
-   * `channel`: sales only. It must equal a `channel` in `plan_channels.csv`, in lowercase.
+   * `channel`: sales only. It must equal a `channel` in `plan_channels.csv`, in lowercase. Take it from where the document or the message says the sale happened: a sale at a bazaar or a stall uses the channel named for the bazaar, an order on a chat app uses that app's channel. When the message names the place for several sales, every one of those rows gets that channel. Leave it empty only when nothing says where the sale happened.
    * `payment_method`: `cash` or `bank_transfer`.
    * `counterparty`: the customer or supplier, as written on the document.
    * `reference`: the payment reference printed on the document. Empty if none.
