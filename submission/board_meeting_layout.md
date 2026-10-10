@@ -82,7 +82,7 @@
 - Run outputs match Sharon's approved, independently checked answer key before any claim of validated execution.
 - Placeholder names are display slots, not new data-model fields or a new workflow.
 - No invented dialogue, financial figures, forecasts, built-feature claims or private data.
-- Final format and visual adaptation are confirmed separately; these notes do not settle Law's fillable template format.
+- Final format and visual adaptation are confirmed separately. The payslip itself is the HTML template filled by a command (design section 7); these notes do not change it.
 
 ## Sources
 

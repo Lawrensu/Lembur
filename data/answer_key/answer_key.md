@@ -128,8 +128,8 @@
 
 ## Reproduction and handoff
 
-- The CSV files data/demo/plan_*.csv and data/answer_key/ledger_*.csv are the source of truth, and data/test_harness/compare_outputs.py checks a run against them with no installed package. The scripts listed below built the first .xlsx version and still need openpyxl and Pillow.
-- Run the scripts using a Python environment with openpyxl and Pillow installed; paths below are relative to the repository root. No runtime app or skills are installed by this fixture.
+- The CSV files data/demo/plan_*.csv and data/answer_key/ledger_*.csv are the source of truth, and data/test_harness/compare_outputs.py checks a run against them with no installed package. The scripts listed below built the first .xlsx version. They are kept as a record and no longer run: the workbooks they read were removed on 10 October. Keep data/answer_key/.expected_ledger.ref/calculation.json, which the comparator still reads.
+- Paths below are relative to the repository root.
 - Baseline workbook: data/demo/.plan.ref/build.py.
 - Expected ledger and primary numbers: data/answer_key/.expected_ledger.ref/build.py.
 - Derived sources: render_receipts.py, render_orders.py and render_bank.py in data/answer_key/.expected_ledger.ref/.

@@ -3,11 +3,13 @@
 ## Draft status and production rules
 
 - Text-only script and shot list for the hackathon submission, not a product advertisement or a generated video.
-- Name WorkBuddy wherever the product uses it, following README. Naming WorkBuddy does not establish execution evidence.
+- The story happens in the student's chat app (PLAN section 17). WorkBuddy is the platform we built the product with, not part of the running product. Name it only in the build segment (scene 8) and only for what it really did (PLAN section 11). Naming WorkBuddy does not establish execution evidence.
 - Proposed narration, scene order and capture instructions. Damian owns the final narration, visual look, recording and editing.
 - Total length: `{submission_video_duration}`. Obtain the organisers' limit and Damian's approval before fixing scene timings.
-- All scene durations below are placeholders. PLAN section 17 suggests about thirty seconds for Day Zero; this is guidance, not the confirmed submission time limit.
+- All scene durations below are placeholders. PLAN section 17 suggests about thirty seconds for Week 0; this is guidance, not the confirmed submission time limit.
 - Aisyah is the fictional student in the merged dataset, subject to Sharon's story sign-off. Use `{approved_persona_name}` in narration until then.
+- There is no scheduled run. A night starts when the student sends her message, and the morning message arrives when the night finishes.
+- The runner, the model module, the bot and the prompts are written as designs and are not built yet (PLAN section 13). Their scenes use real outputs only after the proofs in PLAN section 12 are recorded.
 - Every business figure, recommendation, ruling and runtime claim stays a named placeholder until supported by verified outputs.
 - Narration that describes successful execution is usable only after its scene's evidence gate passes. A scripted claim is not execution evidence.
 - Demo data only. Keep the expected ledger and answer key out of the production agents' inputs.
@@ -16,7 +18,7 @@
 
 - Duration: `{day_zero_scene_duration}`.
 - Purpose: introduce the idea and a plan that the later payslip can test.
-- Shot: `{approved_persona_name}` enters `{business_idea_message}`; show costing, pricing assumptions, time assumptions and Auditor checks only if implemented and verified.
+- Shot: `{approved_persona_name}` sends `{business_idea_message}` to the bot in her chat app; show costing, pricing assumptions, time assumptions and Auditor checks only if implemented and verified.
 - Proposed narration: “Before starting, I want to know what this business could earn, and how much of my time it would take.”
 - Output shot: `{verified_plan_summary_reference}` and `{verified_plan_file_reference}`.
 - Plan target: “RM {target_hourly_rate} per hour”, from the hand written plan file.
@@ -36,45 +38,47 @@
 ## Scene 3: Before bed, message and messy documents
 
 - Duration: `{bedtime_scene_duration}`.
-- Shot: `{verified_nightly_message}` and its dated demo inbox batch.
-- Proposed narration: “The orders and receipts are scattered. Before bed, I send one Telegram message and leave the documents together.”
+- Shot: `{verified_nightly_message}` and its dated demo inbox batch, sent in the chat.
+- Proposed narration: “The orders and receipts are scattered. Before bed, I send one message to my bot and leave the documents with it.”
 - Show actual synthetic receipts, order screenshots and the bank statement only on their documented intake dates.
 - The bank statement arrives on Sunday; do not depict it arriving before its batch. Cash orders in the message are individual orders, not extra screenshots.
-- Evidence gate: the Telegram text trigger is check 1 (Sharon). If it fails, start the task inside WorkBuddy and show the message separately (PLAN section 15, cut 2). Label it honestly.
-- Sources: PLAN sections 12 and 17; DESIGN section 6.1; `data/demo/messages.md` replay instructions.
+- Evidence gate: the bot receiving a message and a photo is proof 3 (PLAN section 12). If the bot is cut, start a night from the command line and show the files (PLAN section 15, cut 2). Label it honestly.
+- Sources: PLAN sections 12, 15 and 17; DESIGN sections 6.1 and 6.5; `data/demo/messages.md` replay instructions.
 
 ## Scene 4: The Night Shift
 
 - Duration: `{night_shift_scene_duration}`.
+- This is the agents-at-work scene. Show it as the plan for the night and the tool calls.
 - Shot sequence from a continuous actual run:
-  - Starting request and authorised inbox.
+  - The message and files arriving in the inbox.
+  - The plan for the night, `audit/<week>/plan_<date>.md`: each step, why tonight needs it, and its outcome.
   - Bookkeeper intake and filed source links.
+  - Tool calls: an agent asks for a tool, the runner runs it and returns the result.
   - Reconciliation statuses and explanations for unclear matches.
   - Ledger rows with their evidence references.
   - Payroll hours and deterministic numbers outputs.
-  - Payslip-day recommendations, Auditor report and ruling.
-  - Generated payslip and unsent drafts.
-- Proposed narration: “In WorkBuddy, the agents read and review. Deterministic tools do the matching and calculations. Uncertainty is flagged, not guessed.”
+  - Payslip-day recommendations, Auditor report and ruling, then the unsent drafts, then the generated payslip. The drafts come before the payslip (design section 6.1).
+- Proposed narration: “First the plan for tonight is written. Then the agents read and review, and ask the tools to do the matching and the calculations. Uncertainty is flagged, not guessed.”
 - Include actual evidence of the duplicate, missing receipt, mismatch and unreadable amount; do not prefill pass labels.
 - Capture `{verified_correction_history}`: the correction is applied once, effective from its recorded date, with earlier sales retaining the earlier assumption.
-- Evidence gates: scripts run from a skill (check 6) and the files are CSV (check 7). Check 5 decides the team run visuals and check 4 receipt reading. Verify saved correction history against the approved key, not only the final total.
-- Label any edited acceleration “Time-lapse”. Do not claim a speed-up factor, runtime, parallel work or unattended scheduling without evidence.
-- Sources: PLAN sections 10, 12 and 14; DESIGN sections 4 to 6; `data/demo/messages.md`.
+- Evidence gates: receipt reading is proof 1, one real night is proof 2 and the whole week is proof 4 (PLAN section 12). The files are CSV. Verify saved correction history against the approved key, not only the final total.
+- Label any edited acceleration “Time-lapse”. Do not claim a speed-up factor, runtime or parallel work without evidence. Nothing here is scheduled.
+- Sources: PLAN sections 10, 12 and 17; DESIGN sections 4 to 6.
 
 ## Scene 5: Morning, the board meeting is ready
 
 - Duration: `{morning_scene_duration}`.
-- Story beat: the morning message, “Your board meeting is ready”, with the approval list.
-- PLAN section 17 specifies 7am as the morning story cue; it is narrative timing, not proof of delivery at that time.
+- Story beat: the morning message in the chat, “Your board meeting is ready”, with the payslip file and the drafts waiting for a reply.
+- The morning message arrives when the night finishes (design section 6.1, step 11). There is no scheduled 7am run; any morning time on screen is narrative framing, not proof of delivery at that time.
 - Proposed narration, only when evidenced: “By morning, the result is ready to review.”
-- Evidence gates: the scheduled run is check 3 and the morning message is check 9 (Sharon). Fallback for check 9: a screenshot of the WorkBuddy result, labelled honestly.
-- Do not portray a manually launched run as an unattended overnight task.
-- Sources: PLAN sections 12, 15 and 17; DESIGN section 6.1.
+- Evidence gate: the full run through the chat (the midnight checkpoint, PLAN section 14). Fallback if the bot is cut: the payslip file and the files of the night from the command line, labelled honestly.
+- Do not portray a run as scheduled or unattended. A night starts when the student sends her message.
+- Sources: PLAN sections 14, 15 and 17; DESIGN sections 6.1 and 6.5.
 
 ## Scene 6: The payslip reveal and the decision
 
 - Duration: `{payslip_and_meeting_scene_duration}`.
-- Shot: the verified payslip, preserving the top-to-bottom order in `submission/payslip_layout.md`.
+- Shot: the verified payslip, which arrives as an HTML file in the chat (a PDF is optional and not built), preserving the fixed ten section order of design section 7.
 - Headline: “RM {hourly_rate} per hour”. Supporting values: “RM {take_home}” and “{total_hours} hours”.
 - Proposed narration: “This is what my business paid for my time, not just what came in.”
 - Visible caveat: “Provisional earnings: an expense amount is unknown.”
@@ -99,10 +103,22 @@
 - Shot: `{verified_individual_approval_evidence}` for each draft shown, followed by the student going to class.
 - Proposed narration: “I approve each draft with a reply. Lembur posts nothing, I send it myself.”
 - Do not use one blanket approval for all drafts. Do not add an interaction control that the confirmed implementation does not support.
-- Show no posting or sending by Lembur. End at the reply "approve N" and the draft moved to `approvals/<week>/approved/`.
+- Show no posting or sending by Lembur. End at the reply "approve N" in the chat, the bot's confirmation, and the draft moved to `approvals/<week>/approved/`.
 - Closing line: “Kau tidur, kami lembur. You sleep, we do the overtime.”
-- Approval is by reply (design section 6.1). Damian approves the final closing treatment.
+- Approval is by reply (design section 6.1). Damian approves the final closing treatment, and decides whether scene 8 sits before this closing line or after the story.
 - Sources: PLAN sections 2 and 17; DESIGN sections 5.1 and 6.1.
+
+## Scene 8: How we built it, with WorkBuddy
+
+- Duration: `{workbuddy_build_scene_duration}`.
+- Purpose: show proof that WorkBuddy was used during the build, and explain how, where and in what scenarios (PLAN sections 1 and 11). It is a short segment outside the chat story.
+- Shot: `{evidence_pack_screenshots}` from `submission/evidence/`: WorkBuddy sessions, task lists and key exchanges, each with a caption of what was being built.
+- Proposed narration: “We built Lembur with WorkBuddy. Each of us gave it the docs as the source of truth, it wrote the code or the content, and we checked the result before merging.”
+- Scenarios to name, only those the evidence pack supports: the engine and its tests, the dataset and answer key, the story, and the early run of the agents as instruction files.
+- If proof 5 is recorded, show `{workbuddy_recorded_run_reference}` labelled as our agents inside WorkBuddy, kept as insurance.
+- Do not say or imply that the running product lives in WorkBuddy. Do not present work done or checked by other means as WorkBuddy's.
+- Evidence gate: every claim in this scene needs a matching item in the evidence pack.
+- Sources: PLAN sections 1, 11 and 12.
 
 ## Recording handoff
 
