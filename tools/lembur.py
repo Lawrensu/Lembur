@@ -1,4 +1,4 @@
-"""Command entry point for docs/SYSTEM_DESIGN.md sections 4 to 7."""
+"""Command entry point for docs/SYSTEM_DESIGN.md sections 4 and 7."""
 
 from __future__ import annotations
 

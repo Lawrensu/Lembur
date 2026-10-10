@@ -1,4 +1,4 @@
-"""Read and write the workbook files as plain strings.
+"""Read and write the CSV data files as plain strings.
 
 A book is a dict of sheet name to a list of rows; a row is a dict of column
 name to string, with "" for an empty cell. Every sheet is one CSV file named
