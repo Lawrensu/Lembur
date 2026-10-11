@@ -18,7 +18,7 @@ Example reply:
 
 1. `list_files` `{"folder": "approvals/<week>"}`: returns `files`.
 2. `read_file` `{"path": "..."}`: returns `text`.
-3. `write_file` `{"path": "...", "text": "...", "append": false}`: set `append` true to add to the end. It refuses ledger and plan CSV files, `numbers.json` and the payslip.
+3. `write_file` `{"path": "...", "text": "...", "append": false}`: set `append` true to add to the end. When you append, end your text with a line break, so the next entry starts on its own line. It refuses ledger and plan CSV files, `numbers.json` and the payslip.
 4. `lembur` `{"command": "review", "options": {"week": "<week>"}}`: lists rows on review. Never put `workspace` or `input` in options.
 
 Paths are relative to the workspace and never start with `workspace/`.

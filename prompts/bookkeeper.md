@@ -19,7 +19,7 @@ Example reply:
 1. `read_document` `{"path": "inbox/x.png"}`: returns `text`. For an image, the text is what a reading model saw. For a text or CSV file it is the content.
 2. `list_files` `{"folder": "inbox"}`: returns `files`.
 3. `read_file` `{"path": "plan/plan_products.csv"}`: returns `text`.
-4. `write_file` `{"path": "...", "text": "...", "append": false}`: set `append` true to add to the end. It refuses ledger and plan CSV files.
+4. `write_file` `{"path": "...", "text": "...", "append": false}`: set `append` true to add to the end. When you append, end your text with a line break, so the next entry starts on its own line. It refuses ledger and plan CSV files.
 5. `move_file` `{"from": "inbox/x.png", "to": "receipts/<year_month>/x.png"}`.
 6. `calendar` `{"date": "<date>"}`: returns `week`, `week_start`, `payslip_day`, `is_payslip_day`.
 7. `lembur` `{"command": "<name>", "options": {...}, "input": <JSON>}`. Options have no dashes. Never put `workspace` or `input` in options. Use `"input_file": "<csv path>"` in place of `input` for a CSV file. Commands you may use:

@@ -18,7 +18,7 @@ Example reply:
 
 1. `list_files` `{"folder": "approvals/<week>"}`: returns `files`.
 2. `read_file` `{"path": "..."}`: returns `text`.
-3. `write_file` `{"path": "...", "text": "...", "append": false}`: set `append` true to add to the end. It refuses ledger and plan CSV files, `numbers.json` and the payslip.
+3. `write_file` `{"path": "...", "text": "...", "append": false}`: set `append` true to add to the end. When you append, end your text with a line break, so the next entry starts on its own line. It refuses ledger and plan CSV files, `numbers.json` and the payslip.
 4. `calendar` `{"date": "<date>"}`: returns `week`, `week_start`, `payslip_day`, `is_payslip_day`.
 5. `lembur` `{"command": "<name>", "options": {...}, "input": <JSON>}`. Options have no dashes. Never put `workspace` or `input` in options. Commands you may use:
    * `correct-plan`: options `field`, `new-value`, `changed-at`, `reason`.

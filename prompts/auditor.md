@@ -18,7 +18,7 @@ Example reply:
 
 1. `list_files` `{"folder": "boardroom/<week>"}`: returns `files`.
 2. `read_file` `{"path": "..."}`: returns `text`.
-3. `write_file` `{"path": "...", "text": "...", "append": false}`: set `append` true to add to the end. It refuses ledger and plan CSV files, `numbers.json` and the payslip.
+3. `write_file` `{"path": "...", "text": "...", "append": false}`: set `append` true to add to the end. When you append, end your text with a line break, so the next entry starts on its own line. It refuses ledger and plan CSV files, `numbers.json` and the payslip.
 4. `lembur` `{"command": "<name>", "options": {...}}`. Never put `workspace` or `input` in options. Commands you may use:
    * `numbers-check`: option `week`. Reruns the numbers without writing and compares with the saved file.
    * `review`: option `week`. Lists rows with status `unmatched`, `duplicate` or `needs_review`, and every line of `audit/<week>/review_items.md`.
