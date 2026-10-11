@@ -383,6 +383,9 @@ def run_night(workspace, date, message, ask=None):
     facts = {"date": date, "week": week, "year_month": year_month, "payslip_day": payslip_day,
              "message": message, "inbox_files": inbox}
     steps = [step for step in STEPS if payslip_day or not step[3]]
+    issued = any((workspace / "payslips" / (week + suffix)).is_file() for suffix in (".html", ".pdf"))
+    if issued:  # the week's payslip is out: only intake and reconciliation stay open (section 4)
+        steps = [step for step in STEPS if step[1] in ("intake", "reconcile")]
 
     reasons, source = _plan(steps, facts, ask)
     rows = [{"step": number, "name": name, "agent": agent, "why": reasons.get((name, agent), ""),
@@ -429,7 +432,10 @@ def run_night(workspace, date, message, ask=None):
                     note = (note + " Untraced figures put on the review list.").strip()
         row["status"], row["note"] = status, note
         if status == "failed":
-            failed = {"step": row["step"], "reason": "%s (%s) stopped: %s" % (row["name"], row["agent"], note)}
+            failed = {"step": row["step"],
+                      "reason": "The %s could not finish the step \"%s\". Nothing was guessed, and what was "
+                                "recorded before it is saved. Send your message again to retry."
+                                % (row["agent"].replace("_", " ").capitalize(), row["name"].replace("_", " "))}
             _append_review(workspace, week, "* %s: the night stopped at %s (%s): %s" % (date, row["name"], row["agent"], note))
         _write_plan(plan_path, date, week, payslip_day, source, rows)
 

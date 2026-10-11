@@ -252,9 +252,15 @@ class BotTests(unittest.TestCase):
                 self.bot.handle_message(message(text))
         self.assertEqual(self.runs, [])
 
+    def test_a_short_ask_that_names_the_payslip_starts_no_night(self):
+        for text in ["Payslip", "payslip please", "I want to see my payslip", "Show me my payslip."]:
+            with self.subTest(text=text):
+                self.bot.handle_message(message(text))
+        self.assertEqual(self.runs, [])
+
     def test_noncommands_are_passed_to_runner_without_date_prefix_special_cases(self):
-        texts = ["2026-10-05 Sold two keychains.", "Payslip", "REVIEW",
-                 "Approve 2", "approve two", "payslip please", "review today"]
+        texts = ["2026-10-05 Sold two keychains.", "Approve 2", "approve two",
+                 "I sold 3 keychains, please update my payslip"]
         for text in texts:
             with self.subTest(text=text):
                 self.bot.handle_message(message(text))

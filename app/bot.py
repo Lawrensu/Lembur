@@ -397,6 +397,13 @@ class Bot:
                 if not isinstance(text, str) or not text.strip():
                     return
                 command = text.strip()
+                # A short ask that names a fixed word means that word: "show me my payslip".
+                words = re.findall(r"[a-z]+", command.lower())
+                if len(words) <= 8 and not re.search(r"[0-9]", command):
+                    if "payslip" in words:
+                        command = "payslip"
+                    elif "review" in words:
+                        command = "review"
                 if command.lower().rstrip("!. ") in GREETINGS:
                     self.telegram.send_message(chat_id, "\n\n".join(WELCOME))
                 elif command == "payslip":
