@@ -17,7 +17,15 @@ PLAN section 11 asks for this folder. WorkBuddy is the platform we built Lembur 
 
 ## Items added so far
 
-* None yet. Add one line per item: the file name, who added it, the date, and what was being built.
+* `workbuddy_session_payslip_template.jpg`, Damian, 11 October: the WorkBuddy session that moved the checklist and built the HTML payslip template, including the ten section order and the field contract.
+* `workbuddy_session_story_drafts.png`, Damian, 11 October: the WorkBuddy session that produced `deck_outline.md`, `video_script.md` and `qa_sheet.md`, and tightened the evidence rule in `identities.md`.
+
+**One thing to fix on the first image:** the left sidebar shows the signed in account email address. Crop or blur that strip before this folder goes to judges. No token, key or real document is visible.
+
+## The built product and the deck
+
+* **Telegram bot**: `http://t.me/lembur_damian_bot`. The live proof 3 photo check used this bot.
+* **Slides**: built in Canva at `https://www.canva.com/design/DAHXkXwiQ1I/7QHnAhURM2yN16ytu5gxtg/edit`. The content behind them is `submission/deck_outline.md`.
 
 ## Evidence already recorded elsewhere
 
