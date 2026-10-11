@@ -9,9 +9,9 @@
 - All scene durations below are placeholders. PLAN section 17 suggests about thirty seconds for Week 0; this is guidance, not the confirmed submission time limit.
 - Aisyah is the fictional student in the merged dataset, subject to Sharon's story sign-off. Use `{approved_persona_name}` in narration until then.
 - There is no scheduled run. A night starts when the student sends her message, and the morning message arrives when the night finishes.
-- The tool layer and the Telegram bot are built and merged; the model module, the runner and the prompts are not built yet (PLAN section 13). Scenes use real outputs only after the proofs in PLAN section 12 are recorded.
-- Every business figure, recommendation, ruling and runtime claim stays a named placeholder until supported by verified outputs.
-- Narration that describes successful execution is usable only after its scene's evidence gate passes. A scripted claim is not execution evidence.
+- The tool layer, the Telegram bot, the model module, the runner and the prompts are built and merged (PLAN section 13). The demo week replays through the runner with the real models and the comparator prints PASS (PLAN section 12, proof 4), so the figures below are real run outputs. Proof 3's live chat half is not yet recorded: the payslip file has not yet arrived in the chat, only in `workspace/payslips/2026-W41.html`.
+- Every business figure below is copied from the recorded run of 11 October 08:10, which passed the comparator. `{approved_persona_name}` stays a placeholder until Sharon signs the persona off.
+- Narration that describes successful execution is usable only after its scene's evidence gate passes. A scripted claim is not execution evidence. The one scene that still needs a live recording is scene 3 and scene 5's chat delivery (proof 3).
 - Demo data only. Keep the expected ledger and answer key out of the production agents' inputs.
 
 ## Scene 1: Week zero, a starting plan
@@ -38,7 +38,7 @@
 ## Scene 3: Before bed, message and messy documents
 
 - Duration: `{bedtime_scene_duration}`.
-- Shot: `{verified_nightly_message}` and its dated demo inbox batch, sent in the chat.
+- Shot: `{verified_nightly_message}` and its dated demo inbox batch, sent in the chat. The real messages and their dated files are in `data/demo/messages.md`; for example Monday 2026-10-05 is four files (two order screenshots, a bead receipt and its duplicate) with the message “Two Instagram keychain orders today, Dana and Mira…”.
 - Proposed narration: “The orders and receipts are scattered. Before bed, I send one message to my bot and leave the documents with it.”
 - Show actual synthetic receipts, order screenshots and the bank statement only on their documented intake dates.
 - The bank statement arrives on Sunday; do not depict it arriving before its batch. Cash orders in the message are individual orders, not extra screenshots.
@@ -59,8 +59,9 @@
   - Payroll hours and deterministic numbers outputs.
   - Payslip-day recommendations, Auditor report and ruling, then the unsent drafts, then the generated payslip. The drafts come before the payslip (design section 6.1).
 - Proposed narration: “First the plan for tonight is written. Then the agents read and review, and ask the tools to do the matching and the calculations. Uncertainty is flagged, not guessed.”
-- Include actual evidence of the duplicate, missing receipt, mismatch and unreadable amount; do not prefill pass labels.
-- Capture `{verified_correction_history}`: the correction is applied once, effective from its recorded date, with earlier sales retaining the earlier assumption.
+- Include actual evidence of the duplicate, missing receipt, mismatch and unreadable amount; do not prefill pass labels. The recorded run shows: the duplicate filed as T0004, the blurred thread receipt T0012 with an empty amount on 2026-10-08, a keychain sale amount mismatch T0019, and the missing bead top-up T0020 on 2026-10-11.
+- Capture the correction history: keychains P01 `minutes_per_unit` 20 to 15, effective 2026-10-07, source `message.2026-10-07`, applied once with earlier sales keeping the 20-minute assumption (`workspace/plan/plan_change_log.csv`).
+- Capture the night plan from `workspace/audit/2026-W41/plan_2026-10-11.md`: each step with its “why tonight needs it” and its outcome, including the two steps the rules added back (growth recommendation, drafts).
 - Evidence gates: receipt reading is proof 1, one real night is proof 2 and the whole week is proof 4 (PLAN section 12). The files are CSV. Verify saved correction history against the approved key, not only the final total.
 - Label any edited acceleration “Time-lapse”. Do not claim a speed-up factor, runtime or parallel work without evidence. Nothing here is scheduled.
 - Sources: PLAN sections 10, 12 and 17; DESIGN sections 4 to 6.
@@ -78,21 +79,21 @@
 ## Scene 6: The payslip reveal and the decision
 
 - Duration: `{payslip_and_meeting_scene_duration}`.
-- Shot: the verified payslip, which arrives as an HTML file in the chat (a PDF is optional and not built), preserving the fixed ten section order of design section 7.
-- Headline: “RM {hourly_rate} per hour”. Supporting values: “RM {take_home}” and “{total_hours} hours”.
+- Shot: the verified payslip, which arrives as an HTML file in the chat (a PDF is optional and not built), preserving the fixed ten section order of design section 7. The file is `workspace/payslips/2026-W41.html`.
+- Headline: “RM 2.53 per hour”. Supporting values: “RM 39.50” and “15.6 hours”.
 - Proposed narration: “This is what my business paid for my time, not just what came in.”
-- Visible caveat: “Provisional earnings: an expense amount is unknown.”
+- Visible caveat: “Provisional earnings: an expense amount is unknown.” (run detail: transaction T0012, the blurred thread receipt, has an empty amount; the Auditor's ruling notes take-home and hourly are provisional because of it.)
 - Proposed narration: “An unreadable expense is still missing, so these earnings may be lower when it is confirmed. The hours use assumptions, corrections and stated event time, not a complete timesheet.”
-- Product shot: `{verified_product_results}` with a loss marker only where the tool establishes a loss.
+- Product shot: Beaded keychain (P01) 11 units sold, revenue RM54.50, profit −RM10.50, −RM2.80 per hour, `loses_money: true`; Beaded bracelet (P02) 3 units sold, revenue RM54.00, profit RM32.00, RM16.99 per hour. Show the loss marker on the keychain only, where the tool establishes it.
 - Explain through caption or narration: product profit uses plan costs and direct production/fulfilment time; take home uses ledger payments and the whole week's time. Product profits do not add up to take home.
-- Plan-comparison shot: `{target_hourly_rate}` against `{hourly_rate}`, and `{planned_margin_percent}` against `{actual_margin_percent}`. Do not relabel the target as a generated prediction.
+- Plan-comparison shot: RM12.00 target against RM2.53 actual, and 40 percent planned margin against 36 percent actual. Do not relabel the target as a generated prediction.
 - Debate shot, following `submission/board_meeting_layout.md`:
-  - Payroll: `{actual_payroll_recommendation}` with `{payroll_cited_evidence}`.
-  - Growth coach: `{actual_growth_recommendation}` with `{growth_cited_evidence}`.
-  - Auditor: `{actual_ruling}` and `{ruling_reason_with_citations}`.
-- Leave agent dialogue unfilled until actual files exist. The answer key's expected ruling direction is not an actual ruling.
+  - Payroll: adjust keychain pricing or materials to stop a −RM2.80 per hour loss; focus production on the bracelet at RM16.99 per hour; reallocate part of the 10.0 shared hours toward productive tasks (cited: profit_per_hour_rm −2.80 and 16.99, shared_hours 10.0, hourly_rate_rm 2.53, from numbers.json).
+  - Growth coach: pull back from the loss-making keychain (−RM10.50); promote the profitable bracelet (RM32.00); re-evaluate the Instagram channel cost (channel_costs_rm RM32.00) (cited: profit_rm −10.50 and 32.00, channel_costs_rm 32.00, from numbers.json).
+  - Auditor: all six recommendations upheld, no conflicts between them (cited: profit_per_hour_rm −2.80 and 16.99, profit_rm −10.50 and 32.00, shared_hours 10.0, hourly_rate_rm 2.53, channel_costs_rm 32.00). The week closes pending the two receipt issues.
+- Agent dialogue above is the actual recorded run output, not the answer key's expected direction.
 - Proposed narration: “One colleague argues for hourly earnings, another for revenue and sales. The Auditor checks the evidence and rules.”
-- Raise-plan shot: `{upheld_recommendation}` linked to `{draft_reference}`, followed by the complete needs-review list.
+- Raise-plan shot: the upheld recommendation links to its draft `approvals/2026-W41/01_instagram_post.md` (“Serves Recommendation 2. Hey friends! Our Beaded bracelet is a hit…”), followed by the complete needs-review list: the 15-minute keychain correction (2026-10-07), the blurred thread receipt with a missing amount (2026-10-08), and the missing bead top-up receipt (2026-10-11).
 - Evidence gate: actual ledger statuses, amounts, minutes, source labels, review items and product results must match Sharon's approved key. Ruling direction must be checked, not copied into the run.
 - No precise raise promise or future demand claim: the raise projection is an agreed design, not built.
 - Sources: PLAN sections 3, 10 and 17; DESIGN sections 4.2, 4.3, 5, 7 and 8; draft answer key limitations.
@@ -100,10 +101,10 @@
 ## Scene 7: Approval by reply, then class
 
 - Duration: `{approval_and_close_scene_duration}`.
-- Shot: `{verified_individual_approval_evidence}` for each draft shown, followed by the student going to class.
+- Shot: `{verified_individual_approval_evidence}` for each draft shown, followed by the student going to class. Only one draft exists in the recorded run: `approvals/2026-W41/01_instagram_post.md`, serving Recommendation 2 (the bracelet).
 - Proposed narration: “I approve each draft with a reply. Lembur posts nothing, I send it myself.”
 - Do not use one blanket approval for all drafts. Do not add an interaction control that the confirmed implementation does not support.
-- Show no posting or sending by Lembur. End at the reply "approve N" in the chat, the bot's confirmation, and the draft moved to `approvals/<week>/approved/`.
+- Show no posting or sending by Lembur. End at the reply "approve 1" in the chat, the bot's confirmation, and the draft moved to `approvals/2026-W41/approved/`. (The run left the draft pending; the move to `approved/` needs the recorded approval reply.)
 - Closing line: “Kau tidur, kami lembur. You sleep, we do the overtime.”
 - Approval is by reply (design section 6.1). Damian approves the final closing treatment, and decides whether scene 8 sits before this closing line or after the story.
 - Sources: PLAN sections 2 and 17; DESIGN sections 5.1 and 6.1.
