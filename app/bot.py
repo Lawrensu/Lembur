@@ -380,6 +380,9 @@ class Bot:
             lines.extend(summary["review"])
         if payslip:
             self.telegram.send_document(chat_id, payslip)
+            # The payslip's links to the drafts only work inside the workspace, so the drafts come too.
+            for _, path in drafts:
+                self.telegram.send_document(chat_id, path)
         self.telegram.send_message(chat_id, "\n".join(lines))
 
     def handle_message(self, message):
