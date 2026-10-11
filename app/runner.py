@@ -77,6 +77,21 @@ def _read_json(text: str):
     return None
 
 
+def _out_of_turn(facts, tool, args):
+    """The week is closed and the payslip built only in their own steps, on payslip day."""
+    if tool != "lembur":
+        return ""
+    command = str(args.get("command"))
+    options = args.get("options") if isinstance(args.get("options"), dict) else {}
+    if command == "payslip" and not (facts["payslip_day"] and facts["step"] == "payslip"):
+        return "the payslip is built only in the payslip step, on payslip day"
+    if command == "close-week" and not (facts["payslip_day"] and facts["step"] == "close_week"):
+        return "the week is closed only in the close_week step, on payslip day"
+    if command == "hours" and options.get("payslip-day") and not facts["payslip_day"]:
+        return "tonight is not payslip day, so run hours without payslip-day"
+    return ""
+
+
 def _trace(workspace, facts, agent, entry):
     """Keep what the agent asked for and what it got back, one JSON line per turn."""
     path = Path(workspace) / "audit" / facts["week"] / ("trace_%s.jsonl" % facts["date"])
@@ -135,6 +150,10 @@ def _run_agent(workspace, agent, facts, ask):
                     args["options"] = {key: args.pop(key) for key in list(args)
                                        if key not in ("command", "input", "input_file")}
                 tool = "lembur"
+            refusal = _out_of_turn(facts, tool, args)
+            if refusal:
+                results.append({"ok": False, "error": refusal})
+                continue
             result = tool_layer.run_tool(workspace, agent, tool, args, ask=ask)
             if tool == "lembur" and result.get("ok"):
                 ran.add(str(args.get("command")))

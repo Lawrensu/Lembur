@@ -119,6 +119,19 @@ class RunnerTests(unittest.TestCase):
         self.assertEqual(summary["failed"]["step"], 2)
         self.assertIn("reconcile", summary["failed"]["reason"])
 
+    def test_no_payslip_and_no_week_closing_on_an_ordinary_night(self):
+        early = {"actions": [
+            {"tool": "lembur", "args": {"command": "payslip", "options": {"week": "2026-W41"},
+                                        "input": {"debate_summary": "x", "ruling": "y", "raise_plan": []}}},
+            {"tool": "lembur", "args": {"command": "hours", "options": {"week": "2026-W41", "payslip-day": True}}}],
+            "why": "too early"}
+        summary = self.night("2026-10-05", self.script(
+            "2026-10-05", numbers=[self.command("numbers", week="2026-W41"), early]))
+        self.assertEqual(summary["payslip"], "")
+        self.assertFalse((self.workspace / "payslips" / "2026-W41.html").exists())
+        hours = (self.workspace / "ledger_hours.csv").read_text(encoding="utf-8")
+        self.assertNotIn("admin", hours)
+
     def test_an_agent_cannot_reach_a_tool_that_is_not_its_own(self):
         forbidden = {"actions": [{"tool": "lembur", "args": {"command": "add-transactions", "input": []}}], "why": "try"}
         self.night("2026-10-05", self.script("2026-10-05", corrections=[forbidden]))
