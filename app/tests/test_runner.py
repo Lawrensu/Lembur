@@ -132,6 +132,22 @@ class RunnerTests(unittest.TestCase):
         hours = (self.workspace / "ledger_hours.csv").read_text(encoding="utf-8")
         self.assertNotIn("admin", hours)
 
+    def test_a_row_is_not_sent_to_review_when_one_bank_line_names_its_counterparty(self):
+        ws = self.workspace
+        header = ("txn_id,date,type,category,description,product_id,quantity,amount_rm,channel,payment_method,"
+                  "counterparty,reference,source_file,reconciliation_status,bank_reference,notes")
+        row = "T0001,2026-10-05,income,sales,Beaded keychain,P01,1,5.00,instagram,bank_transfer,Dana,,,unmatched,,"
+        (ws / "ledger_transactions.csv").write_text("\n".join([header, row, ""]), encoding="utf-8")
+        (ws / "ledger_bank_lines.csv").write_text("\n".join([
+            "date,description,type,amount_rm,bank_reference",
+            "2026-10-05,Transfer from Dana - accessories,income,5.00,DEMO-IN-001",
+            "2026-10-05,Transfer from Mira - accessories,income,5.00,DEMO-IN-002", ""]), encoding="utf-8")
+        give_up = {"command": "resolve", "options": {"txn-id": "T0001", "bank-reference": "", "reason": "unsure"}}
+        self.assertIn("DEMO-IN-001", runner._gives_up_too_early(ws, "lembur", give_up))
+        chosen = {"command": "resolve",
+                  "options": {"txn-id": "T0001", "bank-reference": "DEMO-IN-001", "reason": "names Dana"}}
+        self.assertEqual(runner._gives_up_too_early(ws, "lembur", chosen), "")
+
     def test_an_agent_cannot_reach_a_tool_that_is_not_its_own(self):
         forbidden = {"actions": [{"tool": "lembur", "args": {"command": "add-transactions", "input": []}}], "why": "try"}
         self.night("2026-10-05", self.script("2026-10-05", corrections=[forbidden]))

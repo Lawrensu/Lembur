@@ -92,6 +92,35 @@ def _out_of_turn(facts, tool, args):
     return ""
 
 
+def _rows(path):
+    if not path.is_file():
+        return []
+    with open(path, encoding="utf-8-sig", newline="") as handle:
+        return list(csv.DictReader(handle))
+
+
+def _gives_up_too_early(workspace, tool, args):
+    """Refuse sending a row to review when exactly one free bank line names its counterparty."""
+    options = args.get("options") if isinstance(args.get("options"), dict) else {}
+    if tool != "lembur" or args.get("command") != "resolve" or str(options.get("bank-reference") or "").strip():
+        return ""
+    workspace = Path(workspace)
+    ledger = _rows(workspace / "ledger_transactions.csv")
+    row = next((item for item in ledger if item.get("txn_id") == options.get("txn-id")), None)
+    name = (row or {}).get("counterparty", "").strip().lower()
+    if not name:
+        return ""
+    used = {item.get("bank_reference") for item in ledger if item.get("bank_reference")}
+    fits = [line for line in _rows(workspace / "ledger_bank_lines.csv")
+            if line.get("bank_reference") not in used and line.get("type") == row.get("type")
+            and line.get("amount_rm") == row.get("amount_rm")
+            and re.search(r"\b%s\b" % re.escape(name), line.get("description", "").lower())]
+    if len(fits) != 1:
+        return ""
+    return ("bank line %s reads \"%s\", which names the counterparty of %s. Resolve %s with bank-reference %s"
+            % (fits[0]["bank_reference"], fits[0]["description"], row["txn_id"], row["txn_id"], fits[0]["bank_reference"]))
+
+
 def _trace(workspace, facts, agent, entry):
     """Keep what the agent asked for and what it got back, one JSON line per turn."""
     path = Path(workspace) / "audit" / facts["week"] / ("trace_%s.jsonl" % facts["date"])
@@ -150,7 +179,7 @@ def _run_agent(workspace, agent, facts, ask):
                     args["options"] = {key: args.pop(key) for key in list(args)
                                        if key not in ("command", "input", "input_file")}
                 tool = "lembur"
-            refusal = _out_of_turn(facts, tool, args)
+            refusal = _out_of_turn(facts, tool, args) or _gives_up_too_early(workspace, tool, args)
             if refusal:
                 results.append({"ok": False, "error": refusal})
                 continue
