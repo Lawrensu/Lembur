@@ -216,8 +216,13 @@ def _write_file(root: Path, args: dict) -> dict:
     if body is None:
         raise Refused("write_file needs text")
     target.parent.mkdir(parents=True, exist_ok=True)
+    body = str(body)
+    if args.get("append") and target.is_file() and target.stat().st_size:
+        # an appended entry always starts on its own line
+        if not target.read_text(encoding="utf-8", errors="replace").endswith("\n"):
+            body = "\n" + body
     with target.open("a" if args.get("append") else "w", encoding="utf-8", newline="\n") as out:
-        out.write(str(body))
+        out.write(body)
     return {"ok": True}
 
 
