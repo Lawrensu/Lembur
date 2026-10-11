@@ -6,6 +6,9 @@ A back office team in a student's chat app. She sends one message and her receip
 
 Hackerdorm × BuilderX, Track 2 (Agentic Solutions).
 
+* **Presentation slides**: https://canva.link/7ffbzcafv99mk0j
+* **Team**: Lawrence Lian Anak Matius Ding, Sharon Lee Jia Yi, Damian Choy Wei-Quan
+
 ---
 
 ## How it works
@@ -77,9 +80,9 @@ submission/             payslip template, deck, video script, question and answe
 
 ## Team
 
-* Lawrence Lian Anak Matius DIng
-* Sharon
-* Damian
+* Lawrence Lian Anak Matius Ding
+* Sharon Lee Jia Yi
+* Damian Choy Wei-Quan
 
 ## Roles
 
