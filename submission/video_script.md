@@ -20,8 +20,8 @@
 - Purpose: introduce the idea and a plan that the later payslip can test.
 - Shot: `{approved_persona_name}` sends `{business_idea_message}` to the bot in her chat app; show costing, pricing assumptions, time assumptions and Auditor checks only if implemented and verified.
 - Proposed narration: “Before starting, I want to know what this business could earn, and how much of my time it would take.”
-- Output shot: `{verified_plan_summary_reference}` and `{verified_plan_file_reference}`.
-- Plan target: “RM {target_hourly_rate} per hour”, from the hand written plan file.
+- Output shot: the hand written plan files `data/demo/plan_products.csv`, `plan_channels.csv` and `plan_assumptions.csv` (copied into `workspace/plan/`), shown as “the plan” and labelled hand written. Day Zero is not built, so there is no generated summary to show.
+- Plan target: “RM 12.00 per hour”, from the hand written plan file (`data/demo/plan_assumptions.csv`; `numbers.json` records `target_hourly_rate_rm` 12.00).
 - Proposed narration: “This is my starting plan. The time estimates are assumptions; the weekly payslip will test them against reality.”
 - Evidence gate: Day Zero is an agreed design, not built (design section 8). Law says when. Do not show generated predictions or a break even result.
 - If Day Zero generation is not built, show the hand written plan file as "the plan" (PLAN section 15, cut 1). Law decides. Label it honestly.
@@ -38,7 +38,7 @@
 ## Scene 3: Before bed, message and messy documents
 
 - Duration: `{bedtime_scene_duration}`.
-- Shot: `{verified_nightly_message}` and its dated demo inbox batch, sent in the chat. The real messages and their dated files are in `data/demo/messages.md`; for example Monday 2026-10-05 is four files (two order screenshots, a bead receipt and its duplicate) with the message “Two Instagram keychain orders today, Dana and Mira…”.
+- Shot: the nightly message and its dated demo inbox batch, sent in the chat. Verified messages: the seven dated entries of `data/demo/messages.md`, all replayed in the recorded run. The real messages and their dated files are in `data/demo/messages.md`; for example Monday 2026-10-05 is four files (two order screenshots, a bead receipt and its duplicate) with the message “Two Instagram keychain orders today, Dana and Mira…”.
 - Proposed narration: “The orders and receipts are scattered. Before bed, I send one message to my bot and leave the documents with it.”
 - Show actual synthetic receipts, order screenshots and the bank statement only on their documented intake dates.
 - The bank statement arrives on Sunday; do not depict it arriving before its batch. Cash orders in the message are individual orders, not extra screenshots.
@@ -90,10 +90,10 @@
 - Debate shot, following `submission/board_meeting_layout.md`:
   - Payroll: adjust keychain pricing or materials to stop a −RM2.80 per hour loss; focus production on the bracelet at RM16.99 per hour; reallocate part of the 10.0 shared hours toward productive tasks (cited: profit_per_hour_rm −2.80 and 16.99, shared_hours 10.0, hourly_rate_rm 2.53, from numbers.json).
   - Growth coach: pull back from the loss-making keychain (−RM10.50); promote the profitable bracelet (RM32.00); re-evaluate the Instagram channel cost (channel_costs_rm RM32.00) (cited: profit_rm −10.50 and 32.00, channel_costs_rm 32.00, from numbers.json).
-  - Auditor: all six recommendations upheld, no conflicts between them (cited: profit_per_hour_rm −2.80 and 16.99, profit_rm −10.50 and 32.00, shared_hours 10.0, hourly_rate_rm 2.53, channel_costs_rm 32.00). The week closes pending the two receipt issues.
+  - Auditor: all six recommendations upheld, no conflicts between them (cited: profit_per_hour_rm −2.80 and 16.99, profit_rm −10.50 and 32.00, shared_hours 10.0, hourly_rate_rm 2.53, channel_costs_rm 32.00). The week closes pending the receipt issues (T0012 and T0020); take home and hourly rate stay provisional.
 - Agent dialogue above is the actual recorded run output, not the answer key's expected direction.
 - Proposed narration: “One colleague argues for hourly earnings, another for revenue and sales. The Auditor checks the evidence and rules.”
-- Raise-plan shot: the upheld recommendation links to its draft `approvals/2026-W41/01_instagram_post.md` (“Serves Recommendation 2. Hey friends! Our Beaded bracelet is a hit…”), followed by the complete needs-review list: the 15-minute keychain correction (2026-10-07), the blurred thread receipt with a missing amount (2026-10-08), and the missing bead top-up receipt (2026-10-11).
+- Raise-plan shot: the upheld recommendation links to its draft `approvals/2026-W41/01_instagram_post.md` (“Serves Recommendation 2. Hey friends! Our Beaded bracelet is a hit…”), followed by the complete needs-review list: the 15-minute keychain correction (2026-10-07), the blurred thread receipt T0012 with a missing amount (2026-10-08), the Zahra keychain T0019 whose document says RM5.00 and bank says RM4.50 (2026-10-11), the missing bead top-up receipt T0020 (2026-10-11), and the duplicate bead receipt T0004 that was excluded from totals (2026-10-05). The Auditor's audit report lists T0004, T0012, T0019 and T0020 as the review transactions.
 - Evidence gate: actual ledger statuses, amounts, minutes, source labels, review items and product results must match Sharon's approved key. Ruling direction must be checked, not copied into the run.
 - No precise raise promise or future demand claim: the raise projection is an agreed design, not built.
 - Sources: PLAN sections 3, 10 and 17; DESIGN sections 4.2, 4.3, 5, 7 and 8; draft answer key limitations.
@@ -113,7 +113,7 @@
 
 - Duration: `{workbuddy_build_scene_duration}`.
 - Purpose: show proof that WorkBuddy was used during the build, and explain how, where and in what scenarios (PLAN sections 1 and 11). It is a short segment outside the chat story.
-- Shot: `{evidence_pack_screenshots}` from `submission/evidence/`: WorkBuddy sessions, task lists and key exchanges, each with a caption of what was being built.
+- Shot: `submission/evidence/workbuddy_session_payslip_template.png` and `submission/evidence/workbuddy_session_story_drafts.png`, from `submission/evidence/`: WorkBuddy sessions, task lists and key exchanges, each with a caption of what was being built.
 - Proposed narration: “We built Lembur with WorkBuddy. Each of us gave it the docs as the source of truth, it wrote the code or the content, and we checked the result before merging.”
 - Scenarios to name, only those the evidence pack supports: the engine and its tests, the dataset and answer key, the story, and the early run of the agents as instruction files.
 - Do not say or imply that the running product lives in WorkBuddy. Do not present work done or checked by other means as WorkBuddy's.

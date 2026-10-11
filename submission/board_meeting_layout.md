@@ -94,3 +94,24 @@
 - Raise projections, an agreed design not built: `docs/SYSTEM_DESIGN.md`, section 8.
 - Unknown expense and fixture-only validation: `data/answer_key/answer_key.md`, “Validation and limitations”. The draft key does not supply an observed ruling.
 - Visual structure: Damian's provisional approval of equal arguments above a separate Auditor ruling.
+
+## Filled slots for 2026-W41
+
+* **Source**: the recorded run of 11 October 08:10 (PLAN section 12, proof 4). It passed the comparator. These are actual outputs, not the answer key's expected direction. The slots above stay as the template for later weeks.
+* **Week and topic**: `2026-W41`, 2026-10-05 to 2026-10-11. Topic: what to do about the loss making keychain and the profitable bracelet.
+* **Payroll** (`boardroom/2026-W41/payroll.md`)
+  * Proposed change: adjust Beaded keychain pricing or materials to stop a loss of RM2.80 an hour; focus production on the bracelet at RM16.99 an hour; reallocate part of the 10.0 shared hours to production and fulfilment.
+  * Cited figures: profit_per_hour_rm −2.80 and 16.99, shared_hours 10.0, hourly_rate_rm 2.53.
+  * Sources: `audit/2026-W41/numbers.json`.
+  * Caveat in the file: take home RM39.50 and hourly rate RM2.53 are provisional because transaction T0012 has an empty amount.
+* **Growth coach** (`boardroom/2026-W41/growth.md`)
+  * Proposed change: focus away from the keychain (11 sold, revenue RM54.50, channel costs RM32.00, profit −RM10.50); promote the bracelet (3 sold, revenue RM54.00, profit RM32.00); re-evaluate the Instagram channel cost on the keychain.
+  * Cited figures: profit_rm −10.50 and 32.00, channel_costs_rm 32.00 and 4.00.
+  * Sources: `audit/2026-W41/numbers.json`.
+* **Auditor** (`boardroom/2026-W41/ruling.md`, `audit/2026-W41/audit_report.md`)
+  * Evidence checked: numbers check passed; review list recorded; all ledger hours validated; every cited figure present in `numbers.json`; no prohibited projection.
+  * Decision: all six recommendations upheld, no conflicts between them.
+  * Reason: each recommendation cites a figure that appears in `numbers.json`.
+  * Outstanding: T0012, the blurred thread receipt with no amount; T0020, the bead top-up bank line with no receipt. The audit report also lists T0004 (duplicate, excluded) and T0019 (document RM5.00, bank RM4.50) among the review transactions. The ruling text mentions only the two receipt issues, so show all four.
+* **Upheld action and draft**: the bracelet recommendation (Recommendation 2) links to `approvals/2026-W41/01_instagram_post.md`, waiting for “approve 1” or “skip 1”. It is the only draft the run produced; the two keychain recommendations have no draft.
+* **Payslip summary**: `workspace/payslips/2026-W41.html`, RM2.53 an hour, RM39.50 take home, 15.6 hours.

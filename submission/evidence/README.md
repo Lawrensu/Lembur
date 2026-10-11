@@ -17,7 +17,7 @@ PLAN section 11 asks for this folder. WorkBuddy is the platform we built Lembur 
 
 ## Items added so far
 
-* `workbuddy_session_payslip_template.jpg`, Damian, 11 October: the WorkBuddy session that moved the checklist and built the HTML payslip template, including the ten section order and the field contract.
+* `workbuddy_session_payslip_template.png`, Damian, 11 October: the WorkBuddy session that moved the checklist and built the HTML payslip template, including the ten section order and the field contract.
 * `workbuddy_session_story_drafts.png`, Damian, 11 October: the WorkBuddy session that produced `deck_outline.md`, `video_script.md` and `qa_sheet.md`, and tightened the evidence rule in `identities.md`.
 
 **One thing to fix on the first image:** the left sidebar shows the signed in account email address. Crop or blur that strip before this folder goes to judges. No token, key or real document is visible.
@@ -31,8 +31,8 @@ PLAN section 11 asks for this folder. WorkBuddy is the platform we built Lembur 
 
 These are real results, but they are not screenshots. Keep them as they are and do not restate them as session evidence.
 
-* **Proof 3, photo half**: recorded under the proof in `docs/PLAN.md`, section 12. The bot was created, its token was saved locally and checked live against Telegram, and a photo sent from the phone landed in `workspaces/998236319/inbox/` as a valid JPEG, with the four baseline plan files seeded. The payslip half is not met: `app/runner.py` does not exist yet.
-* **Package 3 tests**: 70 offline tests, 60 passed, 10 skipped for unavailable symlink support, no failures. Run from the repository root with `python -B -m unittest discover -s app/tests -p "test_bot*.py"`.
+* **Proof 3, photo half**: recorded under the proof in `docs/PLAN.md`, section 12. The bot was created, its token was saved locally and checked live against Telegram, and a photo sent from the phone landed in `workspaces/998236319/inbox/` as a valid JPEG, with the four baseline plan files seeded. The payslip half was blocked then because `app/runner.py` did not exist. The runner is now on `dev` and the chat run is still to be recorded.
+* **Package 3 tests**: 71 offline tests, 61 passed, 10 skipped for unavailable symlink support, no failures. Run from the repository root with `python -B -m unittest discover -s app/tests -p "test_bot*.py"`.
 * **Payslip template**: `submission/payslip_template.html`, with a sample PDF printed from an installed browser and the look approved on 10 October.
 * **What we already know**, listed under the proofs in `docs/PLAN.md`, section 12: scripts run from a skill, CSV was chosen, the agents' instructions were rehearsed against the answer key, and the payslip command filled the template with no placeholder left.
 

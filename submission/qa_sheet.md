@@ -5,7 +5,7 @@
 - Point-form rehearsal answers for the hackathon submission, not a claim that the project has passed an end-to-end run.
 - Use source-based answers below; replace evidence placeholders only after the relevant approvals and actual-run checks.
 - The merged answer key is independently verified but still awaits Sharon's business sign-off. Its calculations validate the fixture, not Law's extraction or workflow execution.
-- Built and merged into `dev`: the deterministic tools, the command line, the payslip command and template, the dataset, the answer key, the comparator, the tool layer (`app/tools.py`) and the Telegram bot (`app/bot.py`), each with its tests. Not built yet: the model module, the runner and the prompts (PLAN section 13). Answers about the unbuilt parts describe the design until their proofs in PLAN section 12 are recorded.
+- Built and merged into `dev`: the deterministic tools, the command line, the payslip command and template, the dataset, the answer key, the comparator, the tool layer, the model module, the runner, the prompts and the Telegram bot. Proofs 1, 2 and 4 passed with the real models on 11 October. Proof 3, the full chat round trip, is still open (PLAN section 12).
 - Final wording and delivery belong to Damian. Do not invent user research, pricing, costs, guarantees or traction absent from the source docs.
 
 ## What problem are you solving?
@@ -13,7 +13,7 @@
 - Student founders have scattered business records and rarely track their time. Sales alone do not tell them whether the work is worthwhile.
 - Lembur's intended output is a weekly payslip showing take home, earnings per hour based on estimated/stated time, product economics and practical draft actions for review.
 - It is a back office team in her chat app. She installs nothing; she needs only the chat app (design section 1).
-- Evidence of actual user benefit: `{verified_user_value_evidence}`. Do not imply a real user study has happened.
+- Evidence of actual user benefit: none from real users. The evidence is one fictional demo week turned into a payslip of RM2.53 an hour that flags a RM2.80 an hour loss on the bestselling keychain. No user study has happened.
 - Sources: PLAN section 2; DESIGN sections 1 and 7.
 
 ## What is genuinely different?
@@ -72,7 +72,7 @@
 - A duplicate is excluded from totals and reviewed. A referenced bank/receipt mismatch uses the bank amount, keeps both amounts in notes and is reviewed.
 - An unreadable amount remains empty, not zero. The document is retained and the item is reviewed.
 - On payslip day, an unused bank line becomes an unmatched transaction and is counted when its amount is known; it remains on the review list.
-- These are specified behaviours. Actual-run evidence: `{verified_reconciliation_output}`.
+- These are specified behaviours. Actual-run evidence, `workspace/ledger_transactions.csv`: T0004 `duplicate`, T0012 `needs_review` with an empty amount, T0019 `needs_review` (document RM5.00, bank RM4.50, bank amount used) and T0020 `unmatched` (RM9.00 bank line counted).
 - Sources: PLAN section 10; DESIGN sections 4 and 4.1.
 
 ## Why are the displayed earnings provisional?
@@ -112,7 +112,7 @@
 
 - **Two roles**: `reason` drives the agents and needs no image input. `read` turns one image into text and is used only when a document is read.
 - **Where they come from**: the model gateway the organisers provided. The tools we build with are not part of the product.
-- **Which model fills which role**: still open. It waits on proofs 1 and 2 (PLAN section 12). Do not name a model before then. If a proof fails, a fallback model goes in the same role.
+- **Which model fills which role**: proofs 1 and 2 passed with the models set in `.env`. The model names are not in the repository, so ask Law before naming one. If a proof fails, a fallback model goes in the same role.
 - **Configuration, not code**: the model for each role is set in environment variables. A key never appears in the repository, a prompt, a log or a reply.
 - **No framework**: calls use plain HTTPS and the standard library. There is no third party package and no agent framework.
 - **Tests**: a fake model with scripted answers replays the week in seconds without a key.
@@ -132,7 +132,7 @@
 
 - Payroll prioritises hourly earnings; Growth coach prioritises revenue and sales. Their conflicting objectives must be visible through recommendations supported by current figures.
 - The Auditor reruns numbers, checks review coverage and source traceability, rejects arguments without figures, and rules with reasons.
-- Actual evidence: `{payroll_file}`, `{growth_file}`, `{audit_report}` and `{ruling_file}`. An expected ruling direction in the key is not a completed debate.
+- Actual evidence: `workspace/boardroom/2026-W41/payroll.md`, `workspace/boardroom/2026-W41/growth.md`, `workspace/audit/2026-W41/audit_report.md` and `workspace/boardroom/2026-W41/ruling.md`. In the run the Auditor upheld all six recommendations, each with a cited figure from `numbers.json`. An expected ruling direction in the key is not a completed debate.
 - This verification design does not guarantee perfect document reading or measured hours.
 - Sources: DESIGN sections 5.3 to 5.5 and 7.
 
@@ -147,7 +147,7 @@
 - No. In the chat, the student replies "approve N" or "skip N". The bot moves an approved draft to `approvals/<week>/approved/` and she sends it herself. No agent and no model is involved in the move.
 - Lembur posts and sends nothing in this version. Posting through a connector is roadmap only.
 - Approval of one draft does not approve every draft.
-- Evidence: `{verified_individual_approval_evidence}`.
+- Evidence: not yet recorded. It needs the reply `approve 1` in a live chat and the draft appearing in `approvals/2026-W41/approved/` (proof 3).
 - Sources: DESIGN sections 5.1 and 6.1.
 
 ## Does it run on a schedule?
@@ -162,20 +162,20 @@
 - **Not part of the product**: Lembur is our own chat bot. WorkBuddy is the platform we built it with (PLAN section 11).
 - **How**: each of us works with WorkBuddy as the builder in our own checkout. We give it the docs as the source of truth, it writes the code or the content, and the result is checked before it is merged.
 - **Where and in what scenarios**: the engine and its tests, the runner and the bot (once built), the dataset and answer key, and the story (identities, payslip template, deck, video script, this sheet). Before the redesign the four agents also ran as WorkBuddy skills, and a skill run of our own script passed on 10 October.
-- **Evidence**: `{evidence_pack_references}` from `submission/evidence/`. Claim only what the evidence pack shows WorkBuddy really did. Work done or checked by other means is not presented as WorkBuddy's.
+- **Evidence**: `submission/evidence/workbuddy_session_payslip_template.png` and `submission/evidence/workbuddy_session_story_drafts.png`. Claim only what the evidence pack shows WorkBuddy really did. Work done or checked by other means is not presented as WorkBuddy's.
 - Sources: PLAN sections 1, 11 and 12.
 
 ## Have you validated the project?
 
 - The merged independent comparison and rule-check reports validate the prepared demo fixture. They do not validate extraction accuracy, the bot, approval by reply or an observed end-to-end run.
 - Sharon's business sign-off remains pending. Then actual results must match the approved key for statuses, source labels, review items, minutes and money to the sen.
-- Evidence: `{approved_answer_key}`, `{actual_run_outputs}` and `{row_by_row_comparison}`. A mismatch is a bug to fix before demoing, not an acceptable result.
+- Evidence: the key in `data/answer_key/`, the run outputs in `workspace/` and the row by row comparison from `python -B data/test_harness/compare_outputs.py`, which printed PASS with no difference on 11 October 08:10 (20 transactions, 14 bank lines, 20 hours lines, take home RM39.50, 15.6 hours, RM2.53 an hour). A mismatch is a bug to fix before demoing, not an acceptable result.
 - Sources: PLAN section 10; draft answer key validation and handoff sections.
 
 ## How long does a run take, and how reliable is it?
 
 - Already known, from before the redesign (PLAN section 12): our scripts run from a WorkBuddy skill, the data files are CSV, the agents' instructions matched the answer key in one pass that was not run in WorkBuddy and used a different model, and the payslip template fills.
-- Proofs 1, 2 and 4 passed on 11 October with the real models; proof 3, the chat round trip, is the one still open (PLAN section 12). Use `{recorded_proof_results}` from PLAN section 12 and `{measured_run_duration}` from Law; do not invent them.
+- Proofs 1, 2 and 4 passed on 11 October with the real models; proof 3, the chat round trip, is the one still open (PLAN section 12). Recorded results are under each proof in PLAN section 12. Measured duration: about five minutes for the seven nights (Law, 07:45) and 5m13s in Damian's independent replay (08:10); one night, 2026-10-05, took about 20 seconds (proof 2). One passing run is not a guarantee for every run, so each recorded run is compared again.
 - If a fallback is used, disclose it. Do not present manual execution as scheduled overnight operation.
 - Cost per run, pricing, monetisation and security guarantees are not specified; ask the team rather than invent a business model or assurance.
 - Sources: PLAN sections 10, 12 and 15; DESIGN sections 0 and 8.
