@@ -11,6 +11,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import traceback
 import threading
 import urllib.error
 import urllib.parse
@@ -132,6 +133,8 @@ class Telegram:
 
 def run_night(workspace, date, message):
     """Import the actual orchestration package only when a night is requested."""
+    if str(ROOT) not in sys.path:  # started as "python app/bot.py": make the app package findable
+        sys.path.insert(0, str(ROOT))
     try:
         from app.runner import run_night as runner
     except ModuleNotFoundError:
@@ -406,8 +409,13 @@ class Bot:
                     self.telegram.send_message(chat_id, STARTING)
                     summary = self.run_night(workspace, self.today(), text)
                     self._report_night(chat_id, workspace, summary)
-            except Exception:
+            except Exception as error:
                 # Never send raw exceptions: HTTPS exceptions can embed the token.
+                # The local console gets where it failed, without the exception's own text.
+                where = traceback.extract_tb(error.__traceback__)[-1]
+                detail = str(error) if isinstance(error, BotError) else ""
+                print("Lembur bot: %s at %s line %s. %s" % (type(error).__name__, Path(where.filename).name,
+                                                            where.lineno, detail), file=sys.stderr, flush=True)
                 try:
                     self.telegram.send_message(chat_id, FAILURE)
                 except Exception:
