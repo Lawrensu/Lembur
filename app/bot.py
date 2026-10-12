@@ -1,4 +1,4 @@
-"""Telegram front door for the package 3 contract in SYSTEM_DESIGN section 6.5."""
+"""Telegram front door for the package 3 contract in SYSTEM_DESIGN, Chat."""
 
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone

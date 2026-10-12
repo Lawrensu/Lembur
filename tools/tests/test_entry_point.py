@@ -1,4 +1,4 @@
-"""Entry point acceptance and safety tests from design section 4."""
+"""Entry point acceptance and safety tests from system design, Deterministic Tools."""
 
 from __future__ import annotations
 

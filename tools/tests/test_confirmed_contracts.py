@@ -1,4 +1,4 @@
-"""Regression tests for confirmed design sections 4.1, 4.2 and 4.3.
+"""Regression tests for the confirmed rules of Reconciliation, Hours and Numbers in the system design.
 
 Load the business numbers module by path. Its name avoids shadowing
 Python's standard library numbers module.

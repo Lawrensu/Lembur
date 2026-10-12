@@ -1,4 +1,4 @@
-"""Hours tool: docs/SYSTEM_DESIGN.md section 4.2."""
+"""Hours tool: docs/SYSTEM_DESIGN.md, Hours."""
 
 from __future__ import annotations
 

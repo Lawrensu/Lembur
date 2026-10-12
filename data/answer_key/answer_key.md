@@ -3,7 +3,7 @@
 - Status: independently verified draft; awaiting Sharon's business sign-off. Do not treat as an approved release yet.
 - Synthetic demonstration only. Aisyah and all customers and suppliers are fictional. Channel costs are approved scenario assumptions, not statements of platform pricing.
 - Dates: Monday 2026-10-05 through Sunday 2026-10-11, Malaysia time.
-- Sources of truth: docs/PLAN.md section 10; docs/SYSTEM_DESIGN.md sections 2 to 4.
+- Sources of truth: docs/SYSTEM_DESIGN.md: Validation, Conventions, Data Model and Deterministic Tools.
 - Fixture: 20 transactions, 14 bank lines, 20 hours lines; 14 separate single-product sales orders.
 - Money uses integer sen; time uses integer minutes; display uses half-away-from-zero rounding. Never divide by rounded displayed hours.
 
@@ -14,7 +14,7 @@
 - Rule checker covers every planted problem and every dataset rule. See .expected_ledger.ref/rule_check.md for results and visual-inspection limitations.
 - This validates the fixture, not Law's extraction workflow, model OCR accuracy, trigger reliability, or an observed end-to-end run. Those remain to be tested against this key.
 - The blurry expense has an unknown amount, not a zero expense. Take home and hourly rate are provisional known-amount results; true earnings may be lower once the receipt is readable.
-- No projected raise or Day Zero formula is used. Both designs are agreed in design section 8 but not built.
+- No projected raise or Day Zero formula is used. Both designs are agreed in system design, TODO (future) but not built.
 
 ## Ledger totals by category
 
@@ -45,7 +45,7 @@
 
 - The input, the plan CSV files data/demo/plan_*.csv, is the baseline: P01=20 and change_log has headers only.
 - The run's workspace/plan/plan_*.csv ends with P01=15 and exactly one change_log row: changed_at=2026-10-07; field=products.P01.minutes_per_unit; old_value=20; new_value=15; reason=I timed myself today, keychains take 15 minutes not 20; source=message.2026-10-07.
-- Sharon-approved clarification of design wording: pre-correction P01 lines use 20 and source=estimate; on/after October 7 use 15 and source=corrected. Historical baseline values are not retroactively labelled corrected. Design section 4.2 states this rule.
+- Sharon-approved clarification of design wording: pre-correction P01 lines use 20 and source=estimate; on/after October 7 use 15 and source=corrected. Historical baseline values are not retroactively labelled corrected. System design, Hours states this rule.
 - Other production, fulfilment and admin lines remain estimate. Only the bazaar event is stated. No extra stated production hours are added.
 
 ## Every expected hours line

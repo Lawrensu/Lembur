@@ -1,4 +1,4 @@
-"""The only code that talks to a language model (docs/SYSTEM_DESIGN.md section 6.3).
+"""The only code that talks to a language model (docs/SYSTEM_DESIGN.md, Runtime).
 
 One function, ask(role, messages, images=None), returns the model's text.
 Standard library only. Settings come from the environment, loaded from .env.

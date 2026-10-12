@@ -5,7 +5,7 @@
 - Format-neutral presentation notes based on the provisionally approved wireframe, not a final presentation template or evidence of a completed debate.
 - Warm, student-first presentation with professional-colleague role titles.
 - All recommendations, figures, source references and ruling text remain named placeholders.
-- Approval is by reply, "approve N" or "skip N" (design section 6.1). Style and page breaks await Damian's review.
+- Approval is by reply, "approve N" or "skip N" (system design, Flow). Style and page breaks await Damian's review.
 
 ## Approved structure
 
@@ -66,7 +66,7 @@
   - State: waiting for your reply, "approve N" or "skip N".
 - Lembur posts and sends nothing. The student sends an approved draft herself. Posting through a connector is roadmap only.
 - No blanket approval, auto-send or unsupported interaction controls in the layout.
-- The raise projection is an agreed design, not built (design section 8). Quantified raise projections stay excluded; cite current evidence only.
+- The raise projection is an agreed design, not built (system design, TODO (future)). Quantified raise projections stay excluded; cite current evidence only.
 
 ## Relationship to the payslip
 
@@ -82,22 +82,22 @@
 - Run outputs match Sharon's approved, independently checked answer key before any claim of validated execution.
 - Placeholder names are display slots, not new data-model fields or a new workflow.
 - No invented dialogue, financial figures, forecasts, built-feature claims or private data.
-- Final format and visual adaptation are confirmed separately. The payslip itself is the HTML template filled by a command (design section 7); these notes do not change it.
+- Final format and visual adaptation are confirmed separately. The payslip itself is the HTML template filled by a command (system design, Outputs); these notes do not change it.
 
 ## Sources
 
-- Positioning and honest limits: `docs/PLAN.md`, sections 2 and 3.
-- Validation: `docs/PLAN.md`, section 10.
-- Financial bases and time sources: `docs/SYSTEM_DESIGN.md`, sections 4.2 and 4.3.
-- Conflicting objectives and Auditor duties: `docs/SYSTEM_DESIGN.md`, sections 5.3 to 5.5.
-- Recommendations, ruling, drafts and individual approval: `docs/SYSTEM_DESIGN.md`, sections 6.1 and 7.
-- Raise projections, an agreed design not built: `docs/SYSTEM_DESIGN.md`, section 8.
+- Positioning and honest limits: `docs/SYSTEM_DESIGN.md`, Problem and Positioning.
+- Validation: `docs/SYSTEM_DESIGN.md`, Validation.
+- Financial bases and time sources: `docs/SYSTEM_DESIGN.md`, Hours and Numbers.
+- Conflicting objectives and Auditor duties: `docs/SYSTEM_DESIGN.md`, Payroll, Growth coach and Auditor.
+- Recommendations, ruling, drafts and individual approval: `docs/SYSTEM_DESIGN.md`, Flow and Outputs.
+- Raise projections, an agreed design not built: `docs/SYSTEM_DESIGN.md`, TODO (future).
 - Unknown expense and fixture-only validation: `data/answer_key/answer_key.md`, “Validation and limitations”. The draft key does not supply an observed ruling.
 - Visual structure: Damian's provisional approval of equal arguments above a separate Auditor ruling.
 
 ## Filled slots for 2026-W41
 
-* **Source**: the recorded run of 11 October 08:10 (PLAN section 12, proof 4). It passed the comparator. These are actual outputs, not the answer key's expected direction. The slots above stay as the template for later weeks.
+* **Source**: the recorded run of 11 October 08:10 (system design, Proofs, proof 4). It passed the comparator. These are actual outputs, not the answer key's expected direction. The slots above stay as the template for later weeks.
 * **Week and topic**: `2026-W41`, 2026-10-05 to 2026-10-11. Topic: what to do about the loss making keychain and the profitable bracelet.
 * **Payroll** (`boardroom/2026-W41/payroll.md`)
   * Proposed change: adjust Beaded keychain pricing or materials to stop a loss of RM2.80 an hour; focus production on the bracelet at RM16.99 an hour; reallocate part of the 10.0 shared hours to production and fulfilment.

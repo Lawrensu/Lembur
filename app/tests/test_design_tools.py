@@ -1,7 +1,7 @@
 """Tests for app/tools.py, the tool layer: run_tool(workspace, agent, name, args, ask=None).
 
-These tests are written from docs/SYSTEM_DESIGN.md section 6.4 (with sections
-2, 3.1, 4 and 6.3 where it points to them). The builder of app/tools.py makes
+These tests are written from docs/SYSTEM_DESIGN.md, How an agent acts (with Conventions,
+Folder layout, Deterministic Tools and Runtime where it points to them). The builder of app/tools.py makes
 them pass and does not edit this file. If a test seems wrong, tell Law.
 
 Where the design is silent, nothing is asserted. No network and no key are
@@ -51,7 +51,7 @@ def tearDownModule():
 # ---------------------------------------------------------------- fixtures
 
 def make_layout(workspace):
-    """The folder layout of design section 3.1, with the four plan files."""
+    """The folder layout of system design, Folder layout, with the four plan files."""
     for folder in ("inbox", "plan", "receipts/2026-10", "boardroom/2026-W41",
                    "audit/2026-W41", "audit/2026-W42", "payslips",
                    "approvals/2026-W41/approved"):
@@ -147,7 +147,7 @@ SCENARIOS = {
     "payslip": ("numbers_saved", {"week": WEEK}, PAYSLIP_INPUT, True),
 }
 
-# design section 6.4, "Which agent may use what"
+# system design, How an agent acts, "Which agent may use what"
 ALLOWED_COMMANDS = {
     "bookkeeper": {"add-transactions", "add-bank-lines", "reconcile", "resolve",
                    "classify", "close-week", "review"},

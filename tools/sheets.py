@@ -2,7 +2,7 @@
 
 A book is a dict of sheet name to a list of rows; a row is a dict of column
 name to string, with "" for an empty cell. Every sheet is one CSV file named
-<base>_<sheet>.csv (docs/SYSTEM_DESIGN.md 3.1).
+<base>_<sheet>.csv (docs/SYSTEM_DESIGN.md, Folder layout).
 """
 
 from __future__ import annotations

@@ -4,7 +4,7 @@ Reads data/demo/messages.md for the seven dated messages, resets the inbox to
 each day's files, saves the message as receipts/<year_month>/message_<date>.txt,
 then calls app.runner.run_night once per night.
 
-It repeats the replay of proof 4 (PLAN section 12). It starts each night
+It repeats the replay of proof 4 (system design, Proofs). It starts each night
 from the fixture, not from the chat, so it never touches Telegram.
 
 Usage:

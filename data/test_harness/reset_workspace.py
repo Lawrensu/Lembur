@@ -1,7 +1,7 @@
 """reset_workspace.py -- Clean the workspace and reload baseline demo inputs.
 
 Before each recorded run, the workspace must be wiped and refilled so
-that every run starts from the same state (PLAN section 10:
+that every run starts from the same state (system design, Validation:
 "the workspace can be wiped and refilled before each recorded run").
 
 Modes:
@@ -43,7 +43,7 @@ RUNTIME_DIRS = [
 # Top-level workspace files to remove
 RUNTIME_FILES = ["ledger_transactions.csv", "ledger_bank_lines.csv", "ledger_hours.csv"]
 
-# The baseline plan: one CSV file per sheet (SYSTEM_DESIGN section 3.1)
+# The baseline plan: one CSV file per sheet (SYSTEM_DESIGN, Folder layout)
 PLAN_FILES = ["plan_products.csv", "plan_channels.csv", "plan_assumptions.csv",
               "plan_change_log.csv"]
 

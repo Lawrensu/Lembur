@@ -1,4 +1,4 @@
-"""The tool layer: docs/SYSTEM_DESIGN.md sections 6.3 and 6.4.
+"""The tool layer: docs/SYSTEM_DESIGN.md, Runtime and How an agent acts.
 
 run_tool is the only way an agent acts. It runs one tool for one agent, checks
 that the agent is allowed to use it, keeps every path inside the student's

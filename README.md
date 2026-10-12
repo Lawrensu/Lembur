@@ -4,12 +4,19 @@
 
 A back office team in a student's chat app. She sends one message and her receipts before bed. In the morning she gets a payslip that shows what she really earned per hour of her time, and drafts of the changes that would earn her more.
 
-Hackerdorm × BuilderX, Track 2 (Agentic Solutions).
+* **First runner up**: Hackerdorm × BuilderX, Track 2 (Agentic Solutions).
+![First Runner Up Picture](docs/Pics/first-runner-up.jpeg)
 
 * **Presentation slides**: https://canva.link/7ffbzcafv99mk0j
 * **Team**: Lawrence Lian Anak Matius Ding, Sharon Lee Jia Yi, Damian Choy Wei-Quan
 
 ---
+
+## Docs
+
+* **[Getting started](docs/GETTING_STARTED.md)**: set up, test, run the bot and replay the demo week.
+* **[System design](docs/SYSTEM_DESIGN.md)**: the problem, the stack, the layers, the flow, the key decisions and the exact rules.
+* **[Evidence of the build](submission/evidence/README.md)**: how WorkBuddy was used.
 
 ## How it works
 
@@ -35,88 +42,64 @@ Hackerdorm × BuilderX, Track 2 (Agentic Solutions).
 
 ## How it is built
 
-* **Three layers**: a chat bot, a runner and deterministic tools (design section 1).
-* **Agents act through tools**: each of the four agents works in a short loop. It asks for a tool, the runner runs it, and the agent reads the result and decides the next step (design section 6.4).
-* **Two model roles**: one model reasons and one reads images. Both come from the model gateway the organisers provided (design section 6.3).
-* **Standard library only**: Python 3.13 with no third party package and no agent framework.
-* **WorkBuddy is our build platform**: the code, the dataset and the story were built with it. It is not part of the running product (PLAN section 11).
+* **Three layers**: a Telegram bot, a runner and deterministic tools.
+* **Agents act through tools**: each of the four agents works in a short loop. It asks for a tool, the runner runs it, and the agent reads the result and decides the next step.
+* **Two model roles**: one model reasons and one reads images. Both come from the model gateway the organisers provided.
+* **Standard library only**: Python with no third party package and no agent framework.
+* **WorkBuddy is our build platform**: it is not part of the running product.
+* **Proved against an answer key**: the demo week replayed through the real models matches the expected ledger and figures with no difference.
 
-## Where things stand
+## Quick start
 
-* **Built and tested**: the deterministic tools, the tool layer, the model module, the runner, the four agent prompts, the Telegram bot, the payslip command and template, the demo dataset, the answer key and the comparator.
-* **Proved with the real models**: the reading model reads a receipt image, one night runs as agents, and the whole demo week replayed through the runner matches the answer key with no difference (PLAN section 12, proofs 1, 2 and 4).
-* **Not run yet**: the full round trip through the chat with the real runner (PLAN section 12, proof 3).
-* **Run a night yourself**: copy `.env.example` to `.env`, fill it in, then start the bot with `python -B -m app.bot` from the repository root.
+```bash
+git clone https://github.com/Lawrensu/Lembur.git
+```
 
-## Read in this order
+```bash
+cd Lembur
+```
 
-1. **`docs/PLAN.md`**: product, scope, validation, proofs, roles and schedule.
-2. **`docs/SYSTEM_DESIGN.md`**: data, tools, agents, workflows and outputs.
+* **Run the tests**: no key and no network needed.
 
-* **Both files are the source of truth**: every tool, prompt and template traces back to them.
-* **Not in either file**: ask Law, do not assume.
+```bash
+python -B -m unittest discover -s tools/tests -p "test_*.py"
+```
+
+* **Run the bot**: copy `.env.example` to `.env`, fill it in, then start it.
+
+```bash
+python -B -m app.bot
+```
+
+* **Everything else**: [Getting started](docs/GETTING_STARTED.md).
 
 ## Repository layout
 
 ```
-docs/PLAN.md            master plan
-docs/SYSTEM_DESIGN.md   system design
-tools/                  deterministic tools and their tests (design section 4)
-app/                    model module, tool layer, runner and bot (design section 6.3)
-prompts/                one instruction file per agent (design section 6.4)
-workspace/              one student's files, used by the tests and the demo replay (design section 3.1)
-data/demo/              demo inputs: plan files, inbox files, nightly messages (Role B)
-data/answer_key/        answer key and expected ledger (Role B)
-data/test_harness/      compares a finished run with the answer key, and resets the workspace (Role B)
-submission/             payslip template, deck, video script, question and answer sheet, evidence of the build
+app/            Telegram bot, runner, tool layer, model module and their tests
+prompts/        one instruction file per agent
+tools/          deterministic tools and their tests
+workspace/      one student's files, used by the tests and the demo replay
+data/demo/      demo inputs: plan files, inbox files, nightly messages
+data/answer_key/    expected ledger and expected figures
+data/test_harness/  replay, comparator, reset and mutation test
+submission/     payslip template, story notes, evidence of the build
+docs/           getting started and system design
 ```
-
-* **`workspace/`**: starts empty. A run fills it with the ledger, payslips, boardroom files and drafts.
-* **Plan files, CSV**: `workspace/plan/plan_products.csv`, `workspace/plan/plan_channels.csv`, `workspace/plan/plan_assumptions.csv`, `workspace/plan/plan_change_log.csv`.
-* **Ledger files, CSV**: `workspace/ledger_transactions.csv`, `workspace/ledger_bank_lines.csv`, `workspace/ledger_hours.csv`.
-* **Demo and answer key**: the same plan file names live in `data/demo/` and the same ledger file names in `data/answer_key/`. These CSV files are the source of truth for the demo data.
-* **Check the tools**: `python -B -m unittest discover -s tools/tests -p "test_*.py"` from the repository root. It needs no installed package.
-* **Check a run**: `python -B data/test_harness/compare_outputs.py` compares `workspace/` with the answer key (PLAN section 10).
 
 ## Team
 
-* Lawrence Lian Anak Matius Ding
-* Sharon Lee Jia Yi
-* Damian Choy Wei-Quan
-
-## Roles
-
-* **A. Builder (Law)**: integration and the final say on the build.
-* **B. Data and business (Sharon)**: the demo dataset, the answer key, the comparator, checking every run against the key.
-* **C. Design and story (Damian)**: agent identities, the payslip template, the wording of the bot's replies, the deck, the video.
-* **The remaining build is three packages** (PLAN section 13)
-  1. **Backend**, Sharon, first: `app/tools.py` and `app/model.py`.
-  2. **Agent orchestration**, Law: `app/runner.py` and `prompts/`.
-  3. **Telegram connection**, Damian: `app/bot.py`.
-* **Order of work and checkpoints**: PLAN sections 13 and 14.
-
-## Branches
-
-* **`main`**: production. Only receives merges from `dev`.
-* **`dev`**: integration. Everyone's work merges here first, and it must run end to end before it goes to `main`.
-* **`dev-law`, `dev-sharon`, `dev-damian`**: personal working branches. Pull from `dev` often and open a pull request back into `dev`.
-
-Getting started:
-
-```
-git clone https://github.com/Lawrensu/Lembur.git
-cd Lembur
-git checkout dev-<your name>
-```
+* **Lawrence Lian Anak Matius Ding (Law)**: builder. Integration, the runner, the model module and the agent prompts.
+* **Sharon Lee Jia Yi**: data and business. The demo dataset, the answer key, the comparator and the tool layer.
+* **Damian Choy Wei-Quan**: design and story. The Telegram bot, the agent identities, the payslip template, the deck and the video.
 
 ## Repo rules
 
 * **Demo data only**: no real receipts, bank statements or personal details go in this repository.
 * **No secrets**: the model key and the bot token live in a `.env` file that git ignores. They never appear in a file, a prompt, a log or a commit.
-* **Small commits, frequent pulls**: pull `dev` into your branch before opening a pull request, so conflicts surface early.
 * **Pull requests go into `dev`**: never into `main`. `main` only receives `dev` after an end to end run.
 * **Authors**: the three team members are the only contributors named in commits, files and pull requests. No attribution lines.
-* **WorkBuddy is named truthfully**: it is the platform we build with. The docs, slides and video say what it really did, and nothing more.
+* **WorkBuddy is named truthfully**: it is the platform we built with. The docs, slides and video say what it really did, and nothing more.
 * **Docs style**: point form, no tables, no dashes in prose.
 * **No installs without asking**: a new package or tool needs Law's approval first.
-* **Keep it simple**: add no feature, file or field that is not written in the docs. Ask first.
+* **Design first**: a change to behaviour or data is written in the system design, then in the code.

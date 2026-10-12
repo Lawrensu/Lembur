@@ -1,4 +1,4 @@
-"""Reconciliation tool: docs/SYSTEM_DESIGN.md section 4.1."""
+"""Reconciliation tool: docs/SYSTEM_DESIGN.md, Reconciliation."""
 
 from __future__ import annotations
 

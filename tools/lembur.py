@@ -1,4 +1,4 @@
-"""Command entry point for docs/SYSTEM_DESIGN.md sections 4 and 7."""
+"""Command entry point for docs/SYSTEM_DESIGN.md, Deterministic Tools and Outputs."""
 
 from __future__ import annotations
 

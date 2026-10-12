@@ -1,4 +1,4 @@
-"""Numbers tool: docs/SYSTEM_DESIGN.md section 4.3.
+"""Numbers tool: docs/SYSTEM_DESIGN.md, Numbers.
 
 Money is in whole sen and time in whole minutes. Display strings are added
 beside each figure so agents copy them and never calculate.

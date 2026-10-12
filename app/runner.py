@@ -1,4 +1,4 @@
-"""Plan the night and run the four agents (docs/SYSTEM_DESIGN.md sections 6.1, 6.3 and 6.4).
+"""Plan the night and run the four agents (docs/SYSTEM_DESIGN.md, Flow, Runtime and How an agent acts).
 
 run_night(workspace, date, message, ask=None) is the only entry point. Each agent
 works in a short loop: it asks for tools as one JSON object, the tool layer runs
@@ -26,7 +26,7 @@ COMMANDS = ("add-transactions", "add-bank-lines", "reconcile", "resolve", "class
             "correct-plan", "hours", "numbers", "numbers-check", "review", "payslip")
 SEND_BACKS = 2
 
-# (number in design section 6.1, name, agent, payslip day only, what it is for)
+# (step number in the system design's Flow, name, agent, payslip day only, what it is for)
 STEPS = (
     (1, "intake", "bookkeeper", False, "save the message, read the documents, record and file them"),
     (2, "reconcile", "bookkeeper", False, "give every row a status against the bank lines"),
@@ -336,6 +336,16 @@ def _missing(workspace, facts, name, agent, ran):
         if left and not ({"add-transactions", "add-bank-lines"} & ran):
             gaps.append("no rows were added for the files in inbox (%s). Read each one with read_document "
                         "and add its rows with the lembur tool" % ", ".join(left))
+        # Every document becomes at least one row, even an unreadable one (system design, Bookkeeper).
+        recorded = {(row.get("source_file") or "").replace("\\", "/").rsplit("/", 1)[-1]
+                    for row in _rows(workspace / "ledger_transactions.csv")}
+        unrecorded = [path.rsplit("/", 1)[-1] for path in facts.get("inbox_files", [])
+                      if not path.lower().endswith(".csv") and path.rsplit("/", 1)[-1] not in recorded]
+        if unrecorded:
+            gaps.append("these documents have no row in the ledger: %s. Read each one with read_document and add "
+                        "its row with add-transactions, in file name order. An unreadable document still gets a row "
+                        "with needs_review. Do not add rows again for documents that already have one"
+                        % ", ".join(unrecorded))
     return "; ".join(gaps)
 
 
@@ -432,7 +442,7 @@ def run_night(workspace, date, message, ask=None):
              "message": message, "inbox_files": inbox}
     steps = [step for step in STEPS if payslip_day or not step[3]]
     issued = any((workspace / "payslips" / (week + suffix)).is_file() for suffix in (".html", ".pdf"))
-    if issued:  # the week's payslip is out: only intake and reconciliation stay open (section 4)
+    if issued:  # the week's payslip is out: only intake and reconciliation stay open (system design, Deterministic Tools)
         steps = [step for step in STEPS if step[1] in ("intake", "reconcile")]
 
     reasons, source = _plan(steps, facts, ask)

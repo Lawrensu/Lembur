@@ -1,6 +1,6 @@
 # WorkBuddy evidence pack
 
-PLAN section 11 asks for this folder. WorkBuddy is the platform we built Lembur with, not part of the running product, so the presentation must show what it really did. Session history is easy to lose, so each person adds their own evidence here as they go.
+This folder is the evidence named in `docs/SYSTEM_DESIGN.md`, How WorkBuddy Was Used. WorkBuddy is the platform we built Lembur with, not part of the running product, so the presentation must show what it really did. Session history is easy to lose, so each person adds their own evidence here as they go.
 
 ## How to add an item
 
@@ -31,10 +31,10 @@ PLAN section 11 asks for this folder. WorkBuddy is the platform we built Lembur 
 
 These are real results, but they are not screenshots. Keep them as they are and do not restate them as session evidence.
 
-* **Proof 3, photo half**: recorded under the proof in `docs/PLAN.md`, section 12. The bot was created, its token was saved locally and checked live against Telegram, and a photo sent from the phone landed in `workspaces/998236319/inbox/` as a valid JPEG, with the four baseline plan files seeded. The payslip half was blocked then because `app/runner.py` did not exist. The runner is now on `dev` and the chat run is still to be recorded.
+* **Proof 3, photo half**: recorded under the proof in `docs/SYSTEM_DESIGN.md`, Proofs. The bot was created, its token was saved locally and checked live against Telegram, and a photo sent from the phone landed in `workspaces/998236319/inbox/` as a valid JPEG, with the four baseline plan files seeded. The payslip half was blocked then because `app/runner.py` did not exist. The runner then landed on `dev` and the full chat round trip ran before submission.
 * **Package 3 tests**: 71 offline tests, 61 passed, 10 skipped for unavailable symlink support, no failures. Run from the repository root with `python -B -m unittest discover -s app/tests -p "test_bot*.py"`.
 * **Payslip template**: `submission/payslip_template.html`, with a sample PDF printed from an installed browser and the look approved on 10 October.
-* **What we already know**, listed under the proofs in `docs/PLAN.md`, section 12: scripts run from a skill, CSV was chosen, the agents' instructions were rehearsed against the answer key, and the payslip command filled the template with no placeholder left.
+* **Known before the redesign**: scripts run from a skill, CSV was chosen, the agents' instructions were rehearsed against the answer key, and the payslip command filled the template with no placeholder left.
 
 ## Why this matters
 

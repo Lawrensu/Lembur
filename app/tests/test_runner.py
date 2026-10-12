@@ -1,6 +1,6 @@
 """Tests for app/runner.py with a scripted model: no key and no network.
 
-They follow docs/SYSTEM_DESIGN.md sections 6.1, 6.3 and 6.4.
+They follow docs/SYSTEM_DESIGN.md, Flow, Runtime and How an agent acts.
 """
 
 import json

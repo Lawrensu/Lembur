@@ -1,4 +1,4 @@
-"""Sheets, columns and fixed value lists from docs/SYSTEM_DESIGN.md section 3."""
+"""Sheets, columns and fixed value lists from docs/SYSTEM_DESIGN.md, Data Model."""
 
 PLAN_SHEETS = {
     "products": [

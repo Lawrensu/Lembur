@@ -1,4 +1,4 @@
-"""Dates, weeks, money and rounding from docs/SYSTEM_DESIGN.md section 2."""
+"""Dates, weeks, money and rounding from docs/SYSTEM_DESIGN.md, Conventions."""
 
 from __future__ import annotations
 

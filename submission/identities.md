@@ -21,7 +21,7 @@
 
 ## Source references
 
-* Agent responsibilities, objectives and boundaries: `docs/SYSTEM_DESIGN.md`, section 5.
-* Where these identities are used: each agent's prompt in `prompts/` holds its identity, rules and steps (`docs/SYSTEM_DESIGN.md`, section 6.4). The prompts are built (`docs/PLAN.md`, section 13).
-* Human-language design principle: `docs/PLAN.md`, section 2.
-* Agent-style decision: `docs/PLAN.md`, section 18, supplemented by the confirmed professional-colleague style and role-title names.
+* Agent responsibilities, objectives and boundaries: `docs/SYSTEM_DESIGN.md`, Agents.
+* Where these identities are used: each agent's prompt in `prompts/` holds its identity, rules and steps (`docs/SYSTEM_DESIGN.md`, How an agent acts). The prompts are built.
+* Human-language design principle: `docs/SYSTEM_DESIGN.md`, Problem.
+* Agent-style decision: `docs/SYSTEM_DESIGN.md`, Key Decisions, supplemented by the confirmed professional-colleague style and role-title names.

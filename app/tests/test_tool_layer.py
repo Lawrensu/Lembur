@@ -1,4 +1,4 @@
-"""The tool layer: docs/SYSTEM_DESIGN.md section 6.4.
+"""The tool layer: docs/SYSTEM_DESIGN.md, How an agent acts.
 
 Runs with no key and no network. The module is loaded from its file path,
 which is also the proof that it loads alone.

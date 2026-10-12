@@ -1,6 +1,6 @@
 """compare_outputs.py -- Compare a real Night Shift workspace against the golden answer key.
 
-Pass condition (PLAN section 10): the run's outputs match the answer key
+Pass condition (system design, Validation): the run's outputs match the answer key
 exactly -- statuses, minutes, and money to the sen.  A mismatch is a bug
 to fix, not something to explain away.
 
@@ -17,12 +17,12 @@ Usage:
     python compare_outputs.py --workspace path/to/workspace
     python compare_outputs.py --workspace workspace --answer-key-dir data/answer_key
 
-Files are CSV, one per sheet, named <book>_<sheet>.csv (SYSTEM_DESIGN section 3.1):
+Files are CSV, one per sheet, named <book>_<sheet>.csv (SYSTEM_DESIGN, Folder layout):
     workspace/ledger_*.csv, workspace/plan/plan_*.csv, data/answer_key/ledger_*.csv
 
 Not compared, because an agent writes them in its own words: the notes and
 description columns of transactions. Hours lines are matched by date, activity,
-product and assumption reference, never by entry_id (PLAN section 10).
+product and assumption reference, never by entry_id (system design, Validation).
 
 Outputs:
     Console           -- human-readable PASS/FAIL summary
@@ -51,7 +51,7 @@ DEFAULT_WORKSPACE = ROOT / "workspace"
 DEFAULT_ANSWER_KEY = ROOT / "data" / "answer_key"
 
 # ---------------------------------------------------------------------------
-# Column definitions (must match SYSTEM_DESIGN section 3.3)
+# Column definitions (must match SYSTEM_DESIGN, Ledger files)
 # ---------------------------------------------------------------------------
 
 TX_COLS = (
@@ -330,8 +330,8 @@ def _fmt_value(v):
 def recalculate(ledger, plan):
     """Recalculate all derived figures from the workspace ledger + plan.
 
-    Implements the same rules as SYSTEM_DESIGN section 4.3 (numbers tool)
-    and reads hours from the ledger's hours sheet (section 4.2 output).
+    Implements the same rules as SYSTEM_DESIGN, Numbers (numbers tool)
+    and reads hours from the ledger's hours sheet (the output of Hours).
     """
     txns = ledger["transactions"] or []
     hours = ledger["hours"] or []

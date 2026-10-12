@@ -1,4 +1,4 @@
-"""Tests written from docs/SYSTEM_DESIGN.md sections 2 to 4, not from the code.
+"""Tests written from docs/SYSTEM_DESIGN.md, Conventions, Data Model and Deterministic Tools, not from the code.
 
 Every expected value here was worked out by hand from the design. Known limits
 recorded in the design are not asserted here.
@@ -86,7 +86,7 @@ def statuses(rows):
 
 
 class ConventionTests(unittest.TestCase):
-    """Design section 2."""
+    """System design, Conventions."""
 
     def test_halves_round_away_from_zero(self):
         self.assertEqual(c.round_half_away(D("304.5")), 305)
@@ -116,7 +116,7 @@ class ConventionTests(unittest.TestCase):
 
 
 class ValueInForceTests(unittest.TestCase):
-    """Design section 3.2."""
+    """System design, Plan files."""
 
     def test_two_corrections(self):
         log = [{"changed_at": "2026-10-07", "field": MINUTES_REF, "old_value": "20",
@@ -146,7 +146,7 @@ class ValueInForceTests(unittest.TestCase):
 
 
 class ReconciliationTests(unittest.TestCase):
-    """Design section 4.1, steps 1 to 7."""
+    """System design, Reconciliation, steps 1 to 7."""
 
     def test_cash_is_declared_and_never_a_duplicate(self):
         rows = [txn(1, payment_method="cash"), txn(2, payment_method="cash")]
@@ -242,7 +242,7 @@ class ReconciliationTests(unittest.TestCase):
 
 
 class HoursTests(unittest.TestCase):
-    """Design section 4.2."""
+    """System design, Hours."""
 
     EVENT = {"date": "2026-10-10", "start": "16:00", "end": "21:00"}
 
@@ -314,7 +314,7 @@ class HoursTests(unittest.TestCase):
 
 
 class NumbersTests(unittest.TestCase):
-    """Design section 4.3."""
+    """System design, Numbers."""
 
     def week(self):
         rows = [
